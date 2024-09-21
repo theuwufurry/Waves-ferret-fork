@@ -83,7 +83,7 @@ class ProfilesModule(
                 setBytes(1, uuid.toBytes())
             }
             if (rs.next()) {
-                val player = AquaticPlayer(uuid, rs.getString("username"))
+                val player = AquaticPlayer(rs.getInt("id"), uuid, rs.getString("username"))
                 cache[uuid] = player
                 if (player.username != username) {
                     player.username = username
@@ -91,10 +91,19 @@ class ProfilesModule(
                 }
                 future.complete(player)
             } else {
-                val player = AquaticPlayer(uuid, username)
-                player.updated = true
-                cache[uuid] = player
-                future.complete(player)
+                driver.preparedStatement("INSERT INTO aquaticprofiles (uuid, username) VALUES (?, ?)") {
+                    setBytes(1, uuid.toBytes())
+                    setString(2, username)
+                    executeUpdate()
+                    val keys = generatedKeys
+                    keys.next()
+                    val id = keys.getInt(1)
+
+                    val player = AquaticPlayer(id, uuid, username)
+                    player.updated = true
+                    cache[uuid] = player
+                    future.complete(player)
+                }
             }
         }
         return future
@@ -110,7 +119,7 @@ class ProfilesModule(
                 setBytes(1, uuid.toBytes())
             }
             if (rs.next()) {
-                val player = AquaticPlayer(uuid, rs.getString("username"))
+                val player = AquaticPlayer(rs.getInt("id"),uuid, rs.getString("username"))
                 cache[uuid] = player
                 future.complete(Optional.of(player))
             } else {
