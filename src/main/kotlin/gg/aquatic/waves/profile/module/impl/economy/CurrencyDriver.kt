@@ -2,10 +2,10 @@ package gg.aquatic.waves.profile.module.impl.economy
 
 import gg.aquatic.aquaticseries.lib.data.DataDriver
 import gg.aquatic.aquaticseries.lib.economy.VirtualCurrency
-import gg.aquatic.aquaticseries.lib.util.toBytes
 import gg.aquatic.aquaticseries.lib.util.toUUID
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -15,29 +15,29 @@ class CurrencyDriver(
 
     val driver: DataDriver = (Waves.INSTANCE.modules[WaveModules.PROFILES] as ProfilesModule).driver
 
-    fun get(uuid: UUID): CompletableFuture<EconomyEntry> {
+    fun get(aquaticPlayer: AquaticPlayer): CompletableFuture<EconomyEntry> {
         val future = CompletableFuture<EconomyEntry>()
         CompletableFuture.runAsync {
-            val rs = driver.executeQuery("SELECT * FROM aquaticcurrency WHERE uuid = ?") {
-                setBytes(1, uuid.toBytes())
+            val rs = driver.executeQuery("SELECT * FROM aquaticcurrency WHERE id = ?") {
+                setInt(1, aquaticPlayer.index)
             }
 
-            val economyPlayer = EconomyEntry(uuid)
+            val entry = EconomyEntry(aquaticPlayer.uuid)
             while(rs.next()) {
                 val currencyId = rs.getString("currency_id")
                 val balance = rs.getDouble("balance")
-                economyPlayer.balance[currencyId] = balance
+                entry.balance[currencyId] = balance
             }
-            future.complete(economyPlayer)
+            future.complete(entry)
         }
         return future
     }
 
-    fun get(uuid: UUID, currency: VirtualCurrency): CompletableFuture<Double> {
+    fun get(index: Int, currency: VirtualCurrency): CompletableFuture<Double> {
         val future = CompletableFuture<Double>()
         CompletableFuture.runAsync {
-            val rs = driver.executeQuery("SELECT balance FROM aquaticcurrency WHERE uuid = ? AND currency_id = ?") {
-                setBytes(1, uuid.toBytes())
+            val rs = driver.executeQuery("SELECT balance FROM aquaticcurrency WHERE id = ? AND currency_id = ?") {
+                setInt(1, index)
                 setString(2, currency.id)
             }
             if (rs.next()) {
@@ -87,22 +87,13 @@ class CurrencyDriver(
         return future
     }
 
-    fun set(uuid: UUID, currency: VirtualCurrency, amount: Double): CompletableFuture<Void> {
-        return CompletableFuture.runAsync {
-            driver.execute("replace into aquaticcurrency values (?, ?, ?)") {
-                setBytes(1, uuid.toBytes())
-                setString(2, currency.id)
-                setDouble(3, amount)
-            }
-        }
-    }
-
-    fun set(vararg economyPlayers: EconomyEntry): CompletableFuture<Void> {
+    fun set(vararg aquaticPlayers: AquaticPlayer): CompletableFuture<Void> {
         return CompletableFuture.runAsync {
             driver.executeBatch("replace into aquaticcurrency values (?, ?, ?)") {
-                for (economyPlayer in economyPlayers) {
-                    for ((id, balance) in economyPlayer.balance) {
-                        setBytes(1, economyPlayer.uuid.toBytes())
+                for (player in aquaticPlayers) {
+                    val entry = player.entries["aquaticeconomy"] as? EconomyEntry ?: continue
+                    for ((id, balance) in entry.balance) {
+                        setInt(1, player.index)
                         setString(2, id)
                         setDouble(3, balance)
                         addBatch()
@@ -117,10 +108,10 @@ class CurrencyDriver(
             driver.execute("" +
                     "CREATE TABLE " +
                     "aquaticcurrency (" +
-                    "uuid BINARY(16) NOT NULL," +
+                    "id INTEGER NOT NULL," +
                     "currency_id NVARCHAR(64) NOT NULL," +
                     "balance DECIMAL NOT NULL," +
-                    "PRIMARY KEY (uuid, currency_id)" +
+                    "PRIMARY KEY (id, currency_id)" +
                     ")"
             ) {
             }

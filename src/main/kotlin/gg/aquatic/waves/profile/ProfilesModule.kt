@@ -51,19 +51,18 @@ class ProfilesModule(
         }
     }
 
-    fun save(player: AquaticPlayer): CompletableFuture<Void> {
+    fun save(vararg players: AquaticPlayer): CompletableFuture<Void> {
         return CompletableFuture.runAsync {
             driver.useConnection {
-                try {
-                    autoCommit = false
-                    for (value in player.entries.values) {
-                        value.save(this)
+                for (player in players) {
+                    try {
+                        for (value in player.entries.values) {
+                            value.save(this)
+                        }
+                    } catch (ex: Exception) {
+                        rollback()
+                        ex.printStackTrace()
                     }
-                    commit()
-                    autoCommit = true
-                } catch (ex: Exception) {
-                    rollback()
-                    ex.printStackTrace()
                 }
             }
         }
@@ -84,10 +83,14 @@ class ProfilesModule(
             }
             if (rs.next()) {
                 val player = AquaticPlayer(rs.getInt("id"), uuid, rs.getString("username"))
-                cache[uuid] = player
                 if (player.username != username) {
                     player.username = username
                     player.updated = true
+                }
+
+                for (value in modules.values) {
+                    val entry = value.loadEntry(player).join()
+                    player.entries[value.id] = entry
                 }
                 future.complete(player)
             } else {
@@ -101,7 +104,6 @@ class ProfilesModule(
 
                     val player = AquaticPlayer(id, uuid, username)
                     player.updated = true
-                    cache[uuid] = player
                     future.complete(player)
                 }
             }
@@ -119,7 +121,7 @@ class ProfilesModule(
                 setBytes(1, uuid.toBytes())
             }
             if (rs.next()) {
-                val player = AquaticPlayer(rs.getInt("id"),uuid, rs.getString("username"))
+                val player = AquaticPlayer(rs.getInt("id"), uuid, rs.getString("username"))
                 cache[uuid] = player
                 future.complete(Optional.of(player))
             } else {

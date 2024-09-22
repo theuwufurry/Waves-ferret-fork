@@ -1,9 +1,9 @@
 package gg.aquatic.waves.profile.module.impl.economy
 
+import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.module.ProfileModule
 import gg.aquatic.waves.profile.module.ProfileModuleEntry
 import java.sql.Connection
-import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class EconomyProfileModule(
@@ -14,8 +14,8 @@ class EconomyProfileModule(
         this.initialize()
     }
 
-    override fun loadEntry(uuid: UUID): CompletableFuture<out ProfileModuleEntry> {
-        return currencyDriver.get(uuid)
+    override fun loadEntry(aquaticPlayer: AquaticPlayer): CompletableFuture<out ProfileModuleEntry> {
+        return currencyDriver.get(aquaticPlayer)
     }
 
     override fun initialize(connection: Connection) {
