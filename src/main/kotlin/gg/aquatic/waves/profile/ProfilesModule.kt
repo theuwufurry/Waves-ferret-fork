@@ -1,11 +1,14 @@
 package gg.aquatic.waves.profile
 
 import gg.aquatic.aquaticseries.lib.data.DataDriver
+import gg.aquatic.aquaticseries.lib.util.event
 import gg.aquatic.aquaticseries.lib.util.toBytes
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.module.ProfileModule
+import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerJoinEvent
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -21,7 +24,7 @@ class ProfilesModule(
                 "" +
                         "CREATE TABLE IF NOT EXISTS" +
                         "aquaticprofiles (" +
-                        "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT" +
+                        "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                         "uuid BLOB(16) NOT NULL," +
                         "username NVARCHAR(64) NOT NULL" +
                         ")"
@@ -34,7 +37,11 @@ class ProfilesModule(
     val modules = HashMap<String, ProfileModule>()
 
     override fun initialize(waves: Waves) {
-
+        event<PlayerJoinEvent>(ignoredCancelled = true) {
+            getOrCreate(it.player).thenAccept { player ->
+                cache[player.uuid] = player
+            }
+        }
     }
 
     override fun disable(waves: Waves) {
@@ -68,8 +75,8 @@ class ProfilesModule(
         }
     }
 
-    fun getOrCreate(player: AquaticPlayer): CompletableFuture<AquaticPlayer> {
-        return getOrCreate(player.uuid, player.username)
+    fun getOrCreate(player: Player): CompletableFuture<AquaticPlayer> {
+        return getOrCreate(player.uniqueId, player.name)
     }
 
     fun getOrCreate(uuid: UUID, username: String): CompletableFuture<AquaticPlayer> {

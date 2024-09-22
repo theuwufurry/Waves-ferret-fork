@@ -1,13 +1,10 @@
 package gg.aquatic.waves.profile.module.impl.economy
 
 import gg.aquatic.aquaticseries.lib.data.DataDriver
-import gg.aquatic.aquaticseries.lib.economy.VirtualCurrency
-import gg.aquatic.aquaticseries.lib.util.toUUID
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
-import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class CurrencyDriver(
@@ -22,17 +19,18 @@ class CurrencyDriver(
                 setInt(1, aquaticPlayer.index)
             }
 
-            val entry = EconomyEntry(aquaticPlayer.uuid)
+            val entry = EconomyEntry(aquaticPlayer)
             while(rs.next()) {
                 val currencyId = rs.getString("currency_id")
                 val balance = rs.getDouble("balance")
-                entry.balance[currencyId] = balance
+                entry.balance[currencyId] = balance to balance
             }
             future.complete(entry)
         }
         return future
     }
 
+    /*
     fun get(index: Int, currency: VirtualCurrency): CompletableFuture<Double> {
         val future = CompletableFuture<Double>()
         CompletableFuture.runAsync {
@@ -86,7 +84,9 @@ class CurrencyDriver(
         }
         return future
     }
+     */
 
+    /*
     fun set(vararg aquaticPlayers: AquaticPlayer): CompletableFuture<Void> {
         return CompletableFuture.runAsync {
             driver.executeBatch("replace into aquaticcurrency values (?, ?, ?)") {
@@ -102,6 +102,7 @@ class CurrencyDriver(
             }
         }
     }
+     */
 
     fun initialize(): CompletableFuture<Void> {
         return CompletableFuture.runAsync {
