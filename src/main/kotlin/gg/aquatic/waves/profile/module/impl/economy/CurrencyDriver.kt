@@ -104,18 +104,21 @@ class CurrencyDriver(
     }
      */
 
+    /*
     fun initialize(): CompletableFuture<Void> {
         return CompletableFuture.runAsync {
             driver.execute("" +
                     "CREATE TABLE " +
                     "aquaticcurrency (" +
                     "id INTEGER NOT NULL," +
-                    "currency_id NVARCHAR(64) NOT NULL," +
+                    "currency_id INT NOT NULL," +
                     "balance DECIMAL NOT NULL," +
-                    "PRIMARY KEY (id, currency_id)" +
+                    "PRIMARY KEY (id, currency_id)," +
+                    "FOREIGN KEY (id) REFERENCES aquaticprofiles(id)" +
                     ")"
             ) {
             }
         }
     }
+     */
 }

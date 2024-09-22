@@ -11,7 +11,7 @@ class EconomyProfileModule(
     override val id: String = "aquaticeconomy"
 
     val currencyDriver = CurrencyDriver().apply {
-        this.initialize()
+        //initialize(this)
     }
 
     override fun loadEntry(aquaticPlayer: AquaticPlayer): CompletableFuture<out ProfileModuleEntry> {
@@ -20,15 +20,25 @@ class EconomyProfileModule(
 
     override fun initialize(connection: Connection) {
         connection.prepareStatement("CREATE TABLE IF NOT EXISTS " +
-                "aquaticcurrency (" +
+                "aquaticcurrency_type (" +
                 "id INTEGER NOT NULL," +
-                "currency_id NVARCHAR(64) NOT NULL," +
-                "balance DECIMAL NOT NULL," +
-                "PRIMARY KEY (id, currency_id)," +
-                "FOREIGN KEY (id) REFERENCES aquaticprofiles(id)" +
+                "currency_id NVARCHAR(64) NOT NULL"+
                 ")"
         ).use { preparedStatement ->
             preparedStatement.execute()
         }
+        connection.prepareStatement("CREATE TABLE IF NOT EXISTS " +
+                "aquaticcurrency (" +
+                "id INTEGER NOT NULL," +
+                "currency_id INTEGER NOT NULL," +
+                "balance DECIMAL NOT NULL," +
+                "PRIMARY KEY (id, currency_id)," +
+                "FOREIGN KEY (id) REFERENCES aquaticprofiles(id)," +
+                "FOREIGN KEY (currency_id) REFERENCES aquaticcurrency_type(id)" +
+                ")"
+        ).use { preparedStatement ->
+            preparedStatement.execute()
+        }
+
     }
 }
