@@ -1,6 +1,8 @@
 plugins {
     kotlin("jvm") version "2.0.20"
+    `maven-publish`
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("co.uzzu.dotenv.gradle") version "2.0.0"
 }
 
 group = "gg.aquatic.waves"
@@ -54,5 +56,34 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     archiveClassifier.set("plugin")
     dependencies {
         include(dependency("gg.aquatic.aquaticseries:aquaticlib-17"))
+    }
+}
+
+
+val maven_username = if (env.isPresent("MAVEN_USERNAME")) env.fetch("MAVEN_USERNAME") else ""
+val maven_password = if (env.isPresent("MAVEN_PASSWORD")) env.fetch("MAVEN_PASSWORD") else ""
+
+publishing {
+    repositories {
+        maven {
+            name = "aquaticRepository"
+            url = uri("https://repo.nekroplex.com/releases")
+
+            credentials {
+                username = maven_username
+                password = maven_password
+            }
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+    }
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "gg.aquatic.waves"
+            artifactId = "Waves"
+            version = "${project.version}"
+            from(components["java"])
+        }
     }
 }
