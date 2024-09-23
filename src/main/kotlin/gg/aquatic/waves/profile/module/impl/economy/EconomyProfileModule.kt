@@ -71,3 +71,7 @@ object EconomyProfileModule: ProfileModule {
 
     }
 }
+
+fun AquaticPlayer.aquaticEconomy(): EconomyEntry {
+    return this.entries.getOrPut("aquaticeconomy") { EconomyEntry(this) } as EconomyEntry
+}

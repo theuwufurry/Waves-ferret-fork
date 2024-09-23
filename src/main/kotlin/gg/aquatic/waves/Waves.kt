@@ -18,8 +18,8 @@ class Waves: JavaPlugin() {
         lateinit var INSTANCE: Waves
             private set
 
-        fun getModule(type: WaveModules): WaveModule {
-            return INSTANCE.modules[type]!!
+        fun getModule(type: WaveModules): WaveModule? {
+            return INSTANCE.modules[type]
         }
     }
 

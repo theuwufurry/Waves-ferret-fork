@@ -6,27 +6,26 @@ import org.bukkit.entity.Player
 class RegisteredCurrency(
     val currency: CustomCurrency,
     val index: Int
-): Currency {
-    override val id: String
-        get() = TODO("Not yet implemented")
+) : Currency {
+    override val id: String = currency.id
 
     override fun getBalance(player: Player): Double {
-        TODO("Not yet implemented")
+        return currency.getBalance(player, this)
     }
 
     override fun give(player: Player, amount: Double) {
-        TODO("Not yet implemented")
+        currency.give(player, amount, this)
     }
 
     override fun has(player: Player, amount: Double): Boolean {
-        TODO("Not yet implemented")
+        return currency.has(player, amount, this)
     }
 
     override fun set(player: Player, amount: Double) {
-        TODO("Not yet implemented")
+        currency.set(player, amount, this)
     }
 
     override fun take(player: Player, amount: Double) {
-        TODO("Not yet implemented")
+        currency.take(player, amount, this)
     }
 }

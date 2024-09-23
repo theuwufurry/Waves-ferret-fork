@@ -1,5 +1,7 @@
 package gg.aquatic.waves.profile
 
+import gg.aquatic.waves.Waves
+import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.module.ProfileModuleEntry
 import org.bukkit.entity.Player
 import java.util.UUID
@@ -16,5 +18,6 @@ class AquaticPlayer(
 }
 
 fun Player.toAquaticPlayer(): AquaticPlayer? {
-    val profilesModule =
+    val profilesModule = Waves.getModule(WaveModules.PROFILES) as? ProfilesModule ?: return null
+    return profilesModule.cache[uniqueId]
 }
