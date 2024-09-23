@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-    implementation("gg.aquatic.aquaticseries:aquaticlib-17:1.0.6:all") {
+    implementation("gg.aquatic.aquaticseries:aquaticlib-17:1.0.10:all") {
         exclude("org.jetbrains.kotlin", "kotlin-stdlib")
         exclude("gg.aquatic.aquaticseries", "aquaticlib")
         exclude("gg.aquatic.aquaticseries.core", "core")
