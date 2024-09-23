@@ -1,11 +1,15 @@
 package gg.aquatic.waves.profile
 
 import gg.aquatic.aquaticseries.lib.data.DataDriver
+import gg.aquatic.aquaticseries.lib.util.call
 import gg.aquatic.aquaticseries.lib.util.event
+import gg.aquatic.aquaticseries.lib.util.runSync
 import gg.aquatic.aquaticseries.lib.util.toBytes
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.profile.event.ProfileLoadEvent
+import gg.aquatic.waves.profile.event.ProfileUnloadEvent
 import gg.aquatic.waves.profile.module.ProfileModule
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
@@ -13,6 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 
 class ProfilesModule(
     val driver: DataDriver
@@ -36,7 +41,7 @@ class ProfilesModule(
         }
     }
 
-    val cache = HashMap<UUID, AquaticPlayer>()
+    val cache = ConcurrentHashMap<UUID, AquaticPlayer>()
     val playersSaving = HashSet<UUID>()
     val playersLoading = HashSet<UUID>()
     val modules = HashMap<String, ProfileModule>()
@@ -48,6 +53,9 @@ class ProfilesModule(
             }
             playersLoading += it.player.uniqueId
             getOrCreate(it.player).thenAccept { player ->
+                runSync {
+                    ProfileLoadEvent(player).call()
+                }
                 cache[player.uuid] = player
                 playersLoading -= it.player.uniqueId
             }
@@ -55,6 +63,7 @@ class ProfilesModule(
         event<PlayerQuitEvent>(ignoredCancelled = true) {
             val aPlayer = cache[it.player.uniqueId] ?: return@event
             playersSaving += it.player.uniqueId
+            ProfileUnloadEvent(aPlayer).call()
             save(aPlayer).thenRun {
                 playersSaving -= it.player.uniqueId
             }
