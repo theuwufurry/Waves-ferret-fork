@@ -3,6 +3,6 @@ databases:
     type: SQLite
     ip: ""
     port: ""
-    database: ""
+    database: "database"
     username: ""
     password: ""
