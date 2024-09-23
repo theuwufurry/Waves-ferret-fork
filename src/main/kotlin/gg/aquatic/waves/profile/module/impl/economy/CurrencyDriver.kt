@@ -5,6 +5,7 @@ import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
+import gg.aquatic.waves.registry.WavesRegistry
 import java.util.concurrent.CompletableFuture
 
 class CurrencyDriver(
@@ -21,9 +22,11 @@ class CurrencyDriver(
 
             val entry = EconomyEntry(aquaticPlayer)
             while(rs.next()) {
-                val currencyId = rs.getString("currency_id")
+                val currencyId = rs.getInt("currency_id")
                 val balance = rs.getDouble("balance")
-                entry.balance[currencyId] = balance to balance
+
+                val currency = WavesRegistry.INDEX_TO_CURRENCY[currencyId] ?: continue
+                entry.balance[currency] = balance to balance
             }
             future.complete(entry)
         }
