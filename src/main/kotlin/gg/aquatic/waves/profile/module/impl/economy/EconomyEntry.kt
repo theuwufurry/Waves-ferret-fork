@@ -13,23 +13,6 @@ class EconomyEntry(
     val balance = HashMap<RegisteredCurrency, Pair<Double,Double>>()
 
     override fun save(connection: Connection) {
-
-        val newValues = balance.mapValues { (currency, pair) ->
-            (pair.first to pair.first)
-        }
-        connection.prepareStatement("replace into aquaticcurrency values (?, ?, ?)").use { preparedStatement ->
-            for ((currency, pair) in balance) {
-                val (balance, previous) = pair
-                if (balance == previous) {
-                    continue
-                }
-                preparedStatement.setInt(1, aquaticPlayer.index)
-                preparedStatement.setInt(2, currency.index)
-                preparedStatement.setDouble(3, balance)
-                preparedStatement.addBatch()
-            }
-            preparedStatement.executeBatch()
-        }
-        balance += newValues
+        EconomyProfileModule.currencyDriver.save(connection,this)
     }
 }

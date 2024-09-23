@@ -9,6 +9,7 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.module.ProfileModule
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -34,13 +35,28 @@ class ProfilesModule(
     }
 
     val cache = HashMap<UUID, AquaticPlayer>()
+    val playersSaving = HashSet<UUID>()
+    val playersLoading = HashSet<UUID>()
     val modules = HashMap<String, ProfileModule>()
 
     override fun initialize(waves: Waves) {
         event<PlayerJoinEvent>(ignoredCancelled = true) {
+            if (playersLoading.contains(it.player.uniqueId)) {
+                return@event
+            }
+            playersLoading += it.player.uniqueId
             getOrCreate(it.player).thenAccept { player ->
                 cache[player.uuid] = player
+                playersLoading -= it.player.uniqueId
             }
+        }
+        event<PlayerQuitEvent>(ignoredCancelled = true) {
+            val aPlayer = cache[it.player.uniqueId] ?: return@event
+            playersSaving += it.player.uniqueId
+            save(aPlayer).thenRun {
+                playersSaving -= it.player.uniqueId
+            }
+            cache.remove(it.player.uniqueId)
         }
     }
 

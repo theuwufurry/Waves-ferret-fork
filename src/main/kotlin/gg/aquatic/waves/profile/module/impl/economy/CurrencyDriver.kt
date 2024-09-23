@@ -6,6 +6,7 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.registry.WavesRegistry
+import java.sql.Connection
 import java.util.concurrent.CompletableFuture
 
 class CurrencyDriver(
@@ -31,6 +32,27 @@ class CurrencyDriver(
             future.complete(entry)
         }
         return future
+    }
+
+    fun save(connection: Connection, entry: EconomyEntry) {
+
+        val newValues = entry.balance.mapValues { (currency, pair) ->
+            (pair.first to pair.first)
+        }
+        connection.prepareStatement("replace into aquaticcurrency values (?, ?, ?)").use { preparedStatement ->
+            for ((currency, pair) in entry.balance) {
+                val (balance, previous) = pair
+                if (balance == previous) {
+                    continue
+                }
+                preparedStatement.setInt(1, entry.aquaticPlayer.index)
+                preparedStatement.setInt(2, currency.index)
+                preparedStatement.setDouble(3, balance)
+                preparedStatement.addBatch()
+            }
+            preparedStatement.executeBatch()
+        }
+        entry.balance += newValues
     }
 
     /*
