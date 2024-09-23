@@ -1,0 +1,8 @@
+databases:
+  profiles:
+    type: SQLite
+    ip: ""
+    port: ""
+    database: ""
+    username: ""
+    password: ""

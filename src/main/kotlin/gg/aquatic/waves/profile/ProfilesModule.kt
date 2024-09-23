@@ -19,6 +19,8 @@ class ProfilesModule(
 ) : WaveModule {
     override val type: WaveModules = WaveModules.PROFILES
 
+    constructor(): this(Waves.INSTANCE.configValues.profilesDriver)
+
     init {
         CompletableFuture.runAsync {
             driver.execute(
