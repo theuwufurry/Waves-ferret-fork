@@ -6,7 +6,7 @@ class CustomCurrency(
     val id: String
 ) {
     fun getBalance(player: Player): Double {
-        TODO("Not yet implemented")
+
     }
 
     fun give(player: Player, amount: Double) {
