@@ -78,6 +78,13 @@ class ProfilesModule(
         return CompletableFuture.runAsync {
             driver.useConnection {
                 for (player in players) {
+                    if (player.updated) {
+                        prepareStatement("UPDATE aquaticprofiles SET username = ? WHERE id = ?").use { preparedStatement ->
+                            preparedStatement.setString(1, player.username)
+                            preparedStatement.setInt(2, player.index)
+                            preparedStatement.execute()
+                        }
+                    }
                     try {
                         for (value in player.entries.values) {
                             value.save(this)
