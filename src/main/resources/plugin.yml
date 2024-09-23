@@ -1,0 +1,7 @@
+name: Waves
+main: gg.aquatic.waves.Waves
+version: '1.0'
+authors: [ AquaticCreations ]
+api-version: 1.17
+libraries:
+  - "org.jetbrains.kotlin:kotlin-stdlib:2.0.0"
