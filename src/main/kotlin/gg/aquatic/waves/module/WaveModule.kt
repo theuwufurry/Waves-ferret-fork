@@ -10,3 +10,7 @@ interface WaveModule {
     fun disable(waves: Waves)
 
 }
+
+fun WaveModule.initialize() {
+    Waves.INSTANCE.initializeModule(this)
+}

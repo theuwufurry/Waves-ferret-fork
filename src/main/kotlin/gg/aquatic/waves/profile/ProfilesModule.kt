@@ -11,6 +11,7 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.event.ProfileLoadEvent
 import gg.aquatic.waves.profile.event.ProfileUnloadEvent
 import gg.aquatic.waves.profile.module.ProfileModule
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -30,7 +31,7 @@ class ProfilesModule(
         CompletableFuture.runAsync {
             driver.execute(
                 "" +
-                        "CREATE TABLE IF NOT EXISTS" +
+                        "CREATE TABLE IF NOT EXISTS " +
                         "aquaticprofiles (" +
                         "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                         "uuid BLOB(16) NOT NULL," +
@@ -38,6 +39,9 @@ class ProfilesModule(
                         ")"
             ) {
             }
+        }.exceptionally {
+            it.printStackTrace()
+            null
         }
     }
 
@@ -47,12 +51,30 @@ class ProfilesModule(
     val modules = HashMap<String, ProfileModule>()
 
     override fun initialize(waves: Waves) {
+        CompletableFuture.runAsync {
+            driver.execute(
+                "" +
+                        "CREATE TABLE IF NOT EXISTS " +
+                        "aquaticprofiles (" +
+                        "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+                        "uuid BLOB(16) NOT NULL," +
+                        "username NVARCHAR(64) NOT NULL" +
+                        ")"
+            ) {
+            }
+        }.exceptionally {
+            it.printStackTrace()
+            null
+        }
+
         event<PlayerJoinEvent>(ignoredCancelled = true) {
             if (playersLoading.contains(it.player.uniqueId)) {
                 return@event
             }
             playersLoading += it.player.uniqueId
+            Bukkit.getConsoleSender().sendMessage("Loading profile!")
             getOrCreate(it.player).thenAccept { player ->
+                Bukkit.getConsoleSender().sendMessage("Profile Loaded!")
                 runSync {
                     ProfileLoadEvent(player).call()
                 }
@@ -61,6 +83,7 @@ class ProfilesModule(
             }
         }
         event<PlayerQuitEvent>(ignoredCancelled = true) {
+            Bukkit.getConsoleSender().sendMessage("Unloading profile!")
             val aPlayer = cache[it.player.uniqueId] ?: return@event
             playersSaving += it.player.uniqueId
             ProfileUnloadEvent(aPlayer).call()
@@ -148,6 +171,9 @@ class ProfilesModule(
                     future.complete(player)
                 }
             }
+        }.exceptionally {
+            it.printStackTrace()
+            null
         }
         return future
     }

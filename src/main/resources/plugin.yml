@@ -5,3 +5,4 @@ authors: [ AquaticCreations ]
 api-version: 1.17
 libraries:
   - "org.jetbrains.kotlin:kotlin-stdlib:2.0.0"
+  - "com.zaxxer:HikariCP:5.1.0"

@@ -25,7 +25,6 @@ class Waves: JavaPlugin() {
 
     override fun onLoad() {
         INSTANCE = this
-        loadConfig()
     }
 
     override fun onEnable() {
@@ -33,6 +32,7 @@ class Waves: JavaPlugin() {
             this,
             listOf()
             )
+        loadConfig()
     }
 
     override fun onDisable() {
@@ -54,8 +54,10 @@ class Waves: JavaPlugin() {
         val maxPoolSize = cfg.getInt("databases.profiles.maxPoolSize",10)
         val poolName = cfg.getString("databases.profiles.poolName","Waves Hikari Pool")!!
 
-        val driver = if (type.lowercase() == "SQLITE") {
-            SQLiteDriver(File("$database.db"))
+        val driver = if (type.uppercase() == "SQLITE") {
+            val file = File(dataFolder,"$database.db")
+            file.createNewFile()
+            SQLiteDriver(file)
         } else {
             MySqlDriver(ip, port, userName, password, database, maxPoolSize, poolName)
         }
