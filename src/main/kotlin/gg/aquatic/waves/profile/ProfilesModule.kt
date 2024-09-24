@@ -101,6 +101,9 @@ class ProfilesModule(
     }
 
     fun registerModule(module: ProfileModule): CompletableFuture<Void> {
+        if (modules.containsKey(module.id)) {
+            return CompletableFuture.completedFuture(null)
+        }
         modules[module.id] = module
 
         return CompletableFuture.runAsync {
