@@ -1,6 +1,7 @@
 package gg.aquatic.waves.profile
 
 import gg.aquatic.aquaticseries.lib.data.DataDriver
+import gg.aquatic.aquaticseries.lib.logger.type.InfoLogger
 import gg.aquatic.aquaticseries.lib.util.call
 import gg.aquatic.aquaticseries.lib.util.event
 import gg.aquatic.aquaticseries.lib.util.runSync
@@ -15,6 +16,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import java.io.ByteArrayInputStream
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -34,7 +36,7 @@ class ProfilesModule(
                         "CREATE TABLE IF NOT EXISTS " +
                         "aquaticprofiles (" +
                         "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                        "uuid BLOB(16) NOT NULL," +
+                        "uuid BINARY(16) NOT NULL," +
                         "username NVARCHAR(64) NOT NULL" +
                         ")"
             ) {
@@ -57,7 +59,7 @@ class ProfilesModule(
                         "CREATE TABLE IF NOT EXISTS " +
                         "aquaticprofiles (" +
                         "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                        "uuid BLOB(16) NOT NULL," +
+                        "uuid BINARY(16) NOT NULL," +
                         "username NVARCHAR(64) NOT NULL" +
                         ")"
             ) {
@@ -146,6 +148,7 @@ class ProfilesModule(
                 setBytes(1, uuid.toBytes())
             }
             if (rs.next()) {
+                InfoLogger.send("Player was found in the database!")
                 val player = AquaticPlayer(rs.getInt("id"), uuid, rs.getString("username"))
                 if (player.username != username) {
                     player.username = username
@@ -158,6 +161,7 @@ class ProfilesModule(
                 }
                 future.complete(player)
             } else {
+                InfoLogger.send("Player was not found in the database!")
                 driver.preparedStatement("INSERT INTO aquaticprofiles (uuid, username) VALUES (?, ?)") {
                     setBytes(1, uuid.toBytes())
                     setString(2, username)

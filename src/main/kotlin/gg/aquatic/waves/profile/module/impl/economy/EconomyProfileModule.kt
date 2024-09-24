@@ -43,6 +43,9 @@ object EconomyProfileModule: ProfileModule {
                     future.complete(registeredCurrency)
                 }
             }
+        }.exceptionally {
+            it.printStackTrace()
+            return@exceptionally null
         }
         return future
     }
@@ -50,7 +53,7 @@ object EconomyProfileModule: ProfileModule {
     override fun initialize(connection: Connection) {
         connection.prepareStatement("CREATE TABLE IF NOT EXISTS " +
                 "aquaticcurrency_type (" +
-                "id INTEGER NOT NULL," +
+                "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                 "currency_id NVARCHAR(64) NOT NULL UNIQUE"+
                 ")"
         ).use { preparedStatement ->

@@ -65,6 +65,9 @@ class Waves: JavaPlugin() {
     }
 
     fun initializeModule(module: WaveModule) {
+        if (modules.containsKey(module.type)) {
+            return
+        }
         module.initialize(this)
         modules += module.type to module
     }
