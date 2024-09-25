@@ -8,7 +8,7 @@ import gg.aquatic.waves.profile.module.ProfileModuleEntry
 import java.sql.Connection
 import java.util.concurrent.CompletableFuture
 
-object EconomyProfileModule: ProfileModule {
+object EconomyProfileModule : ProfileModule {
     override val id: String = "aquaticeconomy"
 
     val currencyDriver = CurrencyDriver().apply {
@@ -22,14 +22,21 @@ object EconomyProfileModule: ProfileModule {
     fun initializeEconomy(currency: CustomCurrency): CompletableFuture<RegisteredCurrency> {
         val future = CompletableFuture<RegisteredCurrency>()
         CompletableFuture.runAsync {
-            val rs = currencyDriver.driver.executeQuery("SELECT * FROM aquaticcurrency_type WHERE currency_id = ?") {
-                setString(1, currency.id)
-            }
+            var id: Int? = null
+            currencyDriver.driver.executeQuery("SELECT * FROM aquaticcurrency_type WHERE currency_id = ?",
+                {
+                    setString(1, currency.id)
+                },
+                {
+                    if (next()) {
+                        id = getInt("id")
+                        val registeredCurrency = RegisteredCurrency(currency, id!!)
+                        future.complete(registeredCurrency)
+                    }
+                }
+            )
 
-            if (rs.next()) {
-                val id = rs.getInt("id")
-                val registeredCurrency = RegisteredCurrency(currency, id)
-                future.complete(registeredCurrency)
+            if (id != null) {
                 return@runAsync
             }
             currencyDriver.driver.useConnection {
@@ -38,8 +45,8 @@ object EconomyProfileModule: ProfileModule {
                     preparedStatement.execute()
                     val rs = preparedStatement.generatedKeys
                     rs.next()
-                    val id = rs.getInt(1)
-                    val registeredCurrency = RegisteredCurrency(currency, id)
+                    id = rs.getInt(1)
+                    val registeredCurrency = RegisteredCurrency(currency, id!!)
                     future.complete(registeredCurrency)
                 }
             }
@@ -51,23 +58,25 @@ object EconomyProfileModule: ProfileModule {
     }
 
     override fun initialize(connection: Connection) {
-        connection.prepareStatement("CREATE TABLE IF NOT EXISTS " +
-                "aquaticcurrency_type (" +
-                "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                "currency_id NVARCHAR(64) NOT NULL UNIQUE"+
-                ")"
+        connection.prepareStatement(
+            "CREATE TABLE IF NOT EXISTS " +
+                    "aquaticcurrency_type (" +
+                    "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+                    "currency_id NVARCHAR(64) NOT NULL UNIQUE" +
+                    ")"
         ).use { preparedStatement ->
             preparedStatement.execute()
         }
-        connection.prepareStatement("CREATE TABLE IF NOT EXISTS " +
-                "aquaticcurrency (" +
-                "id INTEGER NOT NULL," +
-                "currency_id INTEGER NOT NULL," +
-                "balance DECIMAL NOT NULL," +
-                "PRIMARY KEY (id, currency_id)," +
-                "FOREIGN KEY (id) REFERENCES aquaticprofiles(id)," +
-                "FOREIGN KEY (currency_id) REFERENCES aquaticcurrency_type(id)" +
-                ")"
+        connection.prepareStatement(
+            "CREATE TABLE IF NOT EXISTS " +
+                    "aquaticcurrency (" +
+                    "id INTEGER NOT NULL," +
+                    "currency_id INTEGER NOT NULL," +
+                    "balance DECIMAL NOT NULL," +
+                    "PRIMARY KEY (id, currency_id)," +
+                    "FOREIGN KEY (id) REFERENCES aquaticprofiles(id)," +
+                    "FOREIGN KEY (currency_id) REFERENCES aquaticcurrency_type(id)" +
+                    ")"
         ).use { preparedStatement ->
             preparedStatement.execute()
         }

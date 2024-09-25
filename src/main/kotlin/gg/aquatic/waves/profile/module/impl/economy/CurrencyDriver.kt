@@ -17,19 +17,22 @@ class CurrencyDriver(
     fun get(aquaticPlayer: AquaticPlayer): CompletableFuture<EconomyEntry> {
         val future = CompletableFuture<EconomyEntry>()
         CompletableFuture.runAsync {
-            val rs = driver.executeQuery("SELECT * FROM aquaticcurrency WHERE id = ?") {
-                setInt(1, aquaticPlayer.index)
-            }
+            driver.executeQuery("SELECT * FROM aquaticcurrency WHERE id = ?",
+                {
+                    setInt(1, aquaticPlayer.index)
+                },
+                {
+                    val entry = EconomyEntry(aquaticPlayer)
+                    while (next()) {
+                        val currencyId = getInt("currency_id")
+                        val balance = getDouble("balance")
 
-            val entry = EconomyEntry(aquaticPlayer)
-            while(rs.next()) {
-                val currencyId = rs.getInt("currency_id")
-                val balance = rs.getDouble("balance")
-
-                val currency = WavesRegistry.INDEX_TO_CURRENCY[currencyId] ?: continue
-                entry.balance[currency] = balance to balance
-            }
-            future.complete(entry)
+                        val currency = WavesRegistry.INDEX_TO_CURRENCY[currencyId] ?: continue
+                        entry.balance[currency] = balance to balance
+                    }
+                    future.complete(entry)
+                }
+            )
         }
         return future
     }

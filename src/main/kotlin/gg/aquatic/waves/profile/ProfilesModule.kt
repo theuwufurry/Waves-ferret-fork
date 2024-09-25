@@ -27,9 +27,10 @@ class ProfilesModule(
 ) : WaveModule {
     override val type: WaveModules = WaveModules.PROFILES
 
-    constructor(): this(Waves.INSTANCE.configValues.profilesDriver)
+    constructor() : this(Waves.INSTANCE.configValues.profilesDriver)
 
     init {
+        /*
         CompletableFuture.runAsync {
             driver.execute(
                 "" +
@@ -45,6 +46,7 @@ class ProfilesModule(
             it.printStackTrace()
             null
         }
+         */
     }
 
     val cache = ConcurrentHashMap<UUID, AquaticPlayer>()
@@ -59,7 +61,7 @@ class ProfilesModule(
                         "CREATE TABLE IF NOT EXISTS " +
                         "aquaticprofiles (" +
                         "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                        "uuid BINARY(16) NOT NULL," +
+                        "uuid VARCHAR(32) NOT NULL," +
                         "username NVARCHAR(64) NOT NULL" +
                         ")"
             ) {
@@ -147,36 +149,44 @@ class ProfilesModule(
         }
         val future = CompletableFuture<AquaticPlayer>()
         CompletableFuture.runAsync {
-            val rs = driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?") {
-                setBytes(1, uuid.toBytes())
-            }
-            if (rs.next()) {
-                InfoLogger.send("Player was found in the database!")
-                val player = AquaticPlayer(rs.getInt("id"), uuid, rs.getString("username"))
-                if (player.username != username) {
-                    player.username = username
-                    player.updated = true
-                }
-
-                for (value in modules.values) {
-                    val entry = value.loadEntry(player).join()
-                    player.entries[value.id] = entry
-                }
-                future.complete(player)
-            } else {
-                InfoLogger.send("Player was not found in the database!")
-                driver.preparedStatement("INSERT INTO aquaticprofiles (uuid, username) VALUES (?, ?)") {
+            var id: Int? = null
+            driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?",
+                {
                     setBytes(1, uuid.toBytes())
-                    setString(2, username)
-                    executeUpdate()
-                    val keys = generatedKeys
-                    keys.next()
-                    val id = keys.getInt(1)
+                },
+                {
+                    if (next()) {
+                        InfoLogger.send("Player was found in the database!")
+                        id = getInt("id")
+                        val player = AquaticPlayer(id!!, uuid, getString("username"))
+                        if (player.username != username) {
+                            player.username = username
+                            player.updated = true
+                        }
 
-                    val player = AquaticPlayer(id, uuid, username)
-                    player.updated = true
-                    future.complete(player)
+                        for (value in modules.values) {
+                            val entry = value.loadEntry(player).join()
+                            player.entries[value.id] = entry
+                        }
+                        future.complete(player)
+                    }
                 }
+            )
+            if (id != null) {
+                return@runAsync
+            }
+            InfoLogger.send("Player was not found in the database!")
+            driver.preparedStatement("INSERT INTO aquaticprofiles (uuid, username) VALUES (?, ?)") {
+                setBytes(1, uuid.toBytes())
+                setString(2, username)
+                executeUpdate()
+                val keys = generatedKeys
+                keys.next()
+                id = keys.getInt(1)
+
+                val player = AquaticPlayer(id!!, uuid, username)
+                player.updated = true
+                future.complete(player)
             }
         }.exceptionally {
             it.printStackTrace()
@@ -191,16 +201,20 @@ class ProfilesModule(
         }
         val future = CompletableFuture<Optional<AquaticPlayer>>()
         CompletableFuture.runAsync {
-            val rs = driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?") {
-                setBytes(1, uuid.toBytes())
-            }
-            if (rs.next()) {
-                val player = AquaticPlayer(rs.getInt("id"), uuid, rs.getString("username"))
-                cache[uuid] = player
-                future.complete(Optional.of(player))
-            } else {
-                future.complete(Optional.empty())
-            }
+            driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?",
+                {
+                    setBytes(1, uuid.toBytes())
+                },
+                {
+                    if (next()) {
+                        val player = AquaticPlayer(getInt("id"), uuid, getString("username"))
+                        cache[uuid] = player
+                        future.complete(Optional.of(player))
+                    } else {
+                        future.complete(Optional.empty())
+                    }
+                }
+            )
         }
         return future
     }
