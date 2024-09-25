@@ -6,7 +6,6 @@ import org.bukkit.entity.Player
 
 class CustomCurrency(
     val id: String,
-    val limit: Double,
     val maxLeaderboardCache: Int,
 ) {
     fun getBalance(player: Player, registeredCurrency: RegisteredCurrency): Double {
