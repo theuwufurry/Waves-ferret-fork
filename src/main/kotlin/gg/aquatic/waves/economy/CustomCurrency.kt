@@ -5,7 +5,9 @@ import gg.aquatic.waves.profile.toAquaticPlayer
 import org.bukkit.entity.Player
 
 class CustomCurrency(
-    val id: String
+    val id: String,
+    val limit: Double,
+    val maxLeaderboardCache: Int,
 ) {
     fun getBalance(player: Player, registeredCurrency: RegisteredCurrency): Double {
         val aPlayer = player.toAquaticPlayer() ?: return 0.0
