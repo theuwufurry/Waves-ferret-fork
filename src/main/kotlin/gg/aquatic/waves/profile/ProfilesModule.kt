@@ -29,26 +29,6 @@ class ProfilesModule(
 
     constructor() : this(Waves.INSTANCE.configValues.profilesDriver)
 
-    init {
-        /*
-        CompletableFuture.runAsync {
-            driver.execute(
-                "" +
-                        "CREATE TABLE IF NOT EXISTS " +
-                        "aquaticprofiles (" +
-                        "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                        "uuid BINARY(16) NOT NULL," +
-                        "username NVARCHAR(64) NOT NULL" +
-                        ")"
-            ) {
-            }
-        }.exceptionally {
-            it.printStackTrace()
-            null
-        }
-         */
-    }
-
     val cache = ConcurrentHashMap<UUID, AquaticPlayer>()
     val playersSaving = HashSet<UUID>()
     val playersLoading = HashSet<UUID>()
@@ -61,7 +41,7 @@ class ProfilesModule(
                         "CREATE TABLE IF NOT EXISTS " +
                         "aquaticprofiles (" +
                         "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                        "uuid VARCHAR(32) NOT NULL," +
+                        "uuid BINARY(16) NOT NULL UNIQUE," +
                         "username NVARCHAR(64) NOT NULL" +
                         ")"
             ) {
