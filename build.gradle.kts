@@ -20,10 +20,11 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-    implementation("gg.aquatic.aquaticseries:aquaticlib-17:1.0.13:all") {
+    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.15:all") {
         exclude("org.jetbrains.kotlin", "kotlin-stdlib")
-        exclude("gg.aquatic.aquaticseries", "aquaticlib")
         exclude("gg.aquatic.aquaticseries.core", "core")
+        exclude("gg.aquatic.aquaticseries.paper", "paper")
+        exclude("gg.aquatic.aquaticseries.spigot", "spigot")
     }
 }
 
@@ -55,7 +56,7 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     archiveFileName.set("Waves-${project.version}.jar")
     archiveClassifier.set("plugin")
     dependencies {
-        include(dependency("gg.aquatic.aquaticseries:aquaticlib-17"))
+        include(dependency("gg.aquatic.aquaticseries:aquaticlib"))
     }
 }
 
