@@ -22,7 +22,8 @@ class CurrencyDriver(
                     setInt(1, aquaticPlayer.index)
                 },
                 {
-                    val entry = EconomyEntry(aquaticPlayer)
+                    val places = EconomyProfileModule.getLeaderboardPlaces(aquaticPlayer).join()
+                    val entry = EconomyEntry(aquaticPlayer, places)
                     while (next()) {
                         val currencyId = getInt("currency_id")
                         val balance = getDouble("balance")

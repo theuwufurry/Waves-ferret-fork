@@ -1,10 +1,15 @@
 package gg.aquatic.waves.profile.module.impl.economy
 
+import gg.aquatic.aquaticseries.lib.util.mapPair
+import gg.aquatic.waves.Waves
 import gg.aquatic.waves.economy.CustomCurrency
 import gg.aquatic.waves.economy.RegisteredCurrency
+import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
+import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.profile.module.ProfileModule
 import gg.aquatic.waves.profile.module.ProfileModuleEntry
+import gg.aquatic.waves.registry.WavesRegistry
 import java.sql.Connection
 import java.util.concurrent.CompletableFuture
 
@@ -14,6 +19,8 @@ object EconomyProfileModule : ProfileModule {
     val currencyDriver = CurrencyDriver().apply {
         //initialize(this)
     }
+
+    val leaderboards = HashMap<RegisteredCurrency, EconomyLeaderboard>()
 
     override fun loadEntry(aquaticPlayer: AquaticPlayer): CompletableFuture<out ProfileModuleEntry> {
         return currencyDriver.get(aquaticPlayer)
@@ -80,10 +87,19 @@ object EconomyProfileModule : ProfileModule {
         ).use { preparedStatement ->
             preparedStatement.execute()
         }
-
     }
+
 }
 
 fun AquaticPlayer.aquaticEconomy(): EconomyEntry {
-    return this.entries.getOrPut("aquaticeconomy") { EconomyEntry(this) } as EconomyEntry
+    if (!this.entries.containsKey("aquaticeconomy")) {
+        val places = HashMap<RegisteredCurrency, Int>()
+        for ((currency, leaderboard) in EconomyProfileModule.leaderboards) {
+            places += currency to leaderboard.totalPlaces
+        }
+        val entry = EconomyEntry(this, places)
+        this.entries += "aquaticeconomy" to entry
+        return entry
+    }
+    return this.entries["aquaticeconomy"] as EconomyEntry
 }
