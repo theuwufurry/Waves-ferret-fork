@@ -1,5 +1,7 @@
 package gg.aquatic.waves.sync
 
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import gg.aquatic.aquaticseries.lib.util.runSync
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -11,6 +13,7 @@ import io.ktor.http.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
+import java.util.UUID
 
 class SyncClient(
     val ip: String,
@@ -40,12 +43,19 @@ class SyncClient(
     private var socketConnection: DefaultWebSocketSession? = null
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun sendPacket(packet: String, target: String) {
+    fun sendPacket(packet: String, target: List<String>, broadcast: Boolean) {
         //outgoingPackets += packet
+
+        val obj = JsonObject()
+        obj.addProperty("packetId", UUID.randomUUID().toString())
+        obj.addProperty("sentFrom", serverId)
+        obj.add("targetServers", JsonParser.parseString(target.toString()).asJsonArray)
+        obj.addProperty("data", packet)
+        obj.addProperty("broadcast", broadcast)
 
         GlobalScope.launch {
             val session = socketConnection ?: return@launch
-            session.send(packet)
+            session.send(obj.toString())
             println("Packet sent!")
         }
     }
