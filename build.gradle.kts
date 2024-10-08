@@ -8,6 +8,8 @@ plugins {
 group = "gg.aquatic.waves"
 version = "1.0.2"
 
+val ktor_version: String by project
+
 repositories {
     mavenCentral()
     mavenLocal()
@@ -26,6 +28,13 @@ dependencies {
         exclude("gg.aquatic.aquaticseries.paper", "paper")
         exclude("gg.aquatic.aquaticseries.spigot", "spigot")
     }
+
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-client-websockets:$ktor_version")
+    implementation("io.ktor:ktor-client-okhttp:$ktor_version")
+    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.12")
+    implementation("io.ktor:ktor-client-auth:$ktor_version")
 }
 
 
