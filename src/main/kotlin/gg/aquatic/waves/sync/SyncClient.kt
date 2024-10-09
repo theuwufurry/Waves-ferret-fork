@@ -1,8 +1,11 @@
 package gg.aquatic.waves.sync
 
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import gg.aquatic.aquaticseries.lib.util.runSync
+import gg.aquatic.waves.sync.internpacket.NetworkPacket
+import gg.aquatic.waves.sync.packet.SyncPacket
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.auth.*
@@ -15,8 +18,10 @@ import io.ktor.websocket.*
 import io.ktor.websocket.readText
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
+import java.util.ArrayList
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import kotlin.time.measureTime
 
 class SyncClient(
     val ip: String,
@@ -43,88 +48,86 @@ class SyncClient(
         }
     }
 
+    val awaiting = HashMap<UUID,CompletableDeferred<String>>()
+
     private var socketConnection: DefaultWebSocketSession? = null
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun cacheCustom(data: String, namespace: String): CompletableFuture<Void> {
-        val future = CompletableFuture<Void>()
-        GlobalScope.launch {
+    suspend fun cacheCustom(data: String, namespace: String) = coroutineScope {
+        launch {
             client.request("$ip:$port/cache/$namespace") {
                 method = HttpMethod.Post
                 setBody(data)
             }
-            future.complete(null)
         }
-        return future
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun getCustomCache(namespace: String): CompletableFuture<String?> {
-        val future = CompletableFuture<String?>()
-        GlobalScope.launch {
+    suspend fun getCustomCache(namespace: String): String {
+        return withContext(Dispatchers.IO) {
             val response = client.request("$ip:$port/cache/$namespace") {
                 method = HttpMethod.Get
             }
-            future.complete(response.bodyAsText())
+            response.bodyAsText()
         }
-        return future
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun sendPacket(packet: String, target: List<String>, broadcast: Boolean) {
+    suspend fun sendPacket(packet: SyncPacket, target: List<String>, broadcast: Boolean, await: Boolean): String? {
         //outgoingPackets += packet
+
+        val networkPacket = NetworkPacket(packet, await)
+        val data = Gson().toJson(networkPacket)
 
         val obj = JsonObject()
         obj.addProperty("packetId", UUID.randomUUID().toString())
         obj.addProperty("sentFrom", serverId)
         obj.add("targetServers", JsonParser.parseString(target.toString()).asJsonArray)
-        obj.addProperty("data", packet)
+        obj.addProperty("data", data)
         obj.addProperty("broadcast", broadcast)
 
-        GlobalScope.launch {
-            val session = socketConnection ?: return@launch
-            session.send(obj.toString())
-            println("Packet sent!")
+        val session = socketConnection ?: return null
+        session.send(obj.toString())
+        println("Packet sent!")
+
+        if (!await || broadcast) {
+            return null
         }
+
+        val deferredResponse = CompletableDeferred<String>()
+        awaiting[networkPacket.packetId] = deferredResponse
+
+        return deferredResponse.await()
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    internal fun start() {
+    internal suspend fun start() = coroutineScope {
+        launch {
+            println("Starting!")
+            client.webSocket(HttpMethod.Get, ip, port, "/waves-sync-packets", request = {
+                this.parameter("server-id", serverId)
+            }) {
 
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
+                socketConnection = this
 
-                println("Starting!")
-                runBlocking {
-                    client.webSocket(HttpMethod.Get, ip, port, "/waves-sync-packets", request = {
-                        this.parameter("server-id", serverId)
-                    }) {
+                try {
+                    for (frame in incoming) {
+                        println("Received Message...")
+                        frame as? Frame.Text ?: continue
+                        val packet = frame.readText()
 
-                        socketConnection = this
-
-                        try {
-                            for (frame in incoming) {
-                                println("Received Message...")
-                                frame as? Frame.Text ?: continue
-                                val packet = frame.readText()
-
-                                runSync {
-                                    handlePacket(packet)
-                                }
-                            }
-
-                        } catch (e: Exception) {
-                            println(e.localizedMessage)
-                        } finally {
-                            println("Closing")
-                            close()
+                        runSync {
+                            handlePacket(packet)
                         }
-
                     }
+
+                } catch (e: Exception) {
+                    println(e.localizedMessage)
+                } finally {
+                    println("Closing")
+                    close()
                 }
-                client.close()
-                Bukkit.shutdown()
+
             }
+            client.close()
+            println("Server is offline, disconnecting!")
+            Bukkit.shutdown()
         }
     }
 

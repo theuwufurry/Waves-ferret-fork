@@ -1,36 +1,67 @@
 package gg.aquatic.waves.sync
 
 import com.google.gson.Gson
+import com.google.gson.JsonObject
+import gg.aquatic.waves.sync.internpacket.NetworkPacket
+import gg.aquatic.waves.sync.packet.PacketResponse
+import gg.aquatic.waves.sync.packet.SyncPacket
+import kotlinx.coroutines.*
 import java.util.concurrent.CompletableFuture
 
 object SyncHandler {
 
     lateinit var client: SyncClient
 
-    inline fun <reified T> cacheCustom(value: T, namespace: String): CompletableFuture<Void> {
-        val json = Gson().toJson(value)
-        val future = CompletableFuture<Void>()
-        CompletableFuture.runAsync {
-            client.cacheCustom(json, namespace).thenAccept {
-                future.complete(null)
-            }
-        }
-        return future
-        // API -> cache the server data (namespace to json)
+    val packetRegistry = mutableMapOf<String, SyncPacketHandler<*>>()
+
+    init {
+        registerPacket("waves_packet_response",PacketResponse.Handler)
     }
 
-    inline fun <reified T> getCustomCache(namespace: String): CompletableFuture<T?> {
-        val future = CompletableFuture<T?>()
+    fun registerPacket(id: String, handler: SyncPacketHandler<*>) {
+        packetRegistry[id] = handler
+    }
 
-        CompletableFuture.runAsync {
-            client.getCustomCache(namespace).thenAccept {
-                if (it == null) {
-                    future.complete(null)
-                    return@thenAccept
-                }
-                future.complete(Gson().fromJson(it, T::class.java))
-            }
+    fun handlePacket(json: JsonObject) {
+        val packetType = json.get("packetType").asString
+        val handler = packetRegistry[packetType] ?: return
+        handler.serializeAndHandle(json.asString)
+    }
+
+    suspend inline fun <reified T> cacheCustom(value: T, namespace: String) = coroutineScope {
+        launch {
+            val json = Gson().toJson(value)
+            client.cacheCustom(json, namespace)
         }
-        return future
+    }
+
+    suspend inline fun <reified T> getCustomCache(namespace: String): T? {
+        val value = withContext(Dispatchers.IO) {
+            return@withContext client.getCustomCache(namespace)
+        }
+        if (value.isEmpty() || value == "null") {
+            return null
+        }
+        return Gson().fromJson(value, T::class.java)
+    }
+
+    suspend fun sendPacket(packet: SyncPacket, target: String) {
+        sendPacket(packet, listOf(target))
+    }
+
+    suspend fun sendPacket(packet: SyncPacket, target: List<String>) {
+        sendPacket(packet, target, broadcast = false, await = false)
+    }
+
+    private suspend fun sendPacket(packet: SyncPacket, target: List<String>, broadcast: Boolean, await: Boolean): String? {
+        return client.sendPacket(packet, target, broadcast, await)
+    }
+
+    suspend fun broadcastPacket(packet: SyncPacket) {
+        sendPacket(packet, listOf(), true, await = false)
+    }
+
+    suspend fun sendPacketAndAwait(packet: SyncPacket, target: String): String? {
+        return sendPacket(packet, listOf(target), broadcast = false, await = true)
     }
 }
