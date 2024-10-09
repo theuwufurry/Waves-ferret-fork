@@ -4,13 +4,13 @@ import gg.aquatic.waves.sync.packet.SyncPacket
 
 interface SyncPacketHandler<T: SyncPacket> {
 
-    fun handle(packet: T)
+    suspend fun handle(packet: T): String?
     fun serialize(json: String): T
     fun deserialize(packet: T): String
 
-    fun serializeAndHandle(json: String) {
+    suspend fun serializeAndHandle(json: String): String? {
         val packet = serialize(json)
-        handle(packet)
+        return handle(packet)
     }
 
 }

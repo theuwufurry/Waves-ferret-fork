@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import gg.aquatic.aquaticseries.lib.util.runSync
-import gg.aquatic.waves.sync.internpacket.NetworkPacket
+import gg.aquatic.waves.sync.packet.PacketResponse
 import gg.aquatic.waves.sync.packet.SyncPacket
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -36,7 +36,7 @@ class SyncClient(
                 followRedirects(true)
             }
         }
-        install (WebSockets) {
+        install(WebSockets) {
         }
         install(Auth) {
             digest {
@@ -48,7 +48,7 @@ class SyncClient(
         }
     }
 
-    val awaiting = HashMap<UUID,CompletableDeferred<String>>()
+    val awaiting = HashMap<UUID, CompletableDeferred<String>>()
 
     private var socketConnection: DefaultWebSocketSession? = null
 
@@ -73,15 +73,16 @@ class SyncClient(
     suspend fun sendPacket(packet: SyncPacket, target: List<String>, broadcast: Boolean, await: Boolean): String? {
         //outgoingPackets += packet
 
-        val networkPacket = NetworkPacket(packet, await)
-        val data = Gson().toJson(networkPacket)
+        val uuid = UUID.randomUUID()
+        val data = Gson().toJson(packet)
 
         val obj = JsonObject()
-        obj.addProperty("packetId", UUID.randomUUID().toString())
+        obj.addProperty("packetId", uuid.toString())
         obj.addProperty("sentFrom", serverId)
         obj.add("targetServers", JsonParser.parseString(target.toString()).asJsonArray)
         obj.addProperty("data", data)
         obj.addProperty("broadcast", broadcast)
+        obj.addProperty("awaitResponse", await)
 
         val session = socketConnection ?: return null
         session.send(obj.toString())
@@ -92,7 +93,7 @@ class SyncClient(
         }
 
         val deferredResponse = CompletableDeferred<String>()
-        awaiting[networkPacket.packetId] = deferredResponse
+        awaiting[uuid] = deferredResponse
 
         return deferredResponse.await()
     }
@@ -111,10 +112,7 @@ class SyncClient(
                         println("Received Message...")
                         frame as? Frame.Text ?: continue
                         val packet = frame.readText()
-
-                        runSync {
-                            handlePacket(packet)
-                        }
+                        handlePacket(packet)
                     }
 
                 } catch (e: Exception) {
@@ -131,8 +129,20 @@ class SyncClient(
         }
     }
 
-    private fun handlePacket(packet: String) {
+    private suspend fun handlePacket(packet: String) {
+        val json = JsonParser.parseString(packet).asJsonObject
+        val id = json.get("packetId").asString
+        val response = json.get("awaitResponse").asBoolean
+        val data = json.get("data").asJsonObject
 
+        val toRespond = SyncHandler.handlePacket(data)
+        if (response) {
+            SyncHandler.sendPacket(
+                PacketResponse(id, toRespond ?: "null"), listOf(
+                    json.get("sentFrom").asString
+                )
+            )
+        }
     }
 
 }

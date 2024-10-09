@@ -2,7 +2,6 @@ package gg.aquatic.waves.sync
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import gg.aquatic.waves.sync.internpacket.NetworkPacket
 import gg.aquatic.waves.sync.packet.PacketResponse
 import gg.aquatic.waves.sync.packet.SyncPacket
 import kotlinx.coroutines.*
@@ -22,10 +21,10 @@ object SyncHandler {
         packetRegistry[id] = handler
     }
 
-    fun handlePacket(json: JsonObject) {
+    suspend fun handlePacket(json: JsonObject): String? {
         val packetType = json.get("packetType").asString
-        val handler = packetRegistry[packetType] ?: return
-        handler.serializeAndHandle(json.asString)
+        val handler = packetRegistry[packetType] ?: return null
+        return handler.serializeAndHandle(json.asString)
     }
 
     suspend inline fun <reified T> cacheCustom(value: T, namespace: String) = coroutineScope {
