@@ -138,9 +138,7 @@ class SyncClient(
         val toRespond = SyncHandler.handlePacket(data)
         if (response) {
             SyncHandler.sendPacket(
-                PacketResponse(id, toRespond ?: "null"), listOf(
-                    json.get("sentFrom").asString
-                )
+                PacketResponse(id, toRespond ?: "null"), json.get("sentFrom").asString
             )
         }
     }
