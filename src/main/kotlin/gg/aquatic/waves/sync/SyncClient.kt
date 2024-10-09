@@ -9,11 +9,14 @@ import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.websocket.*
+import io.ktor.websocket.readText
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 
 class SyncClient(
     val ip: String,
@@ -41,6 +44,31 @@ class SyncClient(
     }
 
     private var socketConnection: DefaultWebSocketSession? = null
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun cacheCustom(data: String, namespace: String): CompletableFuture<Void> {
+        val future = CompletableFuture<Void>()
+        GlobalScope.launch {
+            client.request("$ip:$port/cache/$namespace") {
+                method = HttpMethod.Post
+                setBody(data)
+            }
+            future.complete(null)
+        }
+        return future
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun getCustomCache(namespace: String): CompletableFuture<String?> {
+        val future = CompletableFuture<String?>()
+        GlobalScope.launch {
+            val response = client.request("$ip:$port/cache/$namespace") {
+                method = HttpMethod.Get
+            }
+            future.complete(response.bodyAsText())
+        }
+        return future
+    }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun sendPacket(packet: String, target: List<String>, broadcast: Boolean) {
