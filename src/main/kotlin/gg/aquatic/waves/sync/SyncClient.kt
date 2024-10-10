@@ -70,6 +70,78 @@ class SyncClient(
         }
     }
 
+    suspend fun cachePlayer(syncedPlayer: SyncedPlayer) = coroutineScope {
+        launch {
+            client.request("$ip:$port/cache/player/${syncedPlayer.uuid}") {
+                method = HttpMethod.Post
+                setBody(Gson().toJson(syncedPlayer))
+            }
+        }
+    }
+
+    suspend fun getPlayerCache(): List<SyncedPlayer> {
+        // TODO
+    }
+
+    suspend fun getPlayerCache(uuid: UUID): SyncedPlayer? {
+        return withContext(Dispatchers.IO) {
+            val response = client.request("$ip:$port/player/$uuid") {
+                method = HttpMethod.Get
+            }
+            if (response.status == HttpStatusCode.NotFound) {
+                return@withContext null
+            }
+            val json = response.bodyAsText()
+            return@withContext Gson().fromJson(json, SyncedPlayer::class.java)
+        }
+    }
+
+    suspend fun cachePlayerData(uuid: UUID, data: HashMap<String, String>) = coroutineScope {
+        launch {
+            client.request("$ip:$port/player/$uuid/data") {
+                method = HttpMethod.Post
+                setBody(Gson().toJson(data))
+            }
+        }
+    }
+
+    suspend fun getPlayerData(uuid: UUID): HashMap<String, String> {
+        return withContext(Dispatchers.IO) {
+            val response = client.request("$ip:$port/player/$uuid/data") {
+                method = HttpMethod.Get
+            }
+            val json = response.bodyAsText()
+            // TODO
+        }
+    }
+
+    suspend fun cachePlayerData(uuid: UUID, key: String, value: String) = coroutineScope {
+        launch {
+            client.request("$ip:$port/player/$uuid/data/$key") {
+                method = HttpMethod.Post
+                setBody(value)
+            }
+        }
+    }
+
+    suspend fun getPlayerData(uuid: UUID, key: String): String {
+        return withContext(Dispatchers.IO) {
+            val response = client.request("$ip:$port/player/$uuid/data/$key") {
+                method = HttpMethod.Get
+            }
+            return@withContext response.bodyAsText()
+        }
+    }
+
+    suspend fun getOrCachePlayer(uuid: UUID, default: SyncedPlayer): SyncedPlayer? {
+        val cached = getPlayerCache(uuid)
+        if (cached != null) {
+            return cached
+        }
+        cachePlayer(default)
+        return null
+    }
+
     suspend fun sendPacket(packet: SyncPacket, target: List<String>, broadcast: Boolean, await: Boolean): String? {
         //outgoingPackets += packet
 
