@@ -81,6 +81,7 @@ class SyncClient(
 
     suspend fun getPlayerCache(): List<SyncedPlayer> {
         // TODO
+        throw NotImplementedError()
     }
 
     suspend fun getPlayerCache(uuid: UUID): SyncedPlayer? {
@@ -112,6 +113,7 @@ class SyncClient(
             }
             val json = response.bodyAsText()
             // TODO
+            throw NotImplementedError()
         }
     }
 
