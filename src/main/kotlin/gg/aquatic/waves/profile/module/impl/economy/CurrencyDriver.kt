@@ -6,6 +6,10 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.registry.WavesRegistry
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.util.concurrent.CompletableFuture
 
@@ -14,28 +18,24 @@ class CurrencyDriver(
 
     val driver: DataDriver = (Waves.INSTANCE.modules[WaveModules.PROFILES] as ProfilesModule).driver
 
-    fun get(aquaticPlayer: AquaticPlayer): CompletableFuture<EconomyEntry> {
-        val future = CompletableFuture<EconomyEntry>()
-        CompletableFuture.runAsync {
-            driver.executeQuery("SELECT * FROM aquaticcurrency WHERE id = ?",
-                {
-                    setInt(1, aquaticPlayer.index)
-                },
-                {
-                    val places = EconomyProfileModule.getLeaderboardPlaces(aquaticPlayer).join()
-                    val entry = EconomyEntry(aquaticPlayer, places)
-                    while (next()) {
-                        val currencyId = getInt("currency_id")
-                        val balance = getDouble("balance")
+    suspend fun get(aquaticPlayer: AquaticPlayer): EconomyEntry = withContext(Dispatchers.IO) {
+        val places = EconomyProfileModule.getLeaderboardPlaces(aquaticPlayer)
+        driver.executeQuery("SELECT * FROM aquaticcurrency WHERE id = ?",
+            {
+                setInt(1, aquaticPlayer.index)
+            },
+            {
+                val entry = EconomyEntry(aquaticPlayer, places)
+                while (next()) {
+                    val currencyId = getInt("currency_id")
+                    val balance = getDouble("balance")
 
-                        val currency = WavesRegistry.INDEX_TO_CURRENCY[currencyId] ?: continue
-                        entry.balance[currency] = balance to balance
-                    }
-                    future.complete(entry)
+                    val currency = WavesRegistry.INDEX_TO_CURRENCY[currencyId] ?: continue
+                    entry.balance[currency] = balance to balance
                 }
-            )
-        }
-        return future
+                entry
+            }
+        )
     }
 
     fun save(connection: Connection, entry: EconomyEntry) {

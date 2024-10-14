@@ -16,6 +16,6 @@ fun WavesRegistry.getCurrency(id: String): Currency? {
 }
 
 
-fun WavesRegistry.registerCurrency(currency: CustomCurrency): CompletableFuture<RegisteredCurrency> {
+suspend fun WavesRegistry.registerCurrency(currency: CustomCurrency): RegisteredCurrency {
     return EconomyHandler.register(currency)
 }

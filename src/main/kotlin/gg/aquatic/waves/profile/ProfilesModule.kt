@@ -12,6 +12,8 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.event.ProfileLoadEvent
 import gg.aquatic.waves.profile.event.ProfileUnloadEvent
 import gg.aquatic.waves.profile.module.ProfileModule
+import gg.aquatic.waves.util.thenAccept
+import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
@@ -57,104 +59,117 @@ class ProfilesModule(
             }
             playersLoading += it.player.uniqueId
             Bukkit.getConsoleSender().sendMessage("Loading profile!")
-            getOrCreate(it.player).thenAccept { player ->
-                Bukkit.getConsoleSender().sendMessage("Profile Loaded!")
-                runSync {
-                    ProfileLoadEvent(player).call()
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    val player = getOrCreate(it.player)
+                    Bukkit.getConsoleSender().sendMessage("Profile Loaded!")
+                    runSync {
+                        ProfileLoadEvent(player).call()
+                    }
+                    cache[player.uuid] = player
+                    playersLoading -= it.player.uniqueId
                 }
-                cache[player.uuid] = player
-                playersLoading -= it.player.uniqueId
             }
+
         }
         event<PlayerQuitEvent>(ignoredCancelled = true) {
             Bukkit.getConsoleSender().sendMessage("Unloading profile!")
             val aPlayer = cache[it.player.uniqueId] ?: return@event
             playersSaving += it.player.uniqueId
             ProfileUnloadEvent(aPlayer).call()
-            save(aPlayer).thenRun {
-                playersSaving -= it.player.uniqueId
+            runBlocking {
+                launch {
+                    save(aPlayer)
+                    playersSaving -= it.player.uniqueId
+                    cache.remove(it.player.uniqueId)
+                }
             }
-            cache.remove(it.player.uniqueId)
         }
     }
 
     override fun disable(waves: Waves) {
-
+        runBlocking {
+            launch {
+                save(*cache.values.toTypedArray())
+                cache.clear()
+            }
+        }
     }
 
-    fun registerModule(module: ProfileModule): CompletableFuture<Void> {
+    suspend fun registerModule(module: ProfileModule) = coroutineScope {
         if (modules.containsKey(module.id)) {
-            return CompletableFuture.completedFuture(null)
+            return@coroutineScope
         }
-        modules[module.id] = module
+        launch {
+            modules[module.id] = module
 
-        return CompletableFuture.runAsync {
             driver.useConnection {
                 module.initialize(this)
             }
         }
+
     }
 
-    fun save(vararg players: AquaticPlayer): CompletableFuture<Void> {
-        return CompletableFuture.runAsync {
-            driver.useConnection {
-                for (player in players) {
-                    if (player.updated) {
-                        prepareStatement("UPDATE aquaticprofiles SET username = ? WHERE id = ?").use { preparedStatement ->
-                            preparedStatement.setString(1, player.username)
-                            preparedStatement.setInt(2, player.index)
-                            preparedStatement.execute()
-                        }
+    suspend fun save(vararg players: AquaticPlayer) = withContext(Dispatchers.IO) {
+        driver.useConnection {
+            for (player in players) {
+                if (player.updated) {
+                    prepareStatement("UPDATE aquaticprofiles SET username = ? WHERE id = ?").use { preparedStatement ->
+                        preparedStatement.setString(1, player.username)
+                        preparedStatement.setInt(2, player.index)
+                        preparedStatement.execute()
                     }
-                    try {
-                        for (value in player.entries.values) {
-                            value.save(this)
-                        }
-                    } catch (ex: Exception) {
-                        rollback()
-                        ex.printStackTrace()
+                }
+                try {
+                    for (value in player.entries.values) {
+                        value.save(this)
                     }
+                } catch (ex: Exception) {
+                    rollback()
+                    ex.printStackTrace()
                 }
             }
         }
     }
 
-    fun getOrCreate(player: Player): CompletableFuture<AquaticPlayer> {
+    suspend fun getOrCreate(player: Player): AquaticPlayer {
         return getOrCreate(player.uniqueId, player.name)
     }
 
-    fun getOrCreate(uuid: UUID, username: String): CompletableFuture<AquaticPlayer> {
+    suspend fun getOrCreate(uuid: UUID, username: String): AquaticPlayer = coroutineScope {
         if (cache.containsKey(uuid)) {
-            return CompletableFuture.completedFuture(cache[uuid])
+            return@coroutineScope cache[uuid]!!
         }
-        val future = CompletableFuture<AquaticPlayer>()
-        CompletableFuture.runAsync {
-            var id: Int? = null
-            driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?",
-                {
-                    setBytes(1, uuid.toBytes())
-                },
-                {
-                    if (next()) {
-                        InfoLogger.send("Player was found in the database!")
-                        id = getInt("id")
-                        val player = AquaticPlayer(id!!, uuid, getString("username"))
-                        if (player.username != username) {
-                            player.username = username
-                            player.updated = true
-                        }
 
-                        for (value in modules.values) {
-                            val entry = value.loadEntry(player).join()
-                            player.entries[value.id] = entry
-                        }
-                        future.complete(player)
+        val optionalPlayer = driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?",
+            {
+                setBytes(1, uuid.toBytes())
+            },
+            {
+                if (next()) {
+                    InfoLogger.send("Player was found in the database!")
+                    val id = getInt("id")
+                    val player = AquaticPlayer(id, uuid, getString("username"))
+                    if (player.username != username) {
+                        player.username = username
+                        player.updated = true
                     }
+
+
+                    return@executeQuery Optional.of(player)
                 }
-            )
-            if (id != null) {
-                return@runAsync
+                Optional.empty<AquaticPlayer>()
             }
+        )
+        optionalPlayer.ifPresent {
+            launch {
+                for (value in modules.values) {
+                    val entry = value.loadEntry(it)
+                    it.entries[value.id] = entry
+                }
+            }
+        }
+        return@coroutineScope optionalPlayer.or {
             InfoLogger.send("Player was not found in the database!")
             driver.preparedStatement("INSERT INTO aquaticprofiles (uuid, username) VALUES (?, ?)") {
                 setBytes(1, uuid.toBytes())
@@ -162,41 +177,33 @@ class ProfilesModule(
                 executeUpdate()
                 val keys = generatedKeys
                 keys.next()
-                id = keys.getInt(1)
+                val id = keys.getInt(1)
 
-                val player = AquaticPlayer(id!!, uuid, username)
+                val player = AquaticPlayer(id, uuid, username)
                 player.updated = true
-                future.complete(player)
+                Optional.of(player)
             }
-        }.exceptionally {
-            it.printStackTrace()
-            null
-        }
-        return future
+        }.get()
     }
 
-    fun get(uuid: UUID): CompletableFuture<Optional<AquaticPlayer>> {
+    suspend fun get(uuid: UUID): Optional<AquaticPlayer> = coroutineScope {
         if (cache.containsKey(uuid)) {
-            return CompletableFuture.completedFuture(Optional.of(cache[uuid]!!))
+            return@coroutineScope Optional.of(cache[uuid]!!)
         }
-        val future = CompletableFuture<Optional<AquaticPlayer>>()
-        CompletableFuture.runAsync {
-            driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?",
-                {
-                    setBytes(1, uuid.toBytes())
-                },
-                {
-                    if (next()) {
-                        val player = AquaticPlayer(getInt("id"), uuid, getString("username"))
-                        cache[uuid] = player
-                        future.complete(Optional.of(player))
-                    } else {
-                        future.complete(Optional.empty())
-                    }
+        return@coroutineScope driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?",
+            {
+                setBytes(1, uuid.toBytes())
+            },
+            {
+                if (next()) {
+                    val player = AquaticPlayer(getInt("id"), uuid, getString("username"))
+                    cache[uuid] = player
+                    Optional.of(player)
+                } else {
+                    Optional.of(cache[uuid]!!)
                 }
-            )
-        }
-        return future
+            }
+        )
     }
 
 }

@@ -1,17 +1,15 @@
 package gg.aquatic.waves.profile.module.impl.economy
 
-import gg.aquatic.aquaticseries.lib.util.mapPair
-import gg.aquatic.waves.Waves
 import gg.aquatic.waves.economy.CustomCurrency
 import gg.aquatic.waves.economy.RegisteredCurrency
-import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
-import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.profile.module.ProfileModule
 import gg.aquatic.waves.profile.module.ProfileModuleEntry
-import gg.aquatic.waves.registry.WavesRegistry
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.sql.Connection
-import java.util.concurrent.CompletableFuture
+import java.util.*
+import kotlin.collections.HashMap
 
 object EconomyProfileModule : ProfileModule {
     override val id: String = "aquaticeconomy"
@@ -22,46 +20,36 @@ object EconomyProfileModule : ProfileModule {
 
     val leaderboards = HashMap<RegisteredCurrency, EconomyLeaderboard>()
 
-    override fun loadEntry(aquaticPlayer: AquaticPlayer): CompletableFuture<out ProfileModuleEntry> {
+    override suspend fun loadEntry(aquaticPlayer: AquaticPlayer): ProfileModuleEntry {
         return currencyDriver.get(aquaticPlayer)
     }
 
-    fun initializeEconomy(currency: CustomCurrency): CompletableFuture<RegisteredCurrency> {
-        val future = CompletableFuture<RegisteredCurrency>()
-        CompletableFuture.runAsync {
-            var id: Int? = null
+    suspend fun initializeEconomy(currency: CustomCurrency): RegisteredCurrency {
+        return withContext(Dispatchers.IO) {
             currencyDriver.driver.executeQuery("SELECT * FROM aquaticcurrency_type WHERE currency_id = ?",
                 {
                     setString(1, currency.id)
                 },
                 {
                     if (next()) {
-                        id = getInt("id")
-                        val registeredCurrency = RegisteredCurrency(currency, id!!)
-                        future.complete(registeredCurrency)
+                        val id = getInt("id")
+                        return@executeQuery Optional.of(RegisteredCurrency(currency, id))
+                    } else
+                        return@executeQuery Optional.empty<RegisteredCurrency>()
+                }
+            ).or {
+                currencyDriver.driver.useConnection {
+                    prepareStatement("INSERT INTO aquaticcurrency_type (currency_id) VALUES (?)").use { preparedStatement ->
+                        preparedStatement.setString(1, currency.id)
+                        preparedStatement.execute()
+                        val rs = preparedStatement.generatedKeys
+                        rs.next()
+                        val id = rs.getInt(1)
+                        Optional.of(RegisteredCurrency(currency, id))
                     }
                 }
-            )
-
-            if (id != null) {
-                return@runAsync
-            }
-            currencyDriver.driver.useConnection {
-                prepareStatement("INSERT INTO aquaticcurrency_type (currency_id) VALUES (?)").use { preparedStatement ->
-                    preparedStatement.setString(1, currency.id)
-                    preparedStatement.execute()
-                    val rs = preparedStatement.generatedKeys
-                    rs.next()
-                    id = rs.getInt(1)
-                    val registeredCurrency = RegisteredCurrency(currency, id!!)
-                    future.complete(registeredCurrency)
-                }
-            }
-        }.exceptionally {
-            it.printStackTrace()
-            return@exceptionally null
+            }.get()
         }
-        return future
     }
 
     override fun initialize(connection: Connection) {
