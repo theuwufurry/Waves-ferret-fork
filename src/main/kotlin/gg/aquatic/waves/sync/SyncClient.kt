@@ -48,7 +48,7 @@ class SyncClient(
         }
     }
 
-    val awaiting = HashMap<UUID, CompletableDeferred<String>>()
+    val awaiting = HashMap<UUID, Pair<CompletableDeferred<String>,Long>>()
 
     private var socketConnection: DefaultWebSocketSession? = null
 
@@ -167,7 +167,7 @@ class SyncClient(
         }
 
         val deferredResponse = CompletableDeferred<String>()
-        awaiting[uuid] = deferredResponse
+        awaiting[uuid] = deferredResponse to System.currentTimeMillis()
 
         return deferredResponse.await()
     }

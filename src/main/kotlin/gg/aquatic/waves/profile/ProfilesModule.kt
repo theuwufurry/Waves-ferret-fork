@@ -12,13 +12,12 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.event.ProfileLoadEvent
 import gg.aquatic.waves.profile.event.ProfileUnloadEvent
 import gg.aquatic.waves.profile.module.ProfileModule
-import gg.aquatic.waves.util.thenAccept
+import gg.aquatic.waves.util.await
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import java.io.ByteArrayInputStream
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -59,40 +58,33 @@ class ProfilesModule(
             }
             playersLoading += it.player.uniqueId
             Bukkit.getConsoleSender().sendMessage("Loading profile!")
-            runBlocking {
-                withContext(Dispatchers.IO) {
-                    val player = getOrCreate(it.player)
-                    Bukkit.getConsoleSender().sendMessage("Profile Loaded!")
-                    runSync {
-                        ProfileLoadEvent(player).call()
-                    }
-                    cache[player.uuid] = player
-                    playersLoading -= it.player.uniqueId
+            await(Dispatchers.IO) {
+                val player = getOrCreate(it.player)
+                Bukkit.getConsoleSender().sendMessage("Profile Loaded!")
+                runSync {
+                    ProfileLoadEvent(player).call()
                 }
+                cache[player.uuid] = player
+                playersLoading -= it.player.uniqueId
             }
-
         }
         event<PlayerQuitEvent>(ignoredCancelled = true) {
             Bukkit.getConsoleSender().sendMessage("Unloading profile!")
             val aPlayer = cache[it.player.uniqueId] ?: return@event
             playersSaving += it.player.uniqueId
             ProfileUnloadEvent(aPlayer).call()
-            runBlocking {
-                launch {
-                    save(aPlayer)
-                    playersSaving -= it.player.uniqueId
-                    cache.remove(it.player.uniqueId)
-                }
+            await(Dispatchers.IO) {
+                save(aPlayer)
+                playersSaving -= it.player.uniqueId
+                cache.remove(it.player.uniqueId)
             }
         }
     }
 
     override fun disable(waves: Waves) {
-        runBlocking {
-            launch {
-                save(*cache.values.toTypedArray())
-                cache.clear()
-            }
+        await {
+            save(*cache.values.toTypedArray())
+            cache.clear()
         }
     }
 

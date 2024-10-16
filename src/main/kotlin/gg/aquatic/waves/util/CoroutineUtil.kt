@@ -1,6 +1,6 @@
 package gg.aquatic.waves.util
 
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asCompletableFuture
 
 fun <T> Deferred<T>.thenAccept(consumer: (T) -> Unit) {
@@ -9,4 +9,12 @@ fun <T> Deferred<T>.thenAccept(consumer: (T) -> Unit) {
 
 fun <T> Deferred<T>.thenRun( runnable: () -> Unit) {
     asCompletableFuture().thenRun(runnable)
+}
+
+inline fun await(dispatcher: CoroutineDispatcher = Dispatchers.Default,crossinline runnable: suspend () -> Unit) = runBlocking {
+    withContext(dispatcher) {
+        launch {
+            runnable()
+        }
+    }
 }

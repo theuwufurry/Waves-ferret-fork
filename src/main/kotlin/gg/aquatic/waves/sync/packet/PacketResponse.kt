@@ -1,7 +1,9 @@
 package gg.aquatic.waves.sync.packet
 
 import com.google.gson.Gson
+import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncPacketHandler
+import java.util.*
 
 class PacketResponse(
     val originalId: String,
@@ -12,6 +14,12 @@ class PacketResponse(
     object Handler: SyncPacketHandler<PacketResponse> {
         override suspend fun handle(packet: PacketResponse): String? {
             println("Received packet response")
+
+            val awaiting = SyncHandler.client.awaiting
+            val uuid = UUID.fromString(packet.originalId)
+            val awaitingPacket = awaiting[uuid] ?: return null
+            awaitingPacket.first.complete(packet.response)
+            awaiting.remove(uuid)
             return null
         }
 
