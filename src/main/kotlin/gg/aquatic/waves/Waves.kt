@@ -6,6 +6,7 @@ import gg.aquatic.aquaticseries.lib.data.MySqlDriver
 import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.sync.SyncSettings
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -61,7 +62,15 @@ class Waves: JavaPlugin() {
         } else {
             MySqlDriver(ip, port, userName, password, database, maxPoolSize, poolName)
         }
-        configValues = WavesConfig(driver)
+
+        val syncEnabled = cfg.getBoolean("sync.enabled", false)
+        val syncIP = cfg.getString("sync.ip", "localhost")!!
+        val syncPort = cfg.getInt("sync.port", 25565)
+        val syncPassword = cfg.getString("sync.protection-key", "<PASSWORD>")!!
+        val syncServerId = cfg.getString("sync.server-id")!!
+        val syncSettings = SyncSettings(syncEnabled, syncIP, syncPort, syncPassword, syncServerId)
+
+        configValues = WavesConfig(driver, syncSettings)
     }
 
     fun initializeModule(module: WaveModule) {

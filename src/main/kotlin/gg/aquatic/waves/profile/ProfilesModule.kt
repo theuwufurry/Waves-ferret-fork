@@ -12,6 +12,8 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.event.ProfileLoadEvent
 import gg.aquatic.waves.profile.event.ProfileUnloadEvent
 import gg.aquatic.waves.profile.module.ProfileModule
+import gg.aquatic.waves.sync.SyncHandler
+import gg.aquatic.waves.sync.SyncedPlayer
 import gg.aquatic.waves.util.await
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
@@ -33,6 +35,7 @@ class ProfilesModule(
     val cache = ConcurrentHashMap<UUID, AquaticPlayer>()
     val playersSaving = HashSet<UUID>()
     val playersLoading = HashSet<UUID>()
+    val playersAwaiting = HashSet<UUID>()
     val modules = HashMap<String, ProfileModule>()
 
     override fun initialize(waves: Waves) {
@@ -58,7 +61,8 @@ class ProfilesModule(
             }
             playersLoading += it.player.uniqueId
             Bukkit.getConsoleSender().sendMessage("Loading profile!")
-            await(Dispatchers.IO) {
+
+            suspend fun loadPlayer(): AquaticPlayer {
                 val player = getOrCreate(it.player)
                 Bukkit.getConsoleSender().sendMessage("Profile Loaded!")
                 runSync {
@@ -66,17 +70,61 @@ class ProfilesModule(
                 }
                 cache[player.uuid] = player
                 playersLoading -= it.player.uniqueId
+                return player
             }
+
+            val syncSettings = Waves.INSTANCE.configValues.syncSettings
+            if (syncSettings.enabled) {
+                await(Dispatchers.IO) {
+                    val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
+                    if (player != null) {
+                        if (player.server == null) {
+                            loadPlayer()
+                        } else {
+                            playersAwaiting += it.player.uniqueId
+                        }
+                    } else {
+                        val aquaticPlayer = loadPlayer()
+                        val cachedPlayer = SyncedPlayer(aquaticPlayer.uuid, aquaticPlayer.username, syncSettings.serverId, HashMap())
+                        SyncHandler.client.cachePlayer(cachedPlayer)
+                    }
+                }
+            } else {
+                await {
+                    loadPlayer()
+                }
+            }
+
+
         }
         event<PlayerQuitEvent>(ignoredCancelled = true) {
             Bukkit.getConsoleSender().sendMessage("Unloading profile!")
             val aPlayer = cache[it.player.uniqueId] ?: return@event
             playersSaving += it.player.uniqueId
             ProfileUnloadEvent(aPlayer).call()
-            await(Dispatchers.IO) {
+            suspend fun savePlayer() {
                 save(aPlayer)
                 playersSaving -= it.player.uniqueId
                 cache.remove(it.player.uniqueId)
+            }
+
+            val syncSettings = Waves.INSTANCE.configValues.syncSettings
+            if (syncSettings.enabled) {
+                await(Dispatchers.IO) {
+                    savePlayer()
+                    val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
+                    if (player != null) {
+                        if (player.server == null) {
+                            savePlayer()
+                        } else {
+                            playersAwaiting += it.player.uniqueId
+                        }
+                    }
+                }
+            } else {
+                await {
+                    savePlayer()
+                }
             }
         }
     }

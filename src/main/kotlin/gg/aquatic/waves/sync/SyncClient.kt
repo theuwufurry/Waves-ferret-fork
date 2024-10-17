@@ -6,6 +6,7 @@ import com.google.gson.JsonParser
 import gg.aquatic.aquaticseries.lib.util.runSync
 import gg.aquatic.waves.sync.packet.PacketResponse
 import gg.aquatic.waves.sync.packet.SyncPacket
+import gg.aquatic.waves.util.await
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.auth.*
@@ -21,6 +22,7 @@ import org.bukkit.Bukkit
 import java.util.ArrayList
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.measureTime
 
 class SyncClient(
@@ -46,9 +48,12 @@ class SyncClient(
                 realm = "Access to the '/' path"
             }
         }
+        await {
+            start()
+        }
     }
 
-    val awaiting = HashMap<UUID, Pair<CompletableDeferred<String>,Long>>()
+    val awaiting = ConcurrentHashMap<UUID, Pair<CompletableDeferred<String>,Long>>()
 
     private var socketConnection: DefaultWebSocketSession? = null
 
@@ -61,21 +66,35 @@ class SyncClient(
         }
     }
 
-    suspend fun getCustomCache(namespace: String): String {
-        return withContext(Dispatchers.IO) {
-            val response = client.request("$ip:$port/cache/$namespace") {
-                method = HttpMethod.Get
-            }
-            response.bodyAsText()
+    suspend fun getPlayerServer(uuid: UUID): String? = withContext(Dispatchers.IO) {
+        val response = client.request("$ip:$port/player/$uuid") {
+            method = HttpMethod.Get
+        }
+        val str = response.bodyAsText()
+        if (str == "null") {
+            null
+        } else{
+            str
+        }
+    }
+    suspend fun setPlayerServer(uuid: UUID, serverId: String?) = withContext(Dispatchers.IO) {
+        client.request("$ip:$port/player/$uuid") {
+            setBody(serverId ?: "null")
+            method = HttpMethod.Post
         }
     }
 
-    suspend fun cachePlayer(syncedPlayer: SyncedPlayer) = coroutineScope {
-        launch {
-            client.request("$ip:$port/cache/player/${syncedPlayer.uuid}") {
-                method = HttpMethod.Post
-                setBody(Gson().toJson(syncedPlayer))
-            }
+    suspend fun getCustomCache(namespace: String): String = withContext(Dispatchers.IO) {
+        val response = client.request("$ip:$port/cache/$namespace") {
+            method = HttpMethod.Get
+        }
+        response.bodyAsText()
+    }
+
+    suspend fun cachePlayer(syncedPlayer: SyncedPlayer) = withContext(Dispatchers.IO) {
+        client.request("$ip:$port/cache/player/${syncedPlayer.uuid}") {
+            method = HttpMethod.Post
+            setBody(Gson().toJson(syncedPlayer))
         }
     }
 
@@ -84,67 +103,56 @@ class SyncClient(
         throw NotImplementedError()
     }
 
-    suspend fun getPlayerCache(uuid: UUID): SyncedPlayer? {
-        return withContext(Dispatchers.IO) {
-            val response = client.request("$ip:$port/player/$uuid") {
-                method = HttpMethod.Get
-            }
-            if (response.status == HttpStatusCode.NotFound) {
-                return@withContext null
-            }
-            val json = response.bodyAsText()
-            return@withContext Gson().fromJson(json, SyncedPlayer::class.java)
+    suspend fun getPlayerCache(uuid: UUID): SyncedPlayer? = withContext(Dispatchers.IO) {
+        val response = client.request("$ip:$port/player/$uuid") {
+            method = HttpMethod.Get
+        }
+        if (response.status == HttpStatusCode.NotFound) {
+            return@withContext null
+        }
+        val json = response.bodyAsText()
+        return@withContext Gson().fromJson(json, SyncedPlayer::class.java)
+    }
+
+    suspend fun cachePlayerData(uuid: UUID, data: HashMap<String, String>) = withContext(Dispatchers.IO) {
+        client.request("$ip:$port/player/$uuid/data") {
+            method = HttpMethod.Post
+            setBody(Gson().toJson(data))
         }
     }
 
-    suspend fun cachePlayerData(uuid: UUID, data: HashMap<String, String>) = coroutineScope {
-        launch {
-            client.request("$ip:$port/player/$uuid/data") {
-                method = HttpMethod.Post
-                setBody(Gson().toJson(data))
-            }
+    suspend fun getPlayerData(uuid: UUID): HashMap<String, String> = withContext(Dispatchers.IO) {
+        val response = client.request("$ip:$port/player/$uuid/data") {
+            method = HttpMethod.Get
+        }
+        val json = response.bodyAsText()
+        Gson().fromJson(json, HashMap::class.java) as HashMap<String, String>
+    }
+
+    suspend fun cachePlayerData(uuid: UUID, key: String, value: String) = withContext(Dispatchers.IO) {
+        client.request("$ip:$port/player/$uuid/data/$key") {
+            method = HttpMethod.Post
+            setBody(value)
         }
     }
 
-    suspend fun getPlayerData(uuid: UUID): HashMap<String, String> {
-        return withContext(Dispatchers.IO) {
-            val response = client.request("$ip:$port/player/$uuid/data") {
-                method = HttpMethod.Get
-            }
-            val json = response.bodyAsText()
-            // TODO
-            throw NotImplementedError()
+    suspend fun getPlayerData(uuid: UUID, key: String): String = withContext(Dispatchers.IO) {
+        val response = client.request("$ip:$port/player/$uuid/data/$key") {
+            method = HttpMethod.Get
         }
+        return@withContext response.bodyAsText()
     }
 
-    suspend fun cachePlayerData(uuid: UUID, key: String, value: String) = coroutineScope {
-        launch {
-            client.request("$ip:$port/player/$uuid/data/$key") {
-                method = HttpMethod.Post
-                setBody(value)
-            }
-        }
-    }
-
-    suspend fun getPlayerData(uuid: UUID, key: String): String {
-        return withContext(Dispatchers.IO) {
-            val response = client.request("$ip:$port/player/$uuid/data/$key") {
-                method = HttpMethod.Get
-            }
-            return@withContext response.bodyAsText()
-        }
-    }
-
-    suspend fun getOrCachePlayer(uuid: UUID, default: SyncedPlayer): SyncedPlayer? {
+    suspend fun getOrCachePlayer(uuid: UUID, default: SyncedPlayer): SyncedPlayer? = withContext(Dispatchers.IO) {
         val cached = getPlayerCache(uuid)
         if (cached != null) {
-            return cached
+            return@withContext cached
         }
         cachePlayer(default)
-        return null
+        return@withContext null
     }
 
-    suspend fun sendPacket(packet: SyncPacket, target: List<String>, broadcast: Boolean, await: Boolean): String? {
+    suspend fun sendPacket(packet: SyncPacket, target: List<String>, broadcast: Boolean, await: Boolean): String? = withContext(Dispatchers.IO) {
         //outgoingPackets += packet
 
         val uuid = UUID.randomUUID()
@@ -158,21 +166,21 @@ class SyncClient(
         obj.addProperty("broadcast", broadcast)
         obj.addProperty("awaitResponse", await)
 
-        val session = socketConnection ?: return null
+        val session = socketConnection ?: return@withContext null
         session.send(obj.toString())
         println("Packet sent!")
 
         if (!await || broadcast) {
-            return null
+            return@withContext null
         }
 
         val deferredResponse = CompletableDeferred<String>()
         awaiting[uuid] = deferredResponse to System.currentTimeMillis()
 
-        return deferredResponse.await()
+        return@withContext deferredResponse.await()
     }
 
-    internal suspend fun start() = coroutineScope {
+    private suspend fun start(): Unit = coroutineScope {
         launch {
             println("Starting!")
             client.webSocket(HttpMethod.Get, ip, port, "/waves-sync-packets", request = {
