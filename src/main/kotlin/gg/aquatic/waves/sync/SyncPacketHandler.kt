@@ -1,6 +1,6 @@
 package gg.aquatic.waves.sync
 
-import gg.aquatic.waves.sync.packet.SyncPacket
+import gg.aquatic.wavessync.api.packet.SyncPacket
 
 interface SyncPacketHandler<T: SyncPacket> {
 

@@ -5,8 +5,8 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import gg.aquatic.aquaticseries.lib.util.runSync
 import gg.aquatic.waves.sync.packet.PacketResponse
-import gg.aquatic.waves.sync.packet.SyncPacket
 import gg.aquatic.waves.util.await
+import gg.aquatic.wavessync.api.packet.SyncPacket
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.auth.*
@@ -161,7 +161,7 @@ class SyncClient(
         val obj = JsonObject()
         obj.addProperty("packetId", uuid.toString())
         obj.addProperty("sentFrom", serverId)
-        obj.add("targetServers", JsonParser.parseString(target.toString()).asJsonArray)
+        obj.addProperty("targetServers", Gson().toJson(target))
         obj.addProperty("data", data)
         obj.addProperty("broadcast", broadcast)
         obj.addProperty("awaitResponse", await)

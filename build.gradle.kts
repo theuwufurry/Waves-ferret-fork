@@ -28,6 +28,7 @@ dependencies {
         exclude("gg.aquatic.aquaticseries.paper", "paper")
         exclude("gg.aquatic.aquaticseries.spigot", "spigot")
     }
+    implementation("gg.aquatic.wavessync:wavessync-api:1.0.1:all")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")

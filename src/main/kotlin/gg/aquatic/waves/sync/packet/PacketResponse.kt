@@ -3,6 +3,7 @@ package gg.aquatic.waves.sync.packet
 import com.google.gson.Gson
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncPacketHandler
+import gg.aquatic.wavessync.api.packet.SyncPacket
 import java.util.*
 
 class PacketResponse(
