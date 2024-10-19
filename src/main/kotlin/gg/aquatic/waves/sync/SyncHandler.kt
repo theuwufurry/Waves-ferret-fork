@@ -14,11 +14,15 @@ object SyncHandler {
     val packetRegistry = mutableMapOf<String, SyncPacketHandler<*>>()
 
     init {
-        registerPacket("waves_packet_response",PacketResponse.Handler)
+        registerPacket("waves_packet_response", PacketResponse.Handler)
     }
 
     fun registerPacket(id: String, handler: SyncPacketHandler<*>) {
         packetRegistry[id] = handler
+    }
+
+    fun initializeClient(syncSettings: SyncSettings) {
+        client = SyncClient(syncSettings.ip, syncSettings.port, syncSettings.protectionKey, syncSettings.serverId)
     }
 
     suspend fun handlePacket(json: JsonObject): String? {
@@ -52,7 +56,12 @@ object SyncHandler {
         sendPacket(packet, target, broadcast = false, await = false)
     }
 
-    private suspend fun sendPacket(packet: SyncPacket, target: List<String>, broadcast: Boolean, await: Boolean): String? {
+    private suspend fun sendPacket(
+        packet: SyncPacket,
+        target: List<String>,
+        broadcast: Boolean,
+        await: Boolean
+    ): String? {
         return client.sendPacket(packet, target, broadcast, await)
     }
 

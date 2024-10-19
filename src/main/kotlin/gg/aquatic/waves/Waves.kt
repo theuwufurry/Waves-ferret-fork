@@ -6,6 +6,7 @@ import gg.aquatic.aquaticseries.lib.data.MySqlDriver
 import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -71,6 +72,9 @@ class Waves: JavaPlugin() {
         val syncSettings = SyncSettings(syncEnabled, syncIP, syncPort, syncPassword, syncServerId)
 
         configValues = WavesConfig(driver, syncSettings)
+        if (syncEnabled) {
+            SyncHandler.initializeClient(syncSettings)
+        }
     }
 
     fun initializeModule(module: WaveModule) {
