@@ -1,9 +1,9 @@
 package gg.aquatic.waves
 
 import gg.aquatic.aquaticseries.lib.AquaticSeriesLib
-import gg.aquatic.aquaticseries.lib.Config
 import gg.aquatic.aquaticseries.lib.data.MySqlDriver
 import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
+import gg.aquatic.aquaticseries.lib.util.Config
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.sync.SyncHandler

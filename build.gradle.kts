@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.18:all") {
+    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.20:all") {
         exclude("org.jetbrains.kotlin", "kotlin-stdlib")
         exclude("gg.aquatic.aquaticseries.core", "core")
         exclude("gg.aquatic.aquaticseries.paper", "paper")
@@ -36,6 +36,8 @@ dependencies {
     implementation("io.ktor:ktor-client-okhttp:$ktor_version")
     implementation("io.ktor:ktor-client-okhttp-jvm:2.3.12")
     implementation("io.ktor:ktor-client-auth:$ktor_version")
+
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
 }
 
 

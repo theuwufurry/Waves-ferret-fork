@@ -9,9 +9,9 @@ import org.bukkit.entity.Player
 
 object PriceSerializer {
 
-    inline fun <reified T: ConfiguredPrice<out Any>> fromSection(section: ConfigurationSection): T? {
+    inline fun <reified T: Any> fromSection(section: ConfigurationSection): ConfiguredPrice<T>? {
         val type = section.getString("type") ?: return null
-        val price = WavesRegistry.getPrice<Player>(type)
+        val price = WavesRegistry.getPrice<T>(type)
         if (price == null) {
             println("[AquaticSeriesLib] Price type $type does not exist!")
             return null
@@ -28,7 +28,7 @@ object PriceSerializer {
         return configuredPrice
     }
 
-    inline fun <reified T: ConfiguredPrice<out Any>> fromSections(sections: List<ConfigurationSection>): List<T> {
+    inline fun <reified T: Any> fromSections(sections: List<ConfigurationSection>): List<ConfiguredPrice<T>> {
         return sections.mapNotNull { fromSection(it) }
     }
 
