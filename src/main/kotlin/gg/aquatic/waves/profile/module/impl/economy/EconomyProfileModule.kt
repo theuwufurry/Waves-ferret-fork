@@ -14,19 +14,15 @@ import kotlin.collections.HashMap
 object EconomyProfileModule : ProfileModule {
     override val id: String = "aquaticeconomy"
 
-    val currencyDriver = CurrencyDriver().apply {
-        //initialize(this)
-    }
-
     val leaderboards = HashMap<RegisteredCurrency, EconomyLeaderboard>()
 
     override suspend fun loadEntry(aquaticPlayer: AquaticPlayer): ProfileModuleEntry {
-        return currencyDriver.get(aquaticPlayer)
+        return CurrencyDriver.get(aquaticPlayer)
     }
 
     suspend fun initializeEconomy(currency: CustomCurrency): RegisteredCurrency {
         return withContext(Dispatchers.IO) {
-            currencyDriver.driver.executeQuery("SELECT * FROM aquaticcurrency_type WHERE currency_id = ?",
+            CurrencyDriver.driver.executeQuery("SELECT * FROM aquaticcurrency_type WHERE currency_id = ?",
                 {
                     setString(1, currency.id)
                 },
@@ -38,7 +34,7 @@ object EconomyProfileModule : ProfileModule {
                         return@executeQuery Optional.empty<RegisteredCurrency>()
                 }
             ).orElseGet {
-                currencyDriver.driver.useConnection {
+                CurrencyDriver.driver.useConnection {
                     prepareStatement("INSERT INTO aquaticcurrency_type (currency_id) VALUES (?)").use { preparedStatement ->
                         preparedStatement.setString(1, currency.id)
                         preparedStatement.execute()

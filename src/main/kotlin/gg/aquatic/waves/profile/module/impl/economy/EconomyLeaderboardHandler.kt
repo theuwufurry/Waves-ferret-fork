@@ -10,7 +10,6 @@ import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.registry.WavesRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.concurrent.CompletableFuture
 
 suspend fun EconomyProfileModule.refreshLeaderboard() = withContext(Dispatchers.IO) {
     for (value in WavesRegistry.INDEX_TO_CURRENCY.values) {
@@ -21,7 +20,7 @@ suspend fun EconomyProfileModule.refreshLeaderboard() = withContext(Dispatchers.
 suspend fun EconomyProfileModule.getLeaderboardPlaces(player: AquaticPlayer): HashMap<RegisteredCurrency, Int> =
     withContext(Dispatchers.IO) {
         val map = HashMap<RegisteredCurrency, Int>()
-        currencyDriver.driver.preparedStatement(
+        CurrencyDriver.driver.preparedStatement(
             "SELECT * FROM (SELECT id, currency_id, RANK() OVER (PARTITION BY currency_id ORDER BY balance DESC) AS rank FROM aquaticcurrency) WHERE id = ?"
         ) {
             setInt(1, player.index)
@@ -47,7 +46,7 @@ suspend fun EconomyProfileModule.refreshLeaderboard(
     if (limit <= 0) {
         return@withContext
     }
-    currencyDriver.driver.preparedStatement("SELECT COUNT(*) FROM aquaticcurrency WHERE currency_id = ?") {
+    CurrencyDriver.driver.preparedStatement("SELECT COUNT(*) FROM aquaticcurrency WHERE currency_id = ?") {
         setInt(1, currency.index)
         executeQuery().use {
             if (it.next()) {
@@ -57,7 +56,7 @@ suspend fun EconomyProfileModule.refreshLeaderboard(
         }
     }
 
-    currencyDriver.driver.preparedStatement(
+    CurrencyDriver.driver.preparedStatement(
         "SELECT uuid, balance, username FROM aquaticcurrency INNER JOIN aquaticprofiles ON aquaticprofiles.id = aquaticcurrency.id WHERE aquaticcurrency.currency_id = ? ORDER BY aquaticcurrency.balance DESC LIMIT ?"
     ) {
         setInt(1, currency.index)
@@ -77,7 +76,7 @@ suspend fun EconomyProfileModule.refreshLeaderboard(
 
     val users =
         (Waves.getModule(WaveModules.PROFILES) as ProfilesModule).cache.values.mapPair { it.index to it }
-    currencyDriver.driver.preparedStatement(
+    CurrencyDriver.driver.preparedStatement(
         "SELECT * FROM (SELECT id, RANK() OVER (ORDER BY balance DESC) AS rank FROM aquaticcurrency WHERE currency_id = ?) WHERE id IN (${
             users.values.joinToString(
                 ","

@@ -7,14 +7,10 @@ import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.registry.WavesRegistry
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
-import java.util.concurrent.CompletableFuture
 
-class CurrencyDriver(
-) {
+object CurrencyDriver {
 
     val driver: DataDriver = (Waves.INSTANCE.modules[WaveModules.PROFILES] as ProfilesModule).driver
 

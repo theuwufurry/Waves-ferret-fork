@@ -14,7 +14,7 @@ class EconomyEntry(
     val balance = HashMap<RegisteredCurrency, Pair<Double,Double>>()
 
     override fun save(connection: Connection) {
-        EconomyProfileModule.currencyDriver.save(connection,this)
+        CurrencyDriver.save(connection,this)
     }
 
     fun balance(registeredCurrency: RegisteredCurrency): Double {
