@@ -3,7 +3,6 @@ package gg.aquatic.waves.sync
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import gg.aquatic.aquaticseries.lib.util.runSync
 import gg.aquatic.waves.sync.packet.PacketResponse
 import gg.aquatic.waves.util.await
 import gg.aquatic.wavessync.api.packet.SyncPacket
@@ -19,11 +18,8 @@ import io.ktor.websocket.*
 import io.ktor.websocket.readText
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
-import java.util.ArrayList
 import java.util.UUID
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.time.measureTime
 
 class SyncClient(
     val ip: String,
