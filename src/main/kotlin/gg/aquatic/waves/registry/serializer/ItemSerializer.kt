@@ -8,15 +8,15 @@ import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
-import java.util.function.BiFunction
 
 object ItemSerializer {
 
     inline fun <reified T : Any> fromSection(
-        section: ConfigurationSection?, mapper: BiFunction<ConfigurationSection, AquaticItem, T>
+        section: ConfigurationSection?, mapper: (ConfigurationSection, AquaticItem) -> T
     ): T? {
         val item = fromSection(section) ?: return null
-        return mapper.apply(section!!, item)
+
+        return mapper(section!!, item)
     }
 
     fun fromSection(
@@ -63,7 +63,7 @@ object ItemSerializer {
         return sections.mapNotNull { fromSection(it) }
     }
 
-    inline fun <reified T : Any> fromSections(sections: List<ConfigurationSection>, mapper: BiFunction<ConfigurationSection, AquaticItem, T>): List<T> {
+    inline fun <reified T : Any> fromSections(sections: List<ConfigurationSection>, mapper: (ConfigurationSection, AquaticItem) -> T): List<T> {
         return sections.mapNotNull { fromSection(it, mapper) }
     }
 
