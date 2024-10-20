@@ -37,7 +37,7 @@ object EconomyProfileModule : ProfileModule {
                     } else
                         return@executeQuery Optional.empty<RegisteredCurrency>()
                 }
-            ).or {
+            ).orElseGet {
                 currencyDriver.driver.useConnection {
                     prepareStatement("INSERT INTO aquaticcurrency_type (currency_id) VALUES (?)").use { preparedStatement ->
                         preparedStatement.setString(1, currency.id)
@@ -45,10 +45,10 @@ object EconomyProfileModule : ProfileModule {
                         val rs = preparedStatement.generatedKeys
                         rs.next()
                         val id = rs.getInt(1)
-                        Optional.of(RegisteredCurrency(currency, id))
+                        RegisteredCurrency(currency, id)
                     }
                 }
-            }.get()
+            }
         }
     }
 
