@@ -1,8 +1,11 @@
 package gg.aquatic.waves
 
 import gg.aquatic.aquaticseries.lib.AquaticSeriesLib
+import gg.aquatic.aquaticseries.lib.betterinventory2.InventoryHandler
 import gg.aquatic.aquaticseries.lib.data.MySqlDriver
 import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
+import gg.aquatic.aquaticseries.lib.interactable2.InteractableHandler
+import gg.aquatic.aquaticseries.lib.packet.PacketHandler
 import gg.aquatic.aquaticseries.lib.util.Config
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
@@ -32,7 +35,11 @@ class Waves: JavaPlugin() {
     override fun onEnable() {
         AquaticSeriesLib.init(
             this,
-            listOf()
+            listOf(
+                PacketHandler,
+                InventoryHandler,
+                InteractableHandler
+            )
             )
         loadConfig()
     }
