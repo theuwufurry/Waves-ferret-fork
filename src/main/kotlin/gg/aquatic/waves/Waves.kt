@@ -8,6 +8,7 @@ import gg.aquatic.aquaticseries.lib.interactable2.InteractableHandler
 import gg.aquatic.aquaticseries.lib.packet.PacketHandler
 import gg.aquatic.aquaticseries.lib.util.Config
 import gg.aquatic.aquaticseries.lib.util.await
+import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.ProfilesModule
@@ -21,7 +22,9 @@ import java.io.File
 class Waves: JavaPlugin() {
 
     val modules = hashMapOf(
-        WaveModules.PROFILES to ProfilesModule)
+        WaveModules.PROFILES to ProfilesModule,
+        WaveModules.ITEMS to ItemHandler,
+    )
     lateinit var configValues: WavesConfig
 
     companion object {
