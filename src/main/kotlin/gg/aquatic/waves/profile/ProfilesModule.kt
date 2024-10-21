@@ -25,12 +25,10 @@ import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
-class ProfilesModule(
-    val driver: DataDriver
-) : WaveModule {
+object ProfilesModule : WaveModule {
     override val type: WaveModules = WaveModules.PROFILES
 
-    constructor() : this(Waves.INSTANCE.configValues.profilesDriver)
+    var driver: DataDriver = Waves.INSTANCE.configValues.profilesDriver
 
     val cache = ConcurrentHashMap<UUID, AquaticPlayer>()
     val playersSaving = HashSet<UUID>()
@@ -85,7 +83,8 @@ class ProfilesModule(
                         }
                     } else {
                         val aquaticPlayer = loadPlayer()
-                        val cachedPlayer = SyncedPlayer(aquaticPlayer.uuid, aquaticPlayer.username, syncSettings.serverId, HashMap())
+                        val cachedPlayer =
+                            SyncedPlayer(aquaticPlayer.uuid, aquaticPlayer.username, syncSettings.serverId, HashMap())
                         SyncHandler.client.cachePlayer(cachedPlayer)
                     }
                 }
@@ -147,7 +146,6 @@ class ProfilesModule(
                 module.initialize(this)
             }
         }
-
     }
 
     suspend fun save(vararg players: AquaticPlayer) = withContext(Dispatchers.IO) {
@@ -209,7 +207,7 @@ class ProfilesModule(
                 }
             }
         }
-        return@coroutineScope optionalPlayer.or {
+        return@coroutineScope optionalPlayer.orElseGet {
             InfoLogger.send("Player was not found in the database!")
             driver.preparedStatement("INSERT INTO aquaticprofiles (uuid, username) VALUES (?, ?)") {
                 setBytes(1, uuid.toBytes())
@@ -221,9 +219,9 @@ class ProfilesModule(
 
                 val player = AquaticPlayer(id, uuid, username)
                 player.updated = true
-                Optional.of(player)
+                player
             }
-        }.get()
+        }
     }
 
     suspend fun get(uuid: UUID): Optional<AquaticPlayer> = coroutineScope {

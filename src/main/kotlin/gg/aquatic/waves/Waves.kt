@@ -9,6 +9,7 @@ import gg.aquatic.aquaticseries.lib.packet.PacketHandler
 import gg.aquatic.aquaticseries.lib.util.Config
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
 import org.bukkit.plugin.java.JavaPlugin
@@ -16,7 +17,8 @@ import java.io.File
 
 class Waves: JavaPlugin() {
 
-    val modules = HashMap<WaveModules,WaveModule>()
+    val modules = hashMapOf(
+        WaveModules.PROFILES to ProfilesModule)
     lateinit var configValues: WavesConfig
 
     companion object {
@@ -42,6 +44,10 @@ class Waves: JavaPlugin() {
             )
             )
         loadConfig()
+
+        for ((_, module) in modules) {
+            module.initialize(this)
+        }
     }
 
     override fun onDisable() {
@@ -82,14 +88,6 @@ class Waves: JavaPlugin() {
         if (syncEnabled) {
             SyncHandler.initializeClient(syncSettings)
         }
-    }
-
-    fun initializeModule(module: WaveModule) {
-        if (modules.containsKey(module.type)) {
-            return
-        }
-        module.initialize(this)
-        modules += module.type to module
     }
 
 }
