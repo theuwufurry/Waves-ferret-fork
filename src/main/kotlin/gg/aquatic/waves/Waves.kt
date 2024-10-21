@@ -7,11 +7,14 @@ import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
 import gg.aquatic.aquaticseries.lib.interactable2.InteractableHandler
 import gg.aquatic.aquaticseries.lib.packet.PacketHandler
 import gg.aquatic.aquaticseries.lib.util.Config
+import gg.aquatic.aquaticseries.lib.util.await
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -43,10 +46,11 @@ class Waves: JavaPlugin() {
                 InteractableHandler
             )
             )
-        loadConfig()
-
-        for ((_, module) in modules) {
-            module.initialize(this)
+        await(Dispatchers.IO) {
+            loadConfig()
+            for ((_, module) in modules) {
+                module.initialize(this)
+            }
         }
     }
 
@@ -54,7 +58,7 @@ class Waves: JavaPlugin() {
 
     }
 
-    fun loadConfig() {
+    suspend fun loadConfig() = withContext(Dispatchers.IO) {
         dataFolder.mkdirs()
         val config = Config("config.yml")
         config.load()

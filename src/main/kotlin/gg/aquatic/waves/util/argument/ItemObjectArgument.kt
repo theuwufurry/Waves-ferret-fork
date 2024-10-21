@@ -14,12 +14,12 @@ class ItemObjectArgument(id: String, defaultValue: AquaticItem?, required: Boole
             return Serializer
         }
 
-    override fun load(section: ConfigurationSection): AquaticItem? {
+    override suspend fun load(section: ConfigurationSection): AquaticItem? {
         return serializer.load(section, id) ?: defaultValue
     }
 
     object Serializer : AbstractObjectArgumentSerializer<AquaticItem?>() {
-        override fun load(section: ConfigurationSection, id: String): AquaticItem? {
+        override suspend fun load(section: ConfigurationSection, id: String): AquaticItem? {
             return AquaticItem.loadFromYml(section.getConfigurationSection(id) ?: return null)
         }
     }

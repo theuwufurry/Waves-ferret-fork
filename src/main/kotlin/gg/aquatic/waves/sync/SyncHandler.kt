@@ -21,8 +21,9 @@ object SyncHandler {
         packetRegistry[id] = handler
     }
 
-    fun initializeClient(syncSettings: SyncSettings) {
+    suspend fun initializeClient(syncSettings: SyncSettings) {
         client = SyncClient(syncSettings.ip, syncSettings.port, syncSettings.protectionKey, syncSettings.serverId)
+        client.start()
     }
 
     suspend fun handlePacket(json: JsonObject): String? {

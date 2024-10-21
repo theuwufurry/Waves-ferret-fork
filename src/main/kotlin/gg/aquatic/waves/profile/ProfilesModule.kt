@@ -2,10 +2,7 @@ package gg.aquatic.waves.profile
 
 import gg.aquatic.aquaticseries.lib.data.DataDriver
 import gg.aquatic.aquaticseries.lib.logger.type.InfoLogger
-import gg.aquatic.aquaticseries.lib.util.call
-import gg.aquatic.aquaticseries.lib.util.event
-import gg.aquatic.aquaticseries.lib.util.runSync
-import gg.aquatic.aquaticseries.lib.util.toBytes
+import gg.aquatic.aquaticseries.lib.util.*
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
@@ -14,7 +11,6 @@ import gg.aquatic.waves.profile.event.ProfileUnloadEvent
 import gg.aquatic.waves.profile.module.ProfileModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncedPlayer
-import gg.aquatic.waves.util.await
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -36,7 +32,7 @@ object ProfilesModule : WaveModule {
     val playersAwaiting = HashSet<UUID>()
     val modules = HashMap<String, ProfileModule>()
 
-    override fun initialize(waves: Waves) {
+    override suspend fun initialize(waves: Waves) {
         CompletableFuture.runAsync {
             driver.execute(
                 "" +

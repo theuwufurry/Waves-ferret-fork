@@ -6,7 +6,7 @@ interface WaveModule {
 
     val type: WaveModules
 
-    fun initialize(waves: Waves)
+    suspend fun initialize(waves: Waves)
     fun disable(waves: Waves)
 
 }

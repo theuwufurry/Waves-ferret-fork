@@ -3,8 +3,8 @@ package gg.aquatic.waves.sync
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import gg.aquatic.aquaticseries.lib.util.await
 import gg.aquatic.waves.sync.packet.PacketResponse
-import gg.aquatic.waves.util.await
 import gg.aquatic.wavessync.api.packet.SyncPacket
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -43,9 +43,6 @@ class SyncClient(
                 }
                 realm = "Access to the '/' path"
             }
-        }
-        await {
-            start()
         }
     }
 
@@ -176,7 +173,7 @@ class SyncClient(
         return@withContext deferredResponse.await()
     }
 
-    private suspend fun start(): Unit = coroutineScope {
+    internal suspend fun start(): Unit = coroutineScope {
         launch {
             println("Starting!")
             client.webSocket(HttpMethod.Get, ip, port, "/waves-sync-packets", request = {

@@ -10,6 +10,8 @@ import gg.aquatic.aquaticseries.lib.requirement.ConfiguredRequirement
 import gg.aquatic.aquaticseries.lib.util.getSectionList
 import gg.aquatic.aquaticseries.lib.util.toAquatic
 import gg.aquatic.waves.util.loadFromYml
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Display.Billboard
@@ -20,27 +22,27 @@ import java.util.function.Function
 
 object HologramSerializer {
 
-    fun load(sections: Collection<ConfigurationSection>): MutableList<AquaticHologram.Line> {
+    suspend fun load(sections: Collection<ConfigurationSection>): MutableList<AquaticHologram.Line> = withContext(Dispatchers.IO) {
         val list = mutableListOf<AquaticHologram.Line>()
         for (section in sections) {
             val line = loadLine(section) ?: continue
             list += line
         }
-        return list
+        return@withContext list
     }
 
-    fun loadLine(section: ConfigurationSection): AquaticHologram.Line? {
-        val type = section.getString("type") ?: return null
+    suspend fun loadLine(section: ConfigurationSection): AquaticHologram.Line? = withContext(Dispatchers.IO) {
+        val type = section.getString("type") ?: return@withContext null
         when (type.lowercase()) {
-            "text_display" -> return loadTextLine(section)
-            "item_display" -> return loadItemLine(section)
-            "armorstand" -> return loadArmorstandLine(section)
-            "empty" -> return loadEmptyLine(section)
+            "text_display" -> return@withContext loadTextLine(section)
+            "item_display" -> return@withContext loadItemLine(section)
+            "armorstand" -> return@withContext loadArmorstandLine(section)
+            "empty" -> return@withContext loadEmptyLine(section)
         }
-        return null
+        return@withContext null
     }
 
-    fun loadTextLine(section: ConfigurationSection): TextDisplayLine {
+    suspend fun loadTextLine(section: ConfigurationSection): TextDisplayLine = withContext(Dispatchers.IO) {
         val failLine = loadFailLine(section)
         val requirements = loadRequirements(section)
 
@@ -54,7 +56,7 @@ object HologramSerializer {
             }
         }
 
-        return TextDisplayLine(
+        return@withContext TextDisplayLine(
             Function { p ->
                 for (requirement in requirements) {
                     if (!requirement.check(p)) return@Function false
@@ -66,12 +68,12 @@ object HologramSerializer {
         ) { p, line -> line }
     }
 
-    private fun loadTextKeyframe(section: ConfigurationSection): TextDisplayLine.TextDisplayKeyframe {
+    private suspend fun loadTextKeyframe(section: ConfigurationSection): TextDisplayLine.TextDisplayKeyframe = withContext(Dispatchers.IO) {
         val text = section.getString("text")!!
         val height = section.getDouble("height", 0.3)
         val scale = section.getDouble("scale", 1.0).toFloat()
         val billboard = Billboard.valueOf(section.getString("billboard", "CENTER")!!)
-        return TextDisplayLine.TextDisplayKeyframe(
+        return@withContext TextDisplayLine.TextDisplayKeyframe(
             text.toAquatic(),
             height,
             scale,
@@ -79,13 +81,13 @@ object HologramSerializer {
         )
     }
 
-    fun loadItemLine(section: ConfigurationSection): ItemDisplayLine? {
+    suspend fun loadItemLine(section: ConfigurationSection): ItemDisplayLine? = withContext(Dispatchers.IO) {
         val failLine = loadFailLine(section)
         val requirements = loadRequirements(section)
 
         val keyframes = TreeMap<Int, ItemDisplayLine.ItemDisplayKeyframe>()
         if (!section.contains("frames")) {
-            keyframes += 0 to (loadItemKeyframe(section) ?: return null)
+            keyframes += 0 to (loadItemKeyframe(section) ?: return@withContext null)
         } else {
             val frames = section.getConfigurationSection("frames")!!
             val keys = frames.getKeys(false)
@@ -102,7 +104,7 @@ object HologramSerializer {
             }
         }
 
-        return ItemDisplayLine(
+        return@withContext ItemDisplayLine(
             Function { p ->
                 for (requirement in requirements) {
                     if (!requirement.check(p)) return@Function false
@@ -114,13 +116,13 @@ object HologramSerializer {
         )
     }
 
-    private fun loadItemKeyframe(section: ConfigurationSection): ItemDisplayLine.ItemDisplayKeyframe? {
-        val item = AquaticItem.loadFromYml(section) ?: return null
+    private suspend fun loadItemKeyframe(section: ConfigurationSection): ItemDisplayLine.ItemDisplayKeyframe? = withContext(Dispatchers.IO) {
+        val item = AquaticItem.loadFromYml(section) ?: return@withContext null
         val height = section.getDouble("height", 0.3)
         val scale = section.getDouble("scale", 1.0).toFloat()
         val billboard = Billboard.valueOf(section.getString("billboard", "CENTER")!!)
         val itemDisplayTransform: ItemDisplayTransform = ItemDisplayTransform.valueOf(section.getString("item-display-transform", "GROUND")!!)
-        return ItemDisplayLine.ItemDisplayKeyframe(
+        return@withContext ItemDisplayLine.ItemDisplayKeyframe(
             item.getItem(),
             height,
             scale,
@@ -129,7 +131,7 @@ object HologramSerializer {
         )
     }
 
-    fun loadArmorstandLine(section: ConfigurationSection): ArmorstandLine {
+    suspend fun loadArmorstandLine(section: ConfigurationSection): ArmorstandLine = withContext(Dispatchers.IO) {
         val failLine = loadFailLine(section)
         val requirements = loadRequirements(section)
 
@@ -143,7 +145,7 @@ object HologramSerializer {
             }
         }
 
-        return ArmorstandLine(
+        return@withContext ArmorstandLine(
             Function { p ->
                 for (requirement in requirements) {
                     if (!requirement.check(p)) return@Function false
@@ -155,20 +157,20 @@ object HologramSerializer {
         ) { p, line -> line }
     }
 
-    private fun loadArmorstandKeyframe(section: ConfigurationSection): ArmorstandLine.ArmorstandKeyframe {
+    private suspend fun loadArmorstandKeyframe(section: ConfigurationSection): ArmorstandLine.ArmorstandKeyframe = withContext(Dispatchers.IO) {
         val text = section.getString("text")!!
         val height = section.getDouble("height", 0.3)
-        return ArmorstandLine.ArmorstandKeyframe(
+        return@withContext ArmorstandLine.ArmorstandKeyframe(
             text.toAquatic(),
             height,
         )
     }
 
-    fun loadEmptyLine(section: ConfigurationSection): EmptyLine {
+    suspend fun loadEmptyLine(section: ConfigurationSection): EmptyLine = withContext(Dispatchers.IO) {
         val height = section.getDouble("height", 0.3)
         val failLine = loadFailLine(section)
         val requirements = loadRequirements(section)
-        return EmptyLine(
+        return@withContext EmptyLine(
             Function { p ->
                 for (requirement in requirements) {
                     if (!requirement.check(p)) return@Function false
@@ -180,16 +182,16 @@ object HologramSerializer {
         )
     }
 
-    private fun loadRequirements(section: ConfigurationSection): List<ConfiguredRequirement<Player>> {
-        return if (section.contains("conditions")) {
+    private suspend fun loadRequirements(section: ConfigurationSection): List<ConfiguredRequirement<Player>> = withContext(Dispatchers.IO) {
+        return@withContext if (section.contains("conditions")) {
             RequirementSerializer.fromSections(section.getSectionList("conditions"))
         } else {
             arrayListOf()
         }
     }
 
-    private fun loadFailLine(section: ConfigurationSection): AquaticHologram.Line? {
-        return if (section.isConfigurationSection("fail-line")) {
+    private suspend fun loadFailLine(section: ConfigurationSection): AquaticHologram.Line? = withContext(Dispatchers.IO) {
+        return@withContext if (section.isConfigurationSection("fail-line")) {
             loadLine(section.getConfigurationSection("fail-line")!!)
         } else {
             null
