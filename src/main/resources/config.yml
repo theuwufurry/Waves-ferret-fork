@@ -6,3 +6,9 @@ databases:
     database: "database"
     username: ""
     password: ""
+sync:
+  enabled: false
+  ip: localhost
+  port: 8080
+  protection-key: "YOUR-PROTECTION-KEY"
+  server-id: smp1

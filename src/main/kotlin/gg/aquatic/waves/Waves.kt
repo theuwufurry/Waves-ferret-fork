@@ -66,9 +66,9 @@ class Waves: JavaPlugin() {
 
         val syncEnabled = cfg.getBoolean("sync.enabled", false)
         val syncIP = cfg.getString("sync.ip", "localhost")!!
-        val syncPort = cfg.getInt("sync.port", 25565)
+        val syncPort = cfg.getInt("sync.port", 8080)
         val syncPassword = cfg.getString("sync.protection-key", "<PASSWORD>")!!
-        val syncServerId = cfg.getString("sync.server-id")!!
+        val syncServerId = cfg.getString("sync.server-id", "main")!!
         val syncSettings = SyncSettings(syncEnabled, syncIP, syncPort, syncPassword, syncServerId)
 
         configValues = WavesConfig(driver, syncSettings)
