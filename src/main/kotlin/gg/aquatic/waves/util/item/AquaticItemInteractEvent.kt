@@ -9,7 +9,8 @@ import org.bukkit.event.Event
 class AquaticItemInteractEvent(
     val player: Player,
     val item: AquaticItem,
-    var originalEvent: Event
+    var originalEvent: Event,
+    val isLeftClick: Boolean
 ): AquaticEvent() {
 
     var isCancelled: Boolean

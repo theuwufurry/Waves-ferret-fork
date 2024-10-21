@@ -11,6 +11,7 @@ import gg.aquatic.waves.registry.isAquaticItem
 import gg.aquatic.waves.registry.registryId
 import gg.aquatic.waves.util.item.AquaticItemInteractEvent
 import org.bukkit.NamespacedKey
+import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 
@@ -32,7 +33,7 @@ object ItemHandler : WaveModule {
                 val interaction = listenInteractions[registry] ?: return@event
 
                 val aitemEvent = AquaticItemInteractEvent(
-                    it.player, aitem, it
+                    it.player, aitem, it, it.action == Action.LEFT_CLICK_AIR || it.action == Action.LEFT_CLICK_BLOCK,
                 )
                 interaction(aitemEvent)
                 aitemEvent.call()
