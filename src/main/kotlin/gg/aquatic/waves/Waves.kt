@@ -6,8 +6,7 @@ import gg.aquatic.aquaticseries.lib.data.MySqlDriver
 import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
 import gg.aquatic.aquaticseries.lib.interactable2.InteractableHandler
 import gg.aquatic.aquaticseries.lib.packet.PacketHandler
-import gg.aquatic.aquaticseries.lib.util.Config
-import gg.aquatic.aquaticseries.lib.util.await
+import gg.aquatic.aquaticseries.lib.util.*
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
@@ -48,11 +47,11 @@ class Waves: JavaPlugin() {
                 InventoryHandler,
                 InteractableHandler
             )
-            )
+        )
         await(Dispatchers.IO) {
             loadConfig()
             for ((_, module) in modules) {
-                module.initialize(this)
+                module.initialize(this@Waves)
             }
         }
     }

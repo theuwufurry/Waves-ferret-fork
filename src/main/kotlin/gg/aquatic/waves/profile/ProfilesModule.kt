@@ -24,7 +24,9 @@ import java.util.concurrent.ConcurrentHashMap
 object ProfilesModule : WaveModule {
     override val type: WaveModules = WaveModules.PROFILES
 
-    var driver: DataDriver = Waves.INSTANCE.configValues.profilesDriver
+    val driver: DataDriver by lazy {
+        Waves.INSTANCE.configValues.profilesDriver
+    }
 
     val cache = ConcurrentHashMap<UUID, AquaticPlayer>()
     val playersSaving = HashSet<UUID>()
@@ -33,22 +35,6 @@ object ProfilesModule : WaveModule {
     val modules = HashMap<String, ProfileModule>()
 
     override suspend fun initialize(waves: Waves) {
-        CompletableFuture.runAsync {
-            driver.execute(
-                "" +
-                        "CREATE TABLE IF NOT EXISTS " +
-                        "aquaticprofiles (" +
-                        "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                        "uuid BINARY(16) NOT NULL UNIQUE," +
-                        "username NVARCHAR(64) NOT NULL" +
-                        ")"
-            ) {
-            }
-        }.exceptionally {
-            it.printStackTrace()
-            null
-        }
-
         event<PlayerJoinEvent>(ignoredCancelled = true) {
             if (playersLoading.contains(it.player.uniqueId)) {
                 return@event

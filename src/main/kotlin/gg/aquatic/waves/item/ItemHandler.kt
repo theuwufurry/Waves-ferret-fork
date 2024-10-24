@@ -17,7 +17,9 @@ import org.bukkit.inventory.EquipmentSlot
 
 object ItemHandler : WaveModule {
 
-    val NAMESPACE_KEY = NamespacedKey(AquaticSeriesLib.INSTANCE.plugin, "Custom_Item_Registry")
+    val NAMESPACE_KEY by lazy {
+        NamespacedKey(AquaticSeriesLib.INSTANCE.plugin, "Custom_Item_Registry")
+    }
     val listenInteractions = mutableMapOf<String, (AquaticItemInteractEvent) -> Unit>()
     override val type: WaveModules = WaveModules.ITEMS
 

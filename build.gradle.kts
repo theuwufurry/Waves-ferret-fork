@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.0.20"
+    kotlin("jvm") version "2.0.21"
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("co.uzzu.dotenv.gradle") version "2.0.0"
@@ -37,6 +37,8 @@ dependencies {
     implementation("io.ktor:ktor-client-okhttp-jvm:2.3.12")
     implementation("io.ktor:ktor-client-auth:$ktor_version")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
 }
 
@@ -67,9 +69,25 @@ tasks {
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     archiveFileName.set("Waves-${project.version}.jar")
     archiveClassifier.set("plugin")
+
+    configurations = listOf(project.configurations.compileClasspath.get())
+
     dependencies {
         include(dependency("gg.aquatic.aquaticseries:aquaticlib"))
+        include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
     }
+    //configurations = listOf(project.configurations.implementation.get(), project.configurations.runtimeOnly.get())
+    from({
+        project.configurations.runtimeClasspath.get().filter { it.name.contains("kotlinx-coroutines-core") }.map { project.zipTree(it) }
+    })
+
+    // Relocate packages
+    relocate("kotlinx.coroutines", "gg.aquatic.waves.shadow.kotlinx.coroutines")
+
+    // Exclude the original (unrelocated) kotlinx-coroutines-core package
+    exclude("META-INF/versions/9/module-info.class")
+
+
 }
 
 
