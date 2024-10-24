@@ -9,10 +9,12 @@ import gg.aquatic.aquaticseries.lib.item2.factories.MMFactory
 import gg.aquatic.aquaticseries.lib.item2.factories.OraxenFactory
 import gg.aquatic.aquaticseries.lib.price.AbstractPrice
 import gg.aquatic.aquaticseries.lib.requirement.AbstractRequirement
+import gg.aquatic.waves.Waves
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.util.action.*
 import gg.aquatic.waves.util.price.ItemPrice
 import gg.aquatic.waves.util.price.VaultPrice
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 object WavesRegistry {
@@ -32,10 +34,13 @@ object WavesRegistry {
 
     }
     val REQUIREMENT = HashMap<Class<*>,MutableMap<String,AbstractRequirement<*>>>()
-    val PRICE = HashMap<Class<*>,MutableMap<String,AbstractPrice<*>>>().apply {
-        val p = getOrPut(Player::class.java) { HashMap() }
-        p["item"] = ItemPrice()
-        p["vault"] = VaultPrice()
+    val PRICE by lazy {
+        HashMap<Class<*>,MutableMap<String,AbstractPrice<*>>>().apply {
+            val p = getOrPut(Player::class.java) { HashMap() }
+            p["item"] = ItemPrice()
+            if (Bukkit.getPluginManager().getPlugin("Vault") != null)
+                p["vault"] = VaultPrice()
+        }
     }
     val ITEM_FACTORIES = hashMapOf(
         "MYTHICITEM" to MMFactory,
