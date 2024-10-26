@@ -9,7 +9,6 @@ import gg.aquatic.aquaticseries.lib.item2.factories.MMFactory
 import gg.aquatic.aquaticseries.lib.item2.factories.OraxenFactory
 import gg.aquatic.aquaticseries.lib.price.AbstractPrice
 import gg.aquatic.aquaticseries.lib.requirement.AbstractRequirement
-import gg.aquatic.waves.Waves
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.util.action.*
 import gg.aquatic.waves.util.price.ItemPrice
