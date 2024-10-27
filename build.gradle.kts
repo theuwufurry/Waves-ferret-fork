@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "gg.aquatic.waves"
-version = "1.0.12"
+version = "1.0.15"
 
 val ktor_version: String by project
 
@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.31:all") {
+    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.33:all") {
         exclude("org.jetbrains.kotlin", "kotlin-stdlib")
         exclude("gg.aquatic.aquaticseries.core", "core")
         exclude("gg.aquatic.aquaticseries.paper", "paper")
