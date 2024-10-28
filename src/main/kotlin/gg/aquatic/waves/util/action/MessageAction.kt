@@ -12,17 +12,18 @@ import java.util.function.BiFunction
 class MessageAction : AbstractAction<Player>() {
 
     override fun run(player: Player, args: Map<String, Any?>, textUpdater: BiFunction<Player, String, String>) {
-        val messages = if (args["message"] != null) listOf(args["message"] as String) else args["messages"] as List<String>
 
-        for (message in messages) {
-            message.updatePAPIPlaceholders(player).toAquatic().replace(textUpdater, player).send(player)
+        val message = args["message"]!!
+        val messages = if (message is List<*>) message.map { it.toString() } else listOf(message.toString())
+
+        for (msg in messages) {
+            msg.updatePAPIPlaceholders(player).toAquatic().replace(textUpdater, player).send(player)
         }
     }
 
     override fun arguments(): List<AquaticObjectArgument<*>> {
         return listOf(
-            PrimitiveObjectArgument("message", "", false),
-            PrimitiveObjectArgument("messages", ArrayList<String>(), false)
+            PrimitiveObjectArgument("message", "", true),
         )
     }
 

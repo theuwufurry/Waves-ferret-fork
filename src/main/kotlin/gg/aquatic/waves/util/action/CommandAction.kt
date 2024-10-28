@@ -10,10 +10,22 @@ import java.util.function.BiFunction
 
 class CommandAction: AbstractAction<Player>() {
     override fun run(player: Player, args: Map<String, Any?>, textUpdater: BiFunction<Player, String, String>) {
-        Bukkit.dispatchCommand(
-            Bukkit.getConsoleSender(),
-            textUpdater.apply(player, args["command"]!!.toString().updatePAPIPlaceholders(player))
-        )
+
+        val command = args["command"]!!
+
+
+        val commands = if (command is List<*>) {
+            command.map { it.toString() }
+        } else {
+            listOf(command.toString())
+        }
+
+        for (cmd in commands) {
+            Bukkit.dispatchCommand(
+                Bukkit.getConsoleSender(),
+                textUpdater.apply(player, cmd.updatePAPIPlaceholders(player))
+            )
+        }
     }
 
     override fun arguments(): List<AquaticObjectArgument<*>> {
