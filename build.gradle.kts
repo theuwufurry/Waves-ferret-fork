@@ -18,6 +18,9 @@ repositories {
     maven {
         url = uri("https://repo.nekroplex.com/releases")
     }
+    maven {
+        url = uri("https://repo.codemc.io/repository/maven-releases/")
+    }
 }
 
 dependencies {
@@ -38,6 +41,7 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktor_version")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("com.github.retrooper:packetevents-spigot:2.5.0")
 
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
 }
@@ -75,14 +79,18 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     dependencies {
         include(dependency("gg.aquatic.aquaticseries:aquaticlib"))
         include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        include(dependency("com.github.retrooper:packetevents-spigot"))
     }
     //configurations = listOf(project.configurations.implementation.get(), project.configurations.runtimeOnly.get())
     from({
-        project.configurations.runtimeClasspath.get().filter { it.name.contains("kotlinx-coroutines-core") }.map { project.zipTree(it) }
+        project.configurations.runtimeClasspath.get().filter { it.name.contains("kotlinx-coroutines-core") }
+            .map { project.zipTree(it) }
     })
 
     // Relocate packages
     relocate("kotlinx.coroutines", "gg.aquatic.waves.shadow.kotlinx.coroutines")
+    relocate("com.github.retrooper","gg.aquatic.waves.shadow.com.retrooper")
+    relocate("io.github.retrooper","gg.aquatic.waves.shadow.io.retrooper")
 
     // Exclude the original (unrelocated) kotlinx-coroutines-core package
     exclude("META-INF/versions/9/module-info.class")

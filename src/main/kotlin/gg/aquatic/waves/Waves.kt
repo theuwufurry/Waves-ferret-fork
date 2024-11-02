@@ -1,5 +1,6 @@
 package gg.aquatic.waves
 
+import com.github.retrooper.packetevents.PacketEvents
 import gg.aquatic.aquaticseries.lib.AquaticSeriesLib
 import gg.aquatic.aquaticseries.lib.betterinventory2.InventoryHandler
 import gg.aquatic.aquaticseries.lib.data.MySqlDriver
@@ -13,6 +14,7 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.plugin.java.JavaPlugin
@@ -37,9 +39,12 @@ class Waves: JavaPlugin() {
 
     override fun onLoad() {
         INSTANCE = this
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this))
+        PacketEvents.getAPI().load()
     }
 
     override fun onEnable() {
+        PacketEvents.getAPI().init();
         AquaticSeriesLib.init(
             this,
             listOf(
@@ -57,7 +62,7 @@ class Waves: JavaPlugin() {
     }
 
     override fun onDisable() {
-
+        PacketEvents.getAPI().terminate();
     }
 
     suspend fun loadConfig() = withContext(Dispatchers.IO) {
