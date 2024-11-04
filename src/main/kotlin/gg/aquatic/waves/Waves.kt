@@ -62,7 +62,7 @@ class Waves: JavaPlugin() {
     }
 
     override fun onDisable() {
-        PacketEvents.getAPI().terminate();
+        PacketEvents.getAPI().terminate()
     }
 
     suspend fun loadConfig() = withContext(Dispatchers.IO) {
