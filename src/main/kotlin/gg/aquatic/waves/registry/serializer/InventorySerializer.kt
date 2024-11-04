@@ -7,12 +7,12 @@ import gg.aquatic.aquaticseries.lib.betterinventory2.action.ConfiguredConditionW
 import gg.aquatic.aquaticseries.lib.util.getSectionList
 import gg.aquatic.aquaticseries.lib.util.toAquatic
 import gg.aquatic.waves.item.AquaticItem
+import gg.aquatic.waves.item.loadFromYml
 import gg.aquatic.waves.util.inventory.AnimatedButtonSettings
 import gg.aquatic.waves.util.inventory.ButtonSettings
 import gg.aquatic.waves.util.inventory.ClickSettings
 import gg.aquatic.waves.util.inventory.InventorySettings
 import gg.aquatic.waves.util.inventory.StaticButtonSettings
-import gg.aquatic.waves.util.loadFromYml
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.configuration.ConfigurationSection

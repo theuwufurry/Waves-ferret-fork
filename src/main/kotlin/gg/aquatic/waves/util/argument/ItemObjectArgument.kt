@@ -3,7 +3,7 @@ package gg.aquatic.waves.util.argument
 import gg.aquatic.aquaticseries.lib.util.argument.AbstractObjectArgumentSerializer
 import gg.aquatic.aquaticseries.lib.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.item.AquaticItem
-import gg.aquatic.waves.util.loadFromYml
+import gg.aquatic.waves.item.loadFromYml
 import org.bukkit.configuration.ConfigurationSection
 
 class ItemObjectArgument(id: String, defaultValue: AquaticItem?, required: Boolean) : AquaticObjectArgument<AquaticItem>(id, defaultValue,

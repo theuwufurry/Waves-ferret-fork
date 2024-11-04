@@ -1,12 +1,10 @@
 package gg.aquatic.waves.item
 
-import gg.aquatic.aquaticseries.lib.util.displayName
-import gg.aquatic.aquaticseries.lib.util.lore
 import gg.aquatic.aquaticseries.lib.util.setSpawnerType
 import gg.aquatic.aquaticseries.lib.util.toAquatic
-import gg.aquatic.waves.util.modifyFastMeta
 import gg.aquatic.waves.util.toComponent
 import net.advancedplugins.ae.api.AEAPI
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
@@ -69,7 +67,7 @@ class AquaticItem(
                 displayName = this.toAquatic().toComponent()
             }
             description?.apply {
-                lore = this.toAquatic().toComponent()
+                lore = this.toAquatic().toComponent().map { it.decoration(TextDecoration.ITALIC, false) }
             }
             if (this@AquaticItem.modelData > 0) {
                 modelData = this@AquaticItem.modelData

@@ -9,7 +9,7 @@ import gg.aquatic.aquaticseries.lib.requirement.ConfiguredRequirement
 import gg.aquatic.aquaticseries.lib.util.getSectionList
 import gg.aquatic.aquaticseries.lib.util.toAquatic
 import gg.aquatic.waves.item.AquaticItem
-import gg.aquatic.waves.util.loadFromYml
+import gg.aquatic.waves.item.loadFromYml
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.Bukkit
