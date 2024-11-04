@@ -1,6 +1,5 @@
-package gg.aquatic.waves.util.item
+package gg.aquatic.waves.item
 
-import gg.aquatic.aquaticseries.lib.item2.AquaticItem
 import gg.aquatic.aquaticseries.lib.util.AquaticEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable

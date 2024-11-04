@@ -1,7 +1,7 @@
 package gg.aquatic.waves.registry.serializer
 
-import gg.aquatic.aquaticseries.lib.item2.AquaticItem
-import gg.aquatic.aquaticseries.lib.item2.ItemHandler
+import gg.aquatic.waves.item.AquaticItem
+import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.registry.WavesRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

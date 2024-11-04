@@ -1,9 +1,10 @@
-package gg.aquatic.waves.util
+package gg.aquatic.waves.item
 
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType
+import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
@@ -52,6 +53,15 @@ class FastItemMeta(
 
     fun enchantments(enchantments: Map<EnchantmentType, Int>, showInTooltip: Boolean = true) {
         nms.setComponent(ComponentTypes.ENCHANTMENTS, ItemEnchantments(enchantments, showInTooltip))
+    }
+
+    fun enchantmentsByNames(enchantments: Map<String, Int>, showInTooltip: Boolean = true) {
+        val map = hashMapOf<EnchantmentType, Int>()
+        for ((name, level) in enchantments) {
+            val enchantment = EnchantmentTypes.getByName(name) ?: continue
+            map[enchantment] = level
+        }
+        enchantments(map, showInTooltip)
     }
 
     fun addEnchantment(enchantment: EnchantmentType, level: Int, showInTooltip: Boolean = true) {

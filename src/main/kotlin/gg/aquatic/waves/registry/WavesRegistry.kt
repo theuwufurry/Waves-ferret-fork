@@ -2,14 +2,14 @@ package gg.aquatic.waves.registry
 
 import gg.aquatic.aquaticseries.lib.action.AbstractAction
 import gg.aquatic.aquaticseries.lib.economy.Currency
-import gg.aquatic.aquaticseries.lib.item2.AquaticItem
-import gg.aquatic.aquaticseries.lib.item2.factories.HDBFactory
-import gg.aquatic.aquaticseries.lib.item2.factories.IAFactory
-import gg.aquatic.aquaticseries.lib.item2.factories.MMFactory
-import gg.aquatic.aquaticseries.lib.item2.factories.OraxenFactory
+import gg.aquatic.waves.item.factory.HDBFactory
+import gg.aquatic.waves.item.factory.IAFactory
+import gg.aquatic.waves.item.factory.MMFactory
+import gg.aquatic.waves.item.factory.OraxenFactory
 import gg.aquatic.aquaticseries.lib.price.AbstractPrice
 import gg.aquatic.aquaticseries.lib.requirement.AbstractRequirement
 import gg.aquatic.waves.economy.RegisteredCurrency
+import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.util.action.*
 import gg.aquatic.waves.util.price.ItemPrice
 import gg.aquatic.waves.util.price.VaultPrice

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "gg.aquatic.waves"
-version = "1.0.20"
+version = "1.0.21"
 
 val ktor_version: String by project
 
@@ -15,6 +15,8 @@ repositories {
     mavenLocal()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://mvn.lumine.io/repository/maven-public/")
+    maven("https://repo.oraxen.com/releases")
+    maven("https://jitpack.io")
     maven {
         url = uri("https://repo.nekroplex.com/releases")
     }
@@ -30,9 +32,10 @@ val nmsVersion = "1.0.39"
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.40:all") {
-    }
-    implementation("gg.aquatic.aquaticseries:aquaticlib-core:1.0.40:all") {
+    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.41:all")
+    implementation("gg.aquatic.aquaticseries.spigot:spigot:1.0.41")
+    implementation("gg.aquatic.aquaticseries.paper:paper:1.0.41")
+    implementation("gg.aquatic.aquaticseries:aquaticlib-core:1.0.41:all") {
     }
     implementation("gg.aquatic.aquaticseries.nms:NMS_v1_17_1:$nmsVersion") {
         exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
@@ -58,8 +61,6 @@ dependencies {
     implementation("gg.aquatic.aquaticseries.nms:NMS_v1_21_1:$nmsVersion") {
         exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
     }
-    implementation("gg.aquatic.aquaticseries.spigot:spigot:1.0.40")
-    implementation("gg.aquatic.aquaticseries.paper:paper:1.0.40")
     implementation("gg.aquatic.wavessync:wavessync-api:1.0.1:all")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
@@ -73,6 +74,12 @@ dependencies {
     implementation("com.github.retrooper:packetevents-spigot:2.5.0")
 
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
+    compileOnly("gg.aquatic:AEAPI:1.0")
+    compileOnly("io.th0rgal:oraxen:1.171.0")
+    compileOnly("com.github.LoneDev6:API-ItemsAdder:3.6.2-beta-r3-b")
+    compileOnly ("com.ticxo.modelengine:ModelEngine:R4.0.4")
+    compileOnly("io.lumine:Mythic-Dist:5.6.1")
+    compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
 }
 
 

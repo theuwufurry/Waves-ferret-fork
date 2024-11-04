@@ -1,9 +1,9 @@
 package gg.aquatic.waves.util.action
 
 import gg.aquatic.aquaticseries.lib.action.AbstractAction
-import gg.aquatic.aquaticseries.lib.item2.AquaticItem
 import gg.aquatic.aquaticseries.lib.util.argument.AquaticObjectArgument
-import gg.aquatic.aquaticseries.lib.util.toCustomItem
+import gg.aquatic.waves.item.AquaticItem
+import gg.aquatic.waves.item.toCustomItem
 import gg.aquatic.waves.util.argument.ItemObjectArgument
 import org.bukkit.Material
 import org.bukkit.entity.Player

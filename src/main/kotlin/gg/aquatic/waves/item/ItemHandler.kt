@@ -9,11 +9,13 @@ import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.registry.isAquaticItem
 import gg.aquatic.waves.registry.registryId
-import gg.aquatic.waves.util.item.AquaticItemInteractEvent
 import org.bukkit.NamespacedKey
+import org.bukkit.entity.EntityType
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemFlag
+import org.bukkit.inventory.ItemStack
 
 object ItemHandler : WaveModule {
 
@@ -44,6 +46,34 @@ object ItemHandler : WaveModule {
     }
 
     override fun disable(waves: Waves) {
+
+    }
+
+    fun create(
+        item: ItemStack,
+        name: String? = null,
+        description: MutableList<String>? = null,
+        amount: Int = 1,
+        modeldata: Int = -1,
+        enchantments: MutableMap<String, Int>? = null,
+        flags: MutableList<ItemFlag>? = null,
+        spawnerEntityType: EntityType? = null
+    ): AquaticItem {
+        return AquaticItem(
+            item,
+            name,
+            description,
+            amount,
+            modeldata,
+            enchantments,
+            flags,
+            spawnerEntityType
+        )
+    }
+
+    interface Factory {
+
+        fun create(id: String): ItemStack?
 
     }
 
