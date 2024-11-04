@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
-class Waves: JavaPlugin() {
+class Waves : JavaPlugin() {
 
     val modules = hashMapOf(
         WaveModules.PROFILES to ProfilesModule,
@@ -71,17 +71,17 @@ class Waves: JavaPlugin() {
         config.load()
 
         val cfg = config.getConfiguration()!!
-        val type = cfg.getString("databases.profiles.type","SQLITE")!!
-        val ip = cfg.getString("databases.profiles.ip","")!!
-        val port = cfg.getInt("databases.profiles.port",3306)
-        val userName = cfg.getString("databases.profiles.username","")!!
-        val password = cfg.getString("databases.profiles.password","")!!
-        val database = cfg.getString("databases.profiles.database","")!!
-        val maxPoolSize = cfg.getInt("databases.profiles.maxPoolSize",10)
-        val poolName = cfg.getString("databases.profiles.poolName","Waves Hikari Pool")!!
+        val type = cfg.getString("databases.profiles.type", "SQLITE")!!
+        val ip = cfg.getString("databases.profiles.ip", "")!!
+        val port = cfg.getInt("databases.profiles.port", 3306)
+        val userName = cfg.getString("databases.profiles.username", "")!!
+        val password = cfg.getString("databases.profiles.password", "")!!
+        val database = cfg.getString("databases.profiles.database", "")!!
+        val maxPoolSize = cfg.getInt("databases.profiles.maxPoolSize", 10)
+        val poolName = cfg.getString("databases.profiles.poolName", "Waves Hikari Pool")!!
 
         val driver = if (type.uppercase() == "SQLITE") {
-            val file = File(dataFolder,"$database.db")
+            val file = File(dataFolder, "$database.db")
             file.createNewFile()
             SQLiteDriver(file)
         } else {
