@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "gg.aquatic.waves"
-version = "1.0.16"
+version = "1.0.20"
 
 val ktor_version: String by project
 
@@ -21,16 +21,45 @@ repositories {
     maven {
         url = uri("https://repo.codemc.io/repository/maven-releases/")
     }
+    maven {
+        url = uri("https://repo.codemc.io/repository/maven-snapshots/")
+    }
 }
+
+val nmsVersion = "1.0.39"
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.38:all") {
-        exclude("org.jetbrains.kotlin", "kotlin-stdlib")
-        exclude("gg.aquatic.aquaticseries.core", "core")
-        exclude("gg.aquatic.aquaticseries.paper", "paper")
-        exclude("gg.aquatic.aquaticseries.spigot", "spigot")
+    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.40:all") {
     }
+    implementation("gg.aquatic.aquaticseries:aquaticlib-core:1.0.40:all") {
+    }
+    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_17_1:$nmsVersion") {
+        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
+    }
+    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_18_2:$nmsVersion") {
+        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
+    }
+    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_19_4:$nmsVersion") {
+        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
+    }
+    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_20_1:$nmsVersion") {
+        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
+    }
+    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_20_4:$nmsVersion") {
+        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
+    }
+    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_20_6:$nmsVersion") {
+        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
+    }
+    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_21:$nmsVersion") {
+        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
+    }
+    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_21_1:$nmsVersion") {
+        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
+    }
+    implementation("gg.aquatic.aquaticseries.spigot:spigot:1.0.40")
+    implementation("gg.aquatic.aquaticseries.paper:paper:1.0.40")
     implementation("gg.aquatic.wavessync:wavessync-api:1.0.1:all")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
@@ -74,28 +103,30 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     archiveFileName.set("Waves-${project.version}.jar")
     archiveClassifier.set("plugin")
 
-    configurations = listOf(project.configurations.compileClasspath.get())
-
+    //configurations = listOf(project.configurations.compileClasspath.get())
+    /*
     dependencies {
         include(dependency("gg.aquatic.aquaticseries:aquaticlib"))
         include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
         include(dependency("com.github.retrooper:packetevents-spigot"))
     }
+     */
     //configurations = listOf(project.configurations.implementation.get(), project.configurations.runtimeOnly.get())
+    /*
     from({
         project.configurations.runtimeClasspath.get().filter { it.name.contains("kotlinx-coroutines-core") }
             .map { project.zipTree(it) }
     })
-
+     */
     // Relocate packages
     relocate("kotlinx.coroutines", "gg.aquatic.waves.shadow.kotlinx.coroutines")
-    relocate("com.github.retrooper","gg.aquatic.waves.shadow.com.retrooper")
-    relocate("io.github.retrooper","gg.aquatic.waves.shadow.io.retrooper")
+    relocate("com.github.retrooper", "gg.aquatic.waves.shadow.com.retrooper")
+    relocate("io.github.retrooper", "gg.aquatic.waves.shadow.io.retrooper")
 
     // Exclude the original (unrelocated) kotlinx-coroutines-core package
     exclude("META-INF/versions/9/module-info.class")
 
-
+    exclude("com/google/**","com/typesafe/**", "io/netty/**", "org/slf4j/**")
 }
 
 
