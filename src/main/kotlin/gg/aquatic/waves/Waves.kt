@@ -8,15 +8,19 @@ import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
 import gg.aquatic.aquaticseries.lib.interactable2.InteractableHandler
 import gg.aquatic.aquaticseries.lib.packet.PacketHandler
 import gg.aquatic.aquaticseries.lib.util.*
+import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
+import gg.aquatic.waves.util.showGlow
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -25,6 +29,7 @@ class Waves : JavaPlugin() {
     val modules = hashMapOf(
         WaveModules.PROFILES to ProfilesModule,
         WaveModules.ITEMS to ItemHandler,
+        WaveModules.ENTITIES to EntityHandler
     )
     lateinit var configValues: WavesConfig
 
@@ -57,6 +62,14 @@ class Waves : JavaPlugin() {
             loadConfig()
             for ((_, module) in modules) {
                 module.initialize(this@Waves)
+            }
+        }
+
+        event<AsyncPlayerChatEvent> {
+            runSync {
+                it.player.getNearbyEntities(10.0, 10.0, 10.0).forEach { entity ->
+                    it.player.showGlow(entity,true, NamedTextColor.RED)
+                }
             }
         }
     }

@@ -1,11 +1,10 @@
 package gg.aquatic.waves.util
 
 import com.github.retrooper.packetevents.PacketEvents
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData
-import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
 import com.github.retrooper.packetevents.protocol.player.User
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
+import gg.aquatic.waves.entity.EntityHandler
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 
@@ -20,9 +19,8 @@ fun Player.sendMessage(vararg components: Component) {
     }
 }
 
-fun Player.showGlow(entity: Entity, visible: Boolean) {
-    val packet = WrapperPlayServerEntityMetadata(entity.entityId, mutableListOf(
-        EntityData(0, EntityDataTypes.BYTE, (if (visible) 0x40 else 0x00).toByte())
-    ))
-    toUser().sendPacket(packet)
+fun Player.showGlow(entity: Entity, visible: Boolean, color: NamedTextColor? = null) {
+    EntityHandler.modifyEntity(this,entity) {
+        setGlow(visible, color)
+    }
 }
