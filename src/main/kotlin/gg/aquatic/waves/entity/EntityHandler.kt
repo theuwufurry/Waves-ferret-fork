@@ -25,10 +25,21 @@ import java.util.UUID
 object EntityHandler : WaveModule {
 
     val states = HashMap<UUID, HashMap<Int, EntityState>>()
+    val globalStates = HashMap<Int, EntityState>()
 
     fun updateEntity(player: Player, entityId: Int) {
         val playerStates = states[player.uniqueId] ?: return
-        val state = playerStates[entityId] ?: return
+        val state = playerStates[entityId]
+        if (state != null) {
+            updateEntity(player, entityId, state)
+        }
+        val globalState = globalStates[entityId]
+        if (globalState != null) {
+            updateEntity(player, entityId, globalState)
+        }
+    }
+
+    private fun updateEntity(player: Player, entityId: Int, state: EntityState) {
         val user = player.toUser()
         if (state.isRemoved) {
             val packet = WrapperPlayServerDestroyEntities(entityId)
@@ -61,6 +72,11 @@ object EntityHandler : WaveModule {
         updateEntity(player, entity.entityId)
     }
 
+    fun modifyEntity(entity: Entity, modifier: EntityState.() -> Unit) {
+        val state = globalStates.getOrPut(entity.entityId) { EntityState(entity.uniqueId) }
+        modifier(state)
+    }
+
     fun clearStates(player: Player) {
         val playerStates = states[player.uniqueId] ?: return
         playerStates.clear()
@@ -81,27 +97,28 @@ object EntityHandler : WaveModule {
                 PacketType.Play.Server.ENTITY_METADATA -> {
                     val packet = WrapperPlayServerEntityMetadata(this)
 
-                    val playerStates = states[user.uuid] ?: return@packetEvent
-                    val state = playerStates[packet.entityId] ?: return@packetEvent
+                    val playerStates = states[user.uuid]
+                    val state = playerStates?.get(packet.entityId) ?: globalStates[packet.entityId]
+                    if (state != null) {
+                        if (state.isRemoved) {
+                            isCancelled = true
+                            return@packetEvent
+                        }
 
-                    if (state.isRemoved) {
-                        isCancelled = true
-                        return@packetEvent
+                        val previousData = packet.entityMetadata.mapPair { it.index to it }
+                        if (state.cancelOtherData) {
+                            previousData.clear()
+                        }
+                        previousData.putAll(state.entityData)
+                        packet.entityMetadata = previousData.values.toMutableList()
                     }
-
-                    val previousData = packet.entityMetadata.mapPair { it.index to it }
-                    if (state.cancelOtherData) {
-                        previousData.clear()
-                    }
-                    previousData.putAll(state.entityData)
-                    packet.entityMetadata = previousData.values.toMutableList()
                 }
 
                 PacketType.Play.Server.ENTITY_EQUIPMENT -> {
                     val packet = WrapperPlayServerEntityEquipment(this)
 
-                    val playerStates = states[user.uuid] ?: return@packetEvent
-                    val state = playerStates[packet.entityId] ?: return@packetEvent
+                    val playerStates = states[user.uuid]
+                    val state = playerStates?.get(packet.entityId) ?: globalStates[packet.entityId] ?: return@packetEvent
 
                     if (state.isRemoved) {
                         isCancelled = true
@@ -119,8 +136,8 @@ object EntityHandler : WaveModule {
                 PacketType.Play.Server.SPAWN_ENTITY -> {
                     val packet = WrapperPlayServerSpawnEntity(this)
 
-                    val playerStates = states[user.uuid] ?: return@packetEvent
-                    val state = playerStates[packet.entityId] ?: return@packetEvent
+                    val playerStates = states[user.uuid]
+                    val state = playerStates?.get(packet.entityId) ?: globalStates[packet.entityId] ?: return@packetEvent
                     if (state.isRemoved) {
                         isCancelled = true
                         return@packetEvent
