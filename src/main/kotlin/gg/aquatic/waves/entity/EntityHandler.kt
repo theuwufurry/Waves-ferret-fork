@@ -82,7 +82,7 @@ object EntityHandler : WaveModule {
         playerStates.clear()
     }
 
-    override suspend fun initialize(waves: Waves) {
+    override fun initialize(waves: Waves) {
         event<PlayerQuitEvent> {
             states.remove(it.player.uniqueId)
         }

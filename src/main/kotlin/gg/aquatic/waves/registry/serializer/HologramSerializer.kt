@@ -22,27 +22,27 @@ import java.util.function.Function
 
 object HologramSerializer {
 
-    suspend fun load(sections: Collection<ConfigurationSection>): MutableList<AquaticHologram.Line> = withContext(Dispatchers.IO) {
+    fun load(sections: Collection<ConfigurationSection>): MutableList<AquaticHologram.Line> {
         val list = mutableListOf<AquaticHologram.Line>()
         for (section in sections) {
             val line = loadLine(section) ?: continue
             list += line
         }
-        return@withContext list
+        return list
     }
 
-    suspend fun loadLine(section: ConfigurationSection): AquaticHologram.Line? = withContext(Dispatchers.IO) {
-        val type = section.getString("type") ?: return@withContext null
+    fun loadLine(section: ConfigurationSection): AquaticHologram.Line? {
+        val type = section.getString("type") ?: return null
         when (type.lowercase()) {
-            "text_display" -> return@withContext loadTextLine(section)
-            "item_display" -> return@withContext loadItemLine(section)
-            "armorstand" -> return@withContext loadArmorstandLine(section)
-            "empty" -> return@withContext loadEmptyLine(section)
+            "text_display" -> return loadTextLine(section)
+            "item_display" -> return loadItemLine(section)
+            "armorstand" -> return loadArmorstandLine(section)
+            "empty" -> return loadEmptyLine(section)
         }
-        return@withContext null
+        return null
     }
 
-    suspend fun loadTextLine(section: ConfigurationSection): TextDisplayLine = withContext(Dispatchers.IO) {
+    fun loadTextLine(section: ConfigurationSection): TextDisplayLine {
         val failLine = loadFailLine(section)
         val requirements = loadRequirements(section)
 
@@ -56,7 +56,7 @@ object HologramSerializer {
             }
         }
 
-        return@withContext TextDisplayLine(
+        return TextDisplayLine(
             Function { p ->
                 for (requirement in requirements) {
                     if (!requirement.check(p)) return@Function false
@@ -68,12 +68,12 @@ object HologramSerializer {
         ) { p, line -> line }
     }
 
-    private suspend fun loadTextKeyframe(section: ConfigurationSection): TextDisplayLine.TextDisplayKeyframe = withContext(Dispatchers.IO) {
+    private fun loadTextKeyframe(section: ConfigurationSection): TextDisplayLine.TextDisplayKeyframe {
         val text = section.getString("text")!!
         val height = section.getDouble("height", 0.3)
         val scale = section.getDouble("scale", 1.0).toFloat()
         val billboard = Billboard.valueOf(section.getString("billboard", "CENTER")!!)
-        return@withContext TextDisplayLine.TextDisplayKeyframe(
+        return TextDisplayLine.TextDisplayKeyframe(
             text.toAquatic(),
             height,
             scale,
@@ -81,13 +81,13 @@ object HologramSerializer {
         )
     }
 
-    suspend fun loadItemLine(section: ConfigurationSection): ItemDisplayLine? = withContext(Dispatchers.IO) {
+    fun loadItemLine(section: ConfigurationSection): ItemDisplayLine? {
         val failLine = loadFailLine(section)
         val requirements = loadRequirements(section)
 
         val keyframes = TreeMap<Int, ItemDisplayLine.ItemDisplayKeyframe>()
         if (!section.contains("frames")) {
-            keyframes += 0 to (loadItemKeyframe(section) ?: return@withContext null)
+            keyframes += 0 to (loadItemKeyframe(section) ?: return null)
         } else {
             val frames = section.getConfigurationSection("frames")!!
             val keys = frames.getKeys(false)
@@ -104,7 +104,7 @@ object HologramSerializer {
             }
         }
 
-        return@withContext ItemDisplayLine(
+        return ItemDisplayLine(
             Function { p ->
                 for (requirement in requirements) {
                     if (!requirement.check(p)) return@Function false
@@ -116,13 +116,13 @@ object HologramSerializer {
         )
     }
 
-    private suspend fun loadItemKeyframe(section: ConfigurationSection): ItemDisplayLine.ItemDisplayKeyframe? = withContext(Dispatchers.IO) {
-        val item = AquaticItem.loadFromYml(section) ?: return@withContext null
+    private fun loadItemKeyframe(section: ConfigurationSection): ItemDisplayLine.ItemDisplayKeyframe? {
+        val item = AquaticItem.loadFromYml(section) ?: return null
         val height = section.getDouble("height", 0.3)
         val scale = section.getDouble("scale", 1.0).toFloat()
         val billboard = Billboard.valueOf(section.getString("billboard", "CENTER")!!)
         val itemDisplayTransform: ItemDisplayTransform = ItemDisplayTransform.valueOf(section.getString("item-display-transform", "GROUND")!!)
-        return@withContext ItemDisplayLine.ItemDisplayKeyframe(
+        return ItemDisplayLine.ItemDisplayKeyframe(
             item.getItem(),
             height,
             scale,
@@ -131,7 +131,7 @@ object HologramSerializer {
         )
     }
 
-    suspend fun loadArmorstandLine(section: ConfigurationSection): ArmorstandLine = withContext(Dispatchers.IO) {
+    fun loadArmorstandLine(section: ConfigurationSection): ArmorstandLine {
         val failLine = loadFailLine(section)
         val requirements = loadRequirements(section)
 
@@ -145,7 +145,7 @@ object HologramSerializer {
             }
         }
 
-        return@withContext ArmorstandLine(
+        return ArmorstandLine(
             Function { p ->
                 for (requirement in requirements) {
                     if (!requirement.check(p)) return@Function false
@@ -157,20 +157,20 @@ object HologramSerializer {
         ) { p, line -> line }
     }
 
-    private suspend fun loadArmorstandKeyframe(section: ConfigurationSection): ArmorstandLine.ArmorstandKeyframe = withContext(Dispatchers.IO) {
+    private fun loadArmorstandKeyframe(section: ConfigurationSection): ArmorstandLine.ArmorstandKeyframe {
         val text = section.getString("text")!!
         val height = section.getDouble("height", 0.3)
-        return@withContext ArmorstandLine.ArmorstandKeyframe(
+        return ArmorstandLine.ArmorstandKeyframe(
             text.toAquatic(),
             height,
         )
     }
 
-    suspend fun loadEmptyLine(section: ConfigurationSection): EmptyLine = withContext(Dispatchers.IO) {
+    fun loadEmptyLine(section: ConfigurationSection): EmptyLine {
         val height = section.getDouble("height", 0.3)
         val failLine = loadFailLine(section)
         val requirements = loadRequirements(section)
-        return@withContext EmptyLine(
+        return EmptyLine(
             Function { p ->
                 for (requirement in requirements) {
                     if (!requirement.check(p)) return@Function false
@@ -182,16 +182,16 @@ object HologramSerializer {
         )
     }
 
-    private suspend fun loadRequirements(section: ConfigurationSection): List<ConfiguredRequirement<Player>> = withContext(Dispatchers.IO) {
-        return@withContext if (section.contains("conditions")) {
+    private fun loadRequirements(section: ConfigurationSection): List<ConfiguredRequirement<Player>> {
+        return if (section.contains("conditions")) {
             RequirementSerializer.fromSections(section.getSectionList("conditions"))
         } else {
             arrayListOf()
         }
     }
 
-    private suspend fun loadFailLine(section: ConfigurationSection): AquaticHologram.Line? = withContext(Dispatchers.IO) {
-        return@withContext if (section.isConfigurationSection("fail-line")) {
+    private fun loadFailLine(section: ConfigurationSection): AquaticHologram.Line? {
+        return if (section.isConfigurationSection("fail-line")) {
             loadLine(section.getConfigurationSection("fail-line")!!)
         } else {
             null

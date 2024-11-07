@@ -10,23 +10,22 @@ import org.bukkit.configuration.ConfigurationSection
 
 object RequirementSerializer {
 
-    suspend inline fun <reified T : Any> fromSection(section: ConfigurationSection): ConfiguredRequirement<T>? = withContext(
-        Dispatchers.IO) {
-        val type = section.getString("type") ?: return@withContext null
+    inline fun <reified T : Any> fromSection(section: ConfigurationSection): ConfiguredRequirement<T>? {
+        val type = section.getString("type") ?: return null
         val requirement = WavesRegistry.getRequirement<T>(type)
         if (requirement == null) {
             println("[AquaticSeriesLib] Action type $type does not exist!")
-            return@withContext null
+            return null
         }
 
         val arguments = requirement.arguments()
         val args = AquaticObjectArgument.loadRequirementArguments(section, arguments)
 
         val configuredRequirement = ConfiguredRequirement(requirement, args)
-        return@withContext configuredRequirement
+        return configuredRequirement
     }
 
-    suspend inline fun <reified T: Any> fromSections(sections: List<ConfigurationSection>): List<ConfiguredRequirement<T>> {
+    inline fun <reified T: Any> fromSections(sections: List<ConfigurationSection>): List<ConfiguredRequirement<T>> {
         return sections.mapNotNull { fromSection(it) }
     }
 

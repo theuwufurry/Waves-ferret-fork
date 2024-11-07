@@ -16,33 +16,31 @@ object EconomyProfileModule : ProfileModule {
 
     val leaderboards = HashMap<RegisteredCurrency, EconomyLeaderboard>()
 
-    override suspend fun loadEntry(aquaticPlayer: AquaticPlayer): ProfileModuleEntry {
+    override fun loadEntry(aquaticPlayer: AquaticPlayer): ProfileModuleEntry {
         return CurrencyDriver.get(aquaticPlayer)
     }
 
-    suspend fun initializeEconomy(currency: CustomCurrency): RegisteredCurrency {
-        return withContext(Dispatchers.IO) {
-            CurrencyDriver.driver.executeQuery("SELECT * FROM aquaticcurrency_type WHERE currency_id = ?",
-                {
-                    setString(1, currency.id)
-                },
-                {
-                    if (next()) {
-                        val id = getInt("id")
-                        return@executeQuery Optional.of(RegisteredCurrency(currency, id))
-                    } else
-                        return@executeQuery Optional.empty<RegisteredCurrency>()
-                }
-            ).orElseGet {
-                CurrencyDriver.driver.useConnection {
-                    prepareStatement("INSERT INTO aquaticcurrency_type (currency_id) VALUES (?)").use { preparedStatement ->
-                        preparedStatement.setString(1, currency.id)
-                        preparedStatement.execute()
-                        val rs = preparedStatement.generatedKeys
-                        rs.next()
-                        val id = rs.getInt(1)
-                        RegisteredCurrency(currency, id)
-                    }
+    fun initializeEconomy(currency: CustomCurrency): RegisteredCurrency {
+        return CurrencyDriver.driver.executeQuery("SELECT * FROM aquaticcurrency_type WHERE currency_id = ?",
+            {
+                setString(1, currency.id)
+            },
+            {
+                if (next()) {
+                    val id = getInt("id")
+                    return@executeQuery Optional.of(RegisteredCurrency(currency, id))
+                } else
+                    return@executeQuery Optional.empty<RegisteredCurrency>()
+            }
+        ).orElseGet {
+            CurrencyDriver.driver.useConnection {
+                prepareStatement("INSERT INTO aquaticcurrency_type (currency_id) VALUES (?)").use { preparedStatement ->
+                    preparedStatement.setString(1, currency.id)
+                    preparedStatement.execute()
+                    val rs = preparedStatement.generatedKeys
+                    rs.next()
+                    val id = rs.getInt(1)
+                    RegisteredCurrency(currency, id)
                 }
             }
         }

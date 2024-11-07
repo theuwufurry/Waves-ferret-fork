@@ -55,7 +55,7 @@ class Waves : JavaPlugin() {
                 InteractableHandler
             )
         )
-        await(Dispatchers.IO) {
+        runAsync {
             loadConfig()
             for ((_, module) in modules) {
                 module.initialize(this@Waves)
@@ -80,7 +80,7 @@ class Waves : JavaPlugin() {
         PacketEvents.getAPI().terminate()
     }
 
-    suspend fun loadConfig() = withContext(Dispatchers.IO) {
+    fun loadConfig() {
         dataFolder.mkdirs()
         val config = Config("config.yml")
         config.load()

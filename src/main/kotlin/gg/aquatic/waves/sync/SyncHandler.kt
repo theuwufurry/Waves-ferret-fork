@@ -21,43 +21,41 @@ object SyncHandler {
         packetRegistry[id] = handler
     }
 
-    suspend fun initializeClient(syncSettings: SyncSettings) {
+    fun initializeClient(syncSettings: SyncSettings) {
         client = SyncClient(syncSettings.ip, syncSettings.port, syncSettings.protectionKey, syncSettings.serverId)
-        client.start()
+        runBlocking {
+            client.start()
+        }
     }
 
-    suspend fun handlePacket(json: JsonObject): String? {
+    fun handlePacket(json: JsonObject): String? {
         val packetType = json.get("packetType").asString
         val handler = packetRegistry[packetType] ?: return null
         return handler.serializeAndHandle(json.asString)
     }
 
-    suspend inline fun <reified T> cacheCustom(value: T, namespace: String) = coroutineScope {
-        launch {
-            val json = Gson().toJson(value)
-            client.cacheCustom(json, namespace)
-        }
+    inline fun <reified T> cacheCustom(value: T, namespace: String) {
+        val json = Gson().toJson(value)
+        client.cacheCustom(json, namespace)
     }
 
-    suspend inline fun <reified T> getCustomCache(namespace: String): T? {
-        val value = withContext(Dispatchers.IO) {
-            return@withContext client.getCustomCache(namespace)
-        }
+    inline fun <reified T> getCustomCache(namespace: String): T? {
+        val value = client.getCustomCache(namespace)
         if (value.isEmpty() || value == "null") {
             return null
         }
         return Gson().fromJson(value, T::class.java)
     }
 
-    suspend fun sendPacket(packet: SyncPacket, target: String) {
+    fun sendPacket(packet: SyncPacket, target: String) {
         sendPacket(packet, listOf(target))
     }
 
-    suspend fun sendPacket(packet: SyncPacket, target: List<String>) {
+    fun sendPacket(packet: SyncPacket, target: List<String>) {
         sendPacket(packet, target, broadcast = false, await = false)
     }
 
-    private suspend fun sendPacket(
+    private fun sendPacket(
         packet: SyncPacket,
         target: List<String>,
         broadcast: Boolean,
@@ -66,11 +64,11 @@ object SyncHandler {
         return client.sendPacket(packet, target, broadcast, await)
     }
 
-    suspend fun broadcastPacket(packet: SyncPacket) {
+    fun broadcastPacket(packet: SyncPacket) {
         sendPacket(packet, listOf(), true, await = false)
     }
 
-    suspend fun sendPacketAndAwait(packet: SyncPacket, target: String): String? {
+    fun sendPacketAndAwait(packet: SyncPacket, target: String): String? {
         return sendPacket(packet, listOf(target), broadcast = false, await = true)
     }
 }

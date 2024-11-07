@@ -16,6 +16,6 @@ fun WavesRegistry.getCurrency(id: String): Currency? {
 }
 
 
-suspend fun WavesRegistry.registerCurrency(currency: CustomCurrency): RegisteredCurrency {
+fun WavesRegistry.registerCurrency(currency: CustomCurrency): RegisteredCurrency {
     return EconomyHandler.register(currency)
 }

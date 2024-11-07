@@ -25,7 +25,7 @@ object ItemHandler : WaveModule {
     val listenInteractions = mutableMapOf<String, (AquaticItemInteractEvent) -> Unit>()
     override val type: WaveModules = WaveModules.ITEMS
 
-    override suspend fun initialize(waves: Waves) {
+    override fun initialize(waves: Waves) {
         runSync {
             event<PlayerInteractEvent> {
                 if (it.hand == EquipmentSlot.OFF_HAND) return@event

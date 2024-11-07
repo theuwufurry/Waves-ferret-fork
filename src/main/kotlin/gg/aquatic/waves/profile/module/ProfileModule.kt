@@ -6,7 +6,7 @@ import java.sql.Connection
 interface ProfileModule {
     val id: String
 
-    suspend fun loadEntry(player: AquaticPlayer): ProfileModuleEntry
+    fun loadEntry(player: AquaticPlayer): ProfileModuleEntry
 
     fun initialize(connection: Connection)
 }

@@ -8,43 +8,40 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.registry.WavesRegistry
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
-suspend fun EconomyProfileModule.refreshLeaderboard() = withContext(Dispatchers.IO) {
+fun EconomyProfileModule.refreshLeaderboard() {
     for (value in WavesRegistry.INDEX_TO_CURRENCY.values) {
         refreshLeaderboard(value)
     }
 }
 
-suspend fun EconomyProfileModule.getLeaderboardPlaces(player: AquaticPlayer): HashMap<RegisteredCurrency, Int> =
-    withContext(Dispatchers.IO) {
-        val map = HashMap<RegisteredCurrency, Int>()
-        CurrencyDriver.driver.preparedStatement(
-            "SELECT * FROM (SELECT id, currency_id, RANK() OVER (PARTITION BY currency_id ORDER BY balance DESC) AS rank FROM aquaticcurrency) WHERE id = ?"
-        ) {
-            setInt(1, player.index)
-            executeQuery().use {
-                var i = 0
-                while (it.next()) {
-                    val rank = it.getInt("rank")
-                    val currency = WavesRegistry.INDEX_TO_CURRENCY[it.getInt("currency_id")] ?: continue
-                    map[currency] = rank
-                    //player.aquaticEconomy().leaderboardPlaces += currency to rank
-                    i++
-                }
+fun EconomyProfileModule.getLeaderboardPlaces(player: AquaticPlayer): HashMap<RegisteredCurrency, Int> {
+    val map = HashMap<RegisteredCurrency, Int>()
+    CurrencyDriver.driver.preparedStatement(
+        "SELECT * FROM (SELECT id, currency_id, RANK() OVER (PARTITION BY currency_id ORDER BY balance DESC) AS rank FROM aquaticcurrency) WHERE id = ?"
+    ) {
+        setInt(1, player.index)
+        executeQuery().use {
+            var i = 0
+            while (it.next()) {
+                val rank = it.getInt("rank")
+                val currency = WavesRegistry.INDEX_TO_CURRENCY[it.getInt("currency_id")] ?: continue
+                map[currency] = rank
+                //player.aquaticEconomy().leaderboardPlaces += currency to rank
+                i++
             }
         }
-        map
     }
+    return map
+}
 
-suspend fun EconomyProfileModule.refreshLeaderboard(
+fun EconomyProfileModule.refreshLeaderboard(
     currency: RegisteredCurrency
-) = withContext(Dispatchers.IO) {
+) {
     val limit = currency.currency.maxLeaderboardCache
     val leaderboard = leaderboards.getOrPut(currency) { EconomyLeaderboard(currency, 0) }
     if (limit <= 0) {
-        return@withContext
+        return
     }
     CurrencyDriver.driver.preparedStatement("SELECT COUNT(*) FROM aquaticcurrency WHERE currency_id = ?") {
         setInt(1, currency.index)

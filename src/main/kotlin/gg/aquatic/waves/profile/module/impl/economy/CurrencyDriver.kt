@@ -6,17 +6,15 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.registry.WavesRegistry
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.sql.Connection
 
 object CurrencyDriver {
 
     val driver: DataDriver = (Waves.INSTANCE.modules[WaveModules.PROFILES] as ProfilesModule).driver
 
-    suspend fun get(aquaticPlayer: AquaticPlayer): EconomyEntry = withContext(Dispatchers.IO) {
+    fun get(aquaticPlayer: AquaticPlayer): EconomyEntry {
         val places = EconomyProfileModule.getLeaderboardPlaces(aquaticPlayer)
-        driver.executeQuery("SELECT * FROM aquaticcurrency WHERE id = ?",
+        return driver.executeQuery("SELECT * FROM aquaticcurrency WHERE id = ?",
             {
                 setInt(1, aquaticPlayer.index)
             },

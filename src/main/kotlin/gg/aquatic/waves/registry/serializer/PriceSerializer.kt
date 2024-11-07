@@ -11,13 +11,12 @@ import org.bukkit.entity.Player
 
 object PriceSerializer {
 
-    suspend inline fun <reified T: Any> fromSection(section: ConfigurationSection): ConfiguredPrice<T>? = withContext(
-        Dispatchers.IO) {
-        val type = section.getString("type") ?: return@withContext null
+    inline fun <reified T: Any> fromSection(section: ConfigurationSection): ConfiguredPrice<T>? {
+        val type = section.getString("type") ?: return null
         val price = WavesRegistry.getPrice<T>(type)
         if (price == null) {
             println("[AquaticSeriesLib] Price type $type does not exist!")
-            return@withContext null
+            return null
         }
 
         val arguments = price.arguments()
@@ -25,10 +24,10 @@ object PriceSerializer {
 
         val configuredPrice = ConfiguredPrice(price, args)
 
-        return@withContext configuredPrice
+        return configuredPrice
     }
 
-    suspend inline fun <reified T: Any> fromSections(sections: List<ConfigurationSection>): List<ConfiguredPrice<T>> {
+    inline fun <reified T: Any> fromSections(sections: List<ConfigurationSection>): List<ConfiguredPrice<T>> {
         return sections.mapNotNull { fromSection(it) }
     }
 

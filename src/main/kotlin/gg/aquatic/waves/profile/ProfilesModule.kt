@@ -34,7 +34,7 @@ object ProfilesModule : WaveModule {
     val playersAwaiting = HashSet<UUID>()
     val modules = HashMap<String, ProfileModule>()
 
-    override suspend fun initialize(waves: Waves) {
+    override fun initialize(waves: Waves) {
         driver.execute(
             "" +
                     "CREATE TABLE IF NOT EXISTS " +
@@ -53,7 +53,7 @@ object ProfilesModule : WaveModule {
             playersLoading += it.player.uniqueId
             Bukkit.getConsoleSender().sendMessage("Loading profile!")
 
-            suspend fun loadPlayer(): AquaticPlayer {
+            fun loadPlayer(): AquaticPlayer {
                 val player = getOrCreate(it.player)
                 Bukkit.getConsoleSender().sendMessage("Profile Loaded!")
                 runSync {
@@ -66,23 +66,26 @@ object ProfilesModule : WaveModule {
 
             val syncSettings = Waves.INSTANCE.configValues.syncSettings
             if (syncSettings.enabled) {
-                await(Dispatchers.IO) {
-                    val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
-                    if (player != null) {
-                        if (player.server == null) {
-                            loadPlayer()
+                runAsync {
+                    runBlocking {
+                        val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
+                        if (player != null) {
+                            if (player.server == null) {
+                                loadPlayer()
+                            } else {
+                                playersAwaiting += it.player.uniqueId
+                            }
                         } else {
-                            playersAwaiting += it.player.uniqueId
+                            val aquaticPlayer = loadPlayer()
+                            val cachedPlayer =
+                                SyncedPlayer(aquaticPlayer.uuid, aquaticPlayer.username, syncSettings.serverId, HashMap())
+                            SyncHandler.client.cachePlayer(cachedPlayer)
                         }
-                    } else {
-                        val aquaticPlayer = loadPlayer()
-                        val cachedPlayer =
-                            SyncedPlayer(aquaticPlayer.uuid, aquaticPlayer.username, syncSettings.serverId, HashMap())
-                        SyncHandler.client.cachePlayer(cachedPlayer)
                     }
                 }
+
             } else {
-                await {
+                runAsync {
                     loadPlayer()
                 }
             }
@@ -94,7 +97,7 @@ object ProfilesModule : WaveModule {
             val aPlayer = cache[it.player.uniqueId] ?: return@event
             playersSaving += it.player.uniqueId
             ProfileUnloadEvent(aPlayer).call()
-            suspend fun savePlayer() {
+            fun savePlayer() {
                 save(aPlayer)
                 playersSaving -= it.player.uniqueId
                 cache.remove(it.player.uniqueId)
@@ -102,19 +105,22 @@ object ProfilesModule : WaveModule {
 
             val syncSettings = Waves.INSTANCE.configValues.syncSettings
             if (syncSettings.enabled) {
-                await(Dispatchers.IO) {
-                    savePlayer()
-                    val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
-                    if (player != null) {
-                        if (player.server == null) {
-                            savePlayer()
-                        } else {
-                            playersAwaiting += it.player.uniqueId
+                runAsync {
+                    runBlocking {
+                        savePlayer()
+                        val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
+                        if (player != null) {
+                            if (player.server == null) {
+                                savePlayer()
+                            } else {
+                                playersAwaiting += it.player.uniqueId
+                            }
                         }
                     }
                 }
+
             } else {
-                await {
+                runAsync {
                     savePlayer()
                 }
             }
@@ -122,26 +128,22 @@ object ProfilesModule : WaveModule {
     }
 
     override fun disable(waves: Waves) {
-        await {
-            save(*cache.values.toTypedArray())
-            cache.clear()
-        }
+        save(*cache.values.toTypedArray())
+        cache.clear()
     }
 
-    suspend fun registerModule(module: ProfileModule) = coroutineScope {
+    fun registerModule(module: ProfileModule) {
         if (modules.containsKey(module.id)) {
-            return@coroutineScope
+            return
         }
-        launch {
-            modules[module.id] = module
+        modules[module.id] = module
 
-            driver.useConnection {
-                module.initialize(this)
-            }
+        driver.useConnection {
+            module.initialize(this)
         }
     }
 
-    suspend fun save(vararg players: AquaticPlayer) = withContext(Dispatchers.IO) {
+    fun save(vararg players: AquaticPlayer) {
         driver.useConnection {
             for (player in players) {
                 if (player.updated) {
@@ -163,13 +165,13 @@ object ProfilesModule : WaveModule {
         }
     }
 
-    suspend fun getOrCreate(player: Player): AquaticPlayer {
+    fun getOrCreate(player: Player): AquaticPlayer {
         return getOrCreate(player.uniqueId, player.name)
     }
 
-    suspend fun getOrCreate(uuid: UUID, username: String): AquaticPlayer = coroutineScope {
+    fun getOrCreate(uuid: UUID, username: String): AquaticPlayer {
         if (cache.containsKey(uuid)) {
-            return@coroutineScope cache[uuid]!!
+            return cache[uuid]!!
         }
 
         val optionalPlayer = driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?",
@@ -193,14 +195,12 @@ object ProfilesModule : WaveModule {
             }
         )
         optionalPlayer.ifPresent {
-            launch {
-                for (value in modules.values) {
-                    val entry = value.loadEntry(it)
-                    it.entries[value.id] = entry
-                }
+            for (value in modules.values) {
+                val entry = value.loadEntry(it)
+                it.entries[value.id] = entry
             }
         }
-        return@coroutineScope optionalPlayer.orElseGet {
+        return optionalPlayer.orElseGet {
             InfoLogger.send("Player was not found in the database!")
             driver.preparedStatement("INSERT INTO aquaticprofiles (uuid, username) VALUES (?, ?)") {
                 setBytes(1, uuid.toBytes())
@@ -217,11 +217,11 @@ object ProfilesModule : WaveModule {
         }
     }
 
-    suspend fun get(uuid: UUID): Optional<AquaticPlayer> = coroutineScope {
+    fun get(uuid: UUID): Optional<AquaticPlayer> {
         if (cache.containsKey(uuid)) {
-            return@coroutineScope Optional.of(cache[uuid]!!)
+            return Optional.of(cache[uuid]!!)
         }
-        return@coroutineScope driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?",
+        return driver.executeQuery("SELECT * FROM aquaticprofiles WHERE uuid = ?",
             {
                 setBytes(1, uuid.toBytes())
             },

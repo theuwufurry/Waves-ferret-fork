@@ -10,24 +10,24 @@ import org.bukkit.configuration.ConfigurationSection
 
 object ActionSerializer {
 
-    suspend inline fun <reified T : Any> fromSection(
+    inline fun <reified T : Any> fromSection(
         section: ConfigurationSection
-    ): ConfiguredAction<T>? = withContext(Dispatchers.IO) {
-        val type = section.getString("type") ?: return@withContext null
+    ): ConfiguredAction<T>? {
+        val type = section.getString("type") ?: return null
         val action = WavesRegistry.getAction<T>(type)
         if (action == null) {
             println("[AquaticSeriesLib] Action type $type does not exist!")
-            return@withContext null
+            return null
         }
 
         val arguments = action.arguments()
         val args = AquaticObjectArgument.loadRequirementArguments(section, arguments)
 
         val configuredAction = ConfiguredAction(action, args)
-        return@withContext configuredAction
+        return configuredAction
     }
 
-    suspend inline fun <reified T : Any> fromSections(sections: List<ConfigurationSection>): List<ConfiguredAction<T>> {
+    inline fun <reified T : Any> fromSections(sections: List<ConfigurationSection>): List<ConfiguredAction<T>> {
         return sections.mapNotNull { fromSection(it) }
     }
 

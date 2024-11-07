@@ -13,7 +13,7 @@ class PacketResponse(
     override val packetType: String = "waves_packet_response"
 
     object Handler: SyncPacketHandler<PacketResponse> {
-        override suspend fun handle(packet: PacketResponse): String? {
+        override fun handle(packet: PacketResponse): String? {
             println("Received packet response")
 
             val awaiting = SyncHandler.client.awaiting

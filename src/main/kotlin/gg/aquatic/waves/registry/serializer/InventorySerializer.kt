@@ -23,8 +23,8 @@ import java.util.function.Function
 
 object InventorySerializer {
 
-    suspend fun loadInventory(section: ConfigurationSection): InventorySettings? = withContext(Dispatchers.IO) {
-        val title = section.getString("title") ?: return@withContext null
+    fun loadInventory(section: ConfigurationSection): InventorySettings? {
+        val title = section.getString("title") ?: return null
         val size = section.getInt("size")
         val inventoryType = section.getString("inventory-type")?.let {
             try {
@@ -43,7 +43,7 @@ object InventorySerializer {
         }
         val onOpen = ActionSerializer.fromSections<Player>(section.getSectionList("on-open"))
         val onClose = ActionSerializer.fromSections<Player>(section.getSectionList("on-close"))
-        return@withContext InventorySettings(
+        return InventorySettings(
             title.toAquatic(),
             size,
             inventoryType,
@@ -53,7 +53,7 @@ object InventorySerializer {
         )
     }
 
-    suspend fun loadSlotSelection(list: List<String>): SlotSelection = withContext(Dispatchers.IO) {
+    fun loadSlotSelection(list: List<String>): SlotSelection {
         val slots = ArrayList<Int>()
         for (slot in list) {
             if (slot.contains("-")) {
@@ -67,10 +67,10 @@ object InventorySerializer {
                 slots += slot.toInt()
             }
         }
-        return@withContext SlotSelection.of(slots)
+        return SlotSelection.of(slots)
     }
 
-    suspend fun loadButton(section: ConfigurationSection, id: String): ButtonSettings? = withContext(Dispatchers.IO) {
+    fun loadButton(section: ConfigurationSection, id: String): ButtonSettings? {
         val priority = section.getInt("priority", 0)
         val failItemSection = section.getConfigurationSection("fail-item")
 
@@ -101,18 +101,18 @@ object InventorySerializer {
                 val btn = loadButton(frameSection, "frame") ?: continue
                 frames[time] = btn
             }
-            if (frames.isEmpty()) return@withContext null
-            return@withContext AnimatedButtonSettings(
+            if (frames.isEmpty()) return null
+            return AnimatedButtonSettings(
                 id, priority, conditions, failItem, clickSettings, updateEvery,
                 frames
             )
         } else {
-            val item = AquaticItem.loadFromYml(section) ?: return@withContext null
+            val item = AquaticItem.loadFromYml(section) ?: return null
             val slots = loadSlotSelection(section.getStringList("slots"))
             if (slots.slots.isEmpty()) {
                 slots.slots += section.getInt("slot")
             }
-            return@withContext StaticButtonSettings(
+            return StaticButtonSettings(
                 id, priority, conditions, failItem, clickSettings, updateEvery,
                 item,
                 slots
@@ -120,7 +120,7 @@ object InventorySerializer {
         }
     }
 
-    suspend fun loadClickSettings(sections: List<ConfigurationSection>): ClickSettings = withContext(Dispatchers.IO) {
+    fun loadClickSettings(sections: List<ConfigurationSection>): ClickSettings {
         val map = HashMap<ClickSettings.MenuClickActionType, MutableList<ConfiguredActionsWithConditions>>()
         for (section in sections) {
             val actions = loadActionsWithConditions(section) ?: continue
@@ -130,10 +130,10 @@ object InventorySerializer {
                 list.add(actions)
             }
         }
-        return@withContext ClickSettings(map) { u, t -> t }
+        return ClickSettings(map) { u, t -> t }
     }
 
-    suspend fun loadActionsWithConditions(section: ConfigurationSection): ConfiguredActionsWithConditions? = withContext(Dispatchers.IO){
+    fun loadActionsWithConditions(section: ConfigurationSection): ConfiguredActionsWithConditions? {
         val actions = ArrayList<ConfiguredActionWithConditions>()
         val actionSections = section.getSectionList("actions")
 
@@ -145,17 +145,17 @@ object InventorySerializer {
             conditions += loadConditionWithFailActions(conditionSection) ?: continue
         }
 
-        if (actions.isEmpty() && conditions.isEmpty()) return@withContext null
+        if (actions.isEmpty() && conditions.isEmpty()) return null
 
         val failActions = if (section.isConfigurationSection("fail") && conditions.isNotEmpty()) {
             loadActionsWithConditions(section.getConfigurationSection("fail")!!)
         } else null
 
-        return@withContext ConfiguredActionsWithConditions(actions, conditions, failActions)
+        return ConfiguredActionsWithConditions(actions, conditions, failActions)
     }
 
-    suspend fun loadActionWithCondition(section: ConfigurationSection): ConfiguredActionWithConditions? = withContext(Dispatchers.IO) {
-        val action = ActionSerializer.fromSection<Player>(section) ?: return@withContext null
+    fun loadActionWithCondition(section: ConfigurationSection): ConfiguredActionWithConditions? {
+        val action = ActionSerializer.fromSection<Player>(section) ?: return null
         val conditions = ArrayList<ConfiguredConditionWithFailActions>()
         for (configurationSection in section.getSectionList("conditions")) {
             conditions += loadConditionWithFailActions(configurationSection) ?: continue
@@ -163,14 +163,14 @@ object InventorySerializer {
         val failActions = if (section.isConfigurationSection("fail") && conditions.isNotEmpty()) {
             loadActionsWithConditions(section.getConfigurationSection("fail")!!)
         } else null
-        return@withContext ConfiguredActionWithConditions(action,conditions,failActions)
+        return ConfiguredActionWithConditions(action,conditions,failActions)
     }
 
-    suspend fun loadConditionWithFailActions(section: ConfigurationSection): ConfiguredConditionWithFailActions? = withContext(Dispatchers.IO) {
-        val condition = RequirementSerializer.fromSection<Player>(section) ?: return@withContext null
+    fun loadConditionWithFailActions(section: ConfigurationSection): ConfiguredConditionWithFailActions? {
+        val condition = RequirementSerializer.fromSection<Player>(section) ?: return null
         val failActions = if (section.isConfigurationSection("fail")) {
             loadActionsWithConditions(section.getConfigurationSection("fail")!!)
         } else null
-        return@withContext ConfiguredConditionWithFailActions(condition, failActions)
+        return ConfiguredConditionWithFailActions(condition, failActions)
     }
 }

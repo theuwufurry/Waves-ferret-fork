@@ -10,7 +10,7 @@ fun Material.toCustomItem(): AquaticItem {
     return ItemHandler.create(ItemStack(this))
 }
 
-suspend fun AquaticItem.Companion.loadFromYml(section: ConfigurationSection?): AquaticItem? {
+fun AquaticItem.Companion.loadFromYml(section: ConfigurationSection?): AquaticItem? {
     return ItemSerializer.fromSection(section)
 }
 

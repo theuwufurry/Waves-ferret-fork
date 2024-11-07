@@ -3,8 +3,6 @@ package gg.aquatic.waves.registry.serializer
 import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.registry.WavesRegistry
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.EntityType
@@ -13,18 +11,18 @@ import org.bukkit.inventory.ItemStack
 
 object ItemSerializer {
 
-    suspend inline fun <reified T : Any> fromSection(
+    inline fun <reified T : Any> fromSection(
         section: ConfigurationSection?, crossinline mapper: (ConfigurationSection, AquaticItem) -> T
-    ): T? = withContext(Dispatchers.IO) {
-        val item = fromSection(section) ?: return@withContext null
+    ): T? {
+        val item = fromSection(section) ?: return null
 
-        return@withContext mapper(section!!, item)
+        return mapper(section!!, item)
     }
 
-    suspend fun fromSection(
+    fun fromSection(
         section: ConfigurationSection?
-    ): AquaticItem? = withContext(Dispatchers.IO) {
-        section ?: return@withContext null
+    ): AquaticItem? {
+        section ?: return null
         val material = section.getString("material", "STONE")!!
         var lore: MutableList<String>? = null
         if (section.contains("lore")) {
@@ -50,7 +48,7 @@ object ItemSerializer {
             }
         }
         val spawnerEntityType = section.getString("entity-type")?.let { EntityType.valueOf(it.uppercase()) }
-        return@withContext create(
+        return create(
             material,
             section.getString("display-name"),
             lore,
@@ -61,11 +59,11 @@ object ItemSerializer {
             spawnerEntityType
         )
     }
-    suspend fun fromSections(sections: List<ConfigurationSection>): List<AquaticItem> {
+    fun fromSections(sections: List<ConfigurationSection>): List<AquaticItem> {
         return sections.mapNotNull { fromSection(it) }
     }
 
-    suspend inline fun <reified T : Any> fromSections(sections: List<ConfigurationSection>, crossinline mapper: (ConfigurationSection, AquaticItem) -> T): List<T> {
+    inline fun <reified T : Any> fromSections(sections: List<ConfigurationSection>, crossinline mapper: (ConfigurationSection, AquaticItem) -> T): List<T> {
         return sections.mapNotNull { fromSection(it, mapper) }
     }
 
