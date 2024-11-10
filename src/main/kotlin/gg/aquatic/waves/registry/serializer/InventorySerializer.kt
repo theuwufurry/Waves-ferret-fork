@@ -60,9 +60,7 @@ object InventorySerializer {
                 val range = slot.split("-")
                 val start = range[0].toInt()
                 val end = range[1].toInt()
-                for (i in start..end) {
-                    slots += i
-                }
+                slots += start..end
             } else {
                 slots += slot.toInt()
             }

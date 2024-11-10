@@ -93,7 +93,7 @@ object FakeObjectHandler : WaveModule {
         }
         event<PlayerInteractEvent> {
             val block = it.clickedBlock ?: return@event
-            val bundle = LocationCacheHandler.getObject(block.location, FakeBlockLocationBundle::class.java) as? FakeBlockLocationBundle ?: return@event
+            val bundle = LocationCacheHandler.getObject(block.location, FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle ?: return@event
             it.isCancelled = true
             for (block1 in bundle.blocks) {
                 if (block1.viewers.contains(it.player)) {

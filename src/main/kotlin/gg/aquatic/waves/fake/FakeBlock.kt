@@ -31,18 +31,22 @@ open class FakeBlock(block: AquaticBlock, location: Location,
     fun register() {
         if (registered) return
         registered = true
-        var bundle = LocationCacheHandler.getObject(location,FakeBlockLocationBundle::class.java) as? FakeBlockLocationBundle
+        var bundle = LocationCacheHandler.getObject(location,FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle
         if (bundle == null) {
-            bundle = FakeBlockLocationBundle()
-            LocationCacheHandler.registerObject(bundle, FakeBlockLocationBundle::class.java, location)
+            bundle = FakeObjectLocationBundle()
+            LocationCacheHandler.registerObject(bundle, FakeObjectLocationBundle::class.java, location)
         }
         bundle.blocks += this
     }
     fun unregister() {
         if (!registered) return
         registered = false
-        val bundle = LocationCacheHandler.getObject(location,FakeBlockLocationBundle::class.java) as? FakeBlockLocationBundle ?: return
+        val bundle = LocationCacheHandler.getObject(location,FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle ?: return
         bundle.blocks -= this
+
+        if (bundle.blocks.isEmpty() && bundle.entities.isEmpty()) {
+            LocationCacheHandler.unregisterObject(FakeObjectLocationBundle::class.java, location)
+        }
     }
 
     fun changeBlock(aquaticBlock: AquaticBlock) {
