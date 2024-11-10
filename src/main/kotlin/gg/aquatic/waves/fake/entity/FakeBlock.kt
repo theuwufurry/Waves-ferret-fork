@@ -1,7 +1,10 @@
-package gg.aquatic.waves.fake
+package gg.aquatic.waves.fake.entity
 
 import gg.aquatic.aquaticseries.lib.block.AquaticBlock
 import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationCacheHandler
+import gg.aquatic.waves.fake.FakeObject
+import gg.aquatic.waves.fake.FakeObjectHandler
+import gg.aquatic.waves.fake.FakeObjectLocationBundle
 import gg.aquatic.waves.util.blockLocation
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -31,7 +34,8 @@ open class FakeBlock(block: AquaticBlock, location: Location,
     fun register() {
         if (registered) return
         registered = true
-        var bundle = LocationCacheHandler.getObject(location,FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle
+        var bundle = LocationCacheHandler.getObject(location,
+            FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle
         if (bundle == null) {
             bundle = FakeObjectLocationBundle()
             LocationCacheHandler.registerObject(bundle, FakeObjectLocationBundle::class.java, location)
@@ -41,7 +45,8 @@ open class FakeBlock(block: AquaticBlock, location: Location,
     fun unregister() {
         if (!registered) return
         registered = false
-        val bundle = LocationCacheHandler.getObject(location,FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle ?: return
+        val bundle = LocationCacheHandler.getObject(location,
+            FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle ?: return
         bundle.blocks -= this
 
         if (bundle.blocks.isEmpty() && bundle.entities.isEmpty()) {

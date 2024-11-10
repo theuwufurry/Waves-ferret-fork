@@ -1,4 +1,4 @@
-package gg.aquatic.waves.fake
+package gg.aquatic.waves.fake.block
 
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType
@@ -9,6 +9,9 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
 import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationCacheHandler
+import gg.aquatic.waves.fake.FakeObject
+import gg.aquatic.waves.fake.FakeObjectHandler
+import gg.aquatic.waves.fake.FakeObjectLocationBundle
 import gg.aquatic.waves.util.blockLocation
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
@@ -20,11 +23,9 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class FakeEntity(
-    val type: EntityType, location: Location,
+    val type: EntityType, override val location: Location,
     override val viewRange: Int
-) :
-    FakeObject() {
-    override val location: Location = location.blockLocation()
+) : FakeObject() {
 
     override fun destroy() {
         for (player in isViewing) {
