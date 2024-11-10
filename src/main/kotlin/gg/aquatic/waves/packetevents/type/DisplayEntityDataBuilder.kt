@@ -1,12 +1,10 @@
 package gg.aquatic.waves.packetevents.type
 
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
 import com.github.retrooper.packetevents.util.Quaternion4f
 import com.github.retrooper.packetevents.util.Vector3f
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import org.bukkit.entity.Display.Billboard
-import org.bukkit.entity.Display.Brightness
 import org.bukkit.util.Transformation
 
 abstract class DisplayEntityDataBuilder : EntityDataBuilder() {
