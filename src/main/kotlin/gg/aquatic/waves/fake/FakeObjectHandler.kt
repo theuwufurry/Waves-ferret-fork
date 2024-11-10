@@ -14,18 +14,18 @@ import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player
-import io.ktor.util.collections.*
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
+import java.util.concurrent.ConcurrentHashMap
 
 object FakeObjectHandler : WaveModule {
     override val type: WaveModules = WaveModules.FAKE_OBJECTS
 
-    internal val tickableObjects = ConcurrentSet<FakeObject>()
-    val objectRemovalQueue = ConcurrentSet<FakeObject>()
+    internal val tickableObjects = ConcurrentHashMap.newKeySet<FakeObject>()
+    val objectRemovalQueue = ConcurrentHashMap.newKeySet<FakeObject>()
 
     override fun initialize(waves: Waves) {
         runAsyncTimer(

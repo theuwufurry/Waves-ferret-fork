@@ -3,11 +3,11 @@ package gg.aquatic.waves.fake
 import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationObject
 import gg.aquatic.waves.fake.block.FakeEntity
 import gg.aquatic.waves.fake.entity.FakeBlock
-import io.ktor.util.collections.*
+import java.util.concurrent.ConcurrentHashMap
 
 class FakeObjectLocationBundle: LocationObject {
 
-    val blocks = ConcurrentSet<FakeBlock>()
-    val entities = ConcurrentSet<FakeEntity>()
+    val blocks = ConcurrentHashMap.newKeySet<FakeBlock>()
+    val entities = ConcurrentHashMap.newKeySet<FakeEntity>()
 
 }

@@ -1,9 +1,9 @@
 package gg.aquatic.waves.fake
 
-import io.ktor.util.collections.*
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 abstract class FakeObject {
 
@@ -12,11 +12,11 @@ abstract class FakeObject {
     abstract val viewRange: Int
 
     // List of players that can see the object
-    val viewers = ConcurrentSet<Player>()
+    val viewers = ConcurrentHashMap.newKeySet<Player>()
     // List of players that currently got the chunk loaded
-    val loadedChunkViewers = ConcurrentSet<Player>()
+    val loadedChunkViewers = ConcurrentHashMap.newKeySet<Player>()
     // List of players that are currently viewing the object
-    val isViewing = ConcurrentSet<Player>()
+    val isViewing = ConcurrentHashMap.newKeySet<Player>()
 
     abstract fun destroy()
     abstract fun addViewer(player: Player)
