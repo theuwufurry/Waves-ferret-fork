@@ -1,6 +1,7 @@
 package gg.aquatic.waves.packetevents
 
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
+import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType
 import gg.aquatic.waves.packetevents.type.BlockDisplayEntityDataBuilder
 import gg.aquatic.waves.packetevents.type.ItemDisplayEntityDataBuilder
 import gg.aquatic.waves.packetevents.type.TextDisplayEntityDataBuilder
@@ -9,8 +10,8 @@ abstract class EntityDataBuilder {
 
     protected val entityData = HashMap<Int, EntityData>()
 
-    protected fun addData(entityData: EntityData) {
-        this.entityData += entityData.index to entityData
+    protected fun <T> addData(index: Int, type: EntityDataType<T>, value: T) {
+        entityData += index to EntityData(index, type, value)
     }
 
     fun build(): List<EntityData> {

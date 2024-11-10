@@ -12,19 +12,19 @@ import org.bukkit.util.Transformation
 abstract class DisplayEntityDataBuilder : EntityDataBuilder() {
 
     fun setInterpolationDelay(delay: Int) {
-        addData(EntityData(8, EntityDataTypes.INT, delay))
+        addData(8, EntityDataTypes.INT, delay)
     }
 
     fun setTransformationInterpolationDuration(duration: Int) {
-        addData(EntityData(9, EntityDataTypes.INT, duration))
+        addData(9, EntityDataTypes.INT, duration)
     }
 
     fun setPosRotInterpolationDuration(duration: Int) {
-        addData(EntityData(10, EntityDataTypes.INT, duration))
+        addData(10, EntityDataTypes.INT, duration)
     }
 
     fun setTranslation(vector: Vector3f) {
-        addData(EntityData(11, EntityDataTypes.VECTOR3F, vector))
+        addData(11, EntityDataTypes.VECTOR3F, vector)
     }
 
     fun setTranslation(x: Number, y: Number, z: Number) {
@@ -32,16 +32,16 @@ abstract class DisplayEntityDataBuilder : EntityDataBuilder() {
     }
 
     fun setScale(scale: Vector3f) {
-        addData(EntityData(12, EntityDataTypes.VECTOR3F, scale))
+        addData(12, EntityDataTypes.VECTOR3F, scale)
     }
     fun setScale(x: Number, y: Number, z: Number) {
         setScale(Vector3f(x.toFloat(), y.toFloat(), z.toFloat()))
     }
     fun setRotationLeft(rotation: Quaternion4f) {
-        addData(EntityData(13, EntityDataTypes.QUATERNION, rotation))
+        addData(13, EntityDataTypes.QUATERNION, rotation)
     }
     fun setRotationRight(rotation: Quaternion4f) {
-        addData(EntityData(14, EntityDataTypes.QUATERNION, rotation))
+        addData(14, EntityDataTypes.QUATERNION, rotation)
     }
 
     fun setTransformation(transformation: Transformation) {
@@ -51,24 +51,24 @@ abstract class DisplayEntityDataBuilder : EntityDataBuilder() {
         setRotationRight(Quaternion4f(transformation.rightRotation.x, transformation.rightRotation.y, transformation.rightRotation.z, transformation.rightRotation.w))
     }
     fun setBillboard(billboard: Billboard) {
-        addData(EntityData(15, EntityDataTypes.BYTE, billboard.ordinal.toByte()))
+        addData(15, EntityDataTypes.BYTE, billboard.ordinal.toByte())
     }
     fun setViewRange(range: Float) {
-        addData(EntityData(17, EntityDataTypes.FLOAT, range))
+        addData(17, EntityDataTypes.FLOAT, range)
     }
     fun setShadowRadius(radius: Float) {
-        addData(EntityData(18, EntityDataTypes.FLOAT, radius))
+        addData(18, EntityDataTypes.FLOAT, radius)
     }
     fun setShadowStrength(strength: Float) {
-        addData(EntityData(19, EntityDataTypes.FLOAT, strength))
+        addData(19, EntityDataTypes.FLOAT, strength)
     }
     fun setWidth(width: Float) {
-        addData(EntityData(20, EntityDataTypes.FLOAT, width))
+        addData(20, EntityDataTypes.FLOAT, width)
     }
     fun setHeight(height: Float) {
-        addData(EntityData(21, EntityDataTypes.FLOAT, height))
+        addData(21, EntityDataTypes.FLOAT, height)
     }
     fun setGlowColorOverride(i: Int) {
-        addData(EntityData(22, EntityDataTypes.INT, i))
+        addData(22, EntityDataTypes.INT, i)
     }
 }

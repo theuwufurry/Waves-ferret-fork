@@ -11,13 +11,13 @@ class BlockDisplayEntityDataBuilder : DisplayEntityDataBuilder() {
     fun setBlockState(material: Material) {
         setBlockState(material.createBlockData())
     }
+
     fun setBlockState(blockData: BlockData) {
         addData(
-            EntityData(
-                23,
-                EntityDataTypes.BLOCK_STATE,
-                SpigotConversionUtil.fromBukkitBlockData(blockData).globalId
-            )
+            23,
+            EntityDataTypes.BLOCK_STATE,
+            SpigotConversionUtil.fromBukkitBlockData(blockData).globalId
+
         )
     }
 

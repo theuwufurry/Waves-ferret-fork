@@ -1,6 +1,5 @@
 package gg.aquatic.waves.packetevents.type
 
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.TextDisplay.TextAlignment
@@ -15,16 +14,16 @@ class TextDisplayEntityDataBuilder: DisplayEntityDataBuilder() {
     }
 
     fun setText(text: Component) {
-        addData(EntityData(23,EntityDataTypes.ADV_COMPONENT,text))
+        addData(23,EntityDataTypes.ADV_COMPONENT,text)
     }
     fun setLineWidth(width: Int) {
-        addData(EntityData(24,EntityDataTypes.INT,width))
+        addData(24,EntityDataTypes.INT,width)
     }
     fun setBackgroundColor(color: Int) {
-        addData(EntityData(25,EntityDataTypes.INT,color))
+        addData(25,EntityDataTypes.INT,color)
     }
     fun setTextOpacity(opacity: Byte) {
-        addData(EntityData(26,EntityDataTypes.BYTE,opacity))
+        addData(26,EntityDataTypes.BYTE,opacity)
     }
     fun hasShadow(boolean: Boolean) {
         setFlag(HAS_SHADOW, boolean)
@@ -40,7 +39,7 @@ class TextDisplayEntityDataBuilder: DisplayEntityDataBuilder() {
         var previousByte = previous?.value as? Byte ?: 0x00.toByte()
 
         previousByte = (previousByte.toInt() and ALIGNMENT_MASK.toInt().inv()).toByte()
-        addData(EntityData(28,EntityDataTypes.BYTE,(previousByte.toInt() or (alignment.ordinal shl 3)).toByte()))
+        addData(28,EntityDataTypes.BYTE,(previousByte.toInt() or (alignment.ordinal shl 3)).toByte())
     }
 
     /*
@@ -59,7 +58,7 @@ class TextDisplayEntityDataBuilder: DisplayEntityDataBuilder() {
         } else {
             (previousByte.toInt() and flag.toInt().inv()).toByte()
         }
-        addData(EntityData(27,EntityDataTypes.BYTE,previousByte))
+        addData(27,EntityDataTypes.BYTE,previousByte)
     }
 
 }

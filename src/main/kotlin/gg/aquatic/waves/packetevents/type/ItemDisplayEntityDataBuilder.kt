@@ -10,11 +10,11 @@ class ItemDisplayEntityDataBuilder: DisplayEntityDataBuilder() {
 
     fun setItem(item: ItemStack) {
         addData(
-            EntityData(23,EntityDataTypes.ITEMSTACK,SpigotConversionUtil.fromBukkitItemStack(item))
+            23,EntityDataTypes.ITEMSTACK,SpigotConversionUtil.fromBukkitItemStack(item)
         )
     }
     fun setItemTransformation(transform: ItemDisplayTransform) {
-        addData(EntityData(24,EntityDataTypes.BYTE,transform.ordinal.toByte()))
+        addData(24,EntityDataTypes.BYTE,transform.ordinal.toByte())
     }
 
 }
