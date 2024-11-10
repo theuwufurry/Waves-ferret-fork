@@ -8,7 +8,10 @@ fun PacketListener.register(priority: PacketListenerPriority = PacketListenerPri
     return PacketEvents.getAPI().eventManager.registerListener(this, priority)
 }
 
-inline fun <reified T: PacketEvent> packetEvent(priority: PacketListenerPriority, crossinline block: T.() -> Unit): PacketListenerCommon {
+inline fun <reified T : PacketEvent> packetEvent(
+    priority: PacketListenerPriority = PacketListenerPriority.NORMAL,
+    crossinline block: T.() -> Unit
+): PacketListenerCommon {
     return if (T::class == PacketReceiveEvent::class) {
         object : PacketListener {
             override fun onPacketReceive(event: PacketReceiveEvent) {

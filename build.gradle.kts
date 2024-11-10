@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "gg.aquatic.waves"
-version = "1.0.25"
+version = "1.0.44"
 
 val ktor_version: String by project
 
@@ -71,7 +71,7 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktor_version")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-    implementation("com.github.retrooper:packetevents-spigot:2.5.0")
+    implementation("com.github.retrooper:packetevents-spigot:2.6.0")
 
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("gg.aquatic:AEAPI:1.0")
@@ -87,9 +87,44 @@ kotlin {
     jvmToolchain(17)
 }
 
+tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarPlugin") {
+    archiveFileName.set("Waves-${project.version}-Shaded.jar")
+    archiveClassifier.set("plugin")
+
+    from(sourceSets.main.get().output)
+    configurations = listOf(project.configurations.runtimeClasspath.get())
+
+    relocate("kotlinx.coroutines", "gg.aquatic.waves.shadow.kotlinx.coroutines")
+    relocate("com.github.retrooper", "gg.aquatic.waves.shadow.com.retrooper")
+    relocate("io.github.retrooper", "gg.aquatic.waves.shadow.io.retrooper")
+    relocate("kotlin", "gg.aquatic.waves.shadow.kotlin")
+
+    // Exclude the original (unrelocated) kotlinx-coroutines-core package
+    //exclude("kotlin/**")
+    exclude("com/google/**","com/typesafe/**", "io/netty/**", "org/slf4j/**")
+}
+
+tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarPublish") {
+    archiveFileName.set("Waves-${project.version}-Publish.jar")
+    archiveClassifier.set("publish")
+
+    from(sourceSets.main.get().output)
+    configurations = listOf(project.configurations.runtimeClasspath.get())
+
+    relocate("kotlinx.coroutines", "gg.aquatic.waves.shadow.kotlinx.coroutines")
+    relocate("com.github.retrooper", "gg.aquatic.waves.shadow.com.retrooper")
+    relocate("io.github.retrooper", "gg.aquatic.waves.shadow.io.retrooper")
+
+    // Exclude the original (unrelocated) kotlinx-coroutines-core package
+    exclude("kotlin/**")
+    //relocate("kotlin", "gg.aquatic.waves.shadow.kotlin")
+    exclude("com/google/**","com/typesafe/**", "io/netty/**", "org/slf4j/**")
+}
+
 tasks {
     build {
-        dependsOn(shadowJar)
+        dependsOn(named("shadowJarPlugin"))
+        dependsOn(named("shadowJarPublish"))
     }
 
     compileJava {
@@ -105,37 +140,6 @@ tasks {
         filteringCharset = Charsets.UTF_8.name()
     }
 }
-
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    archiveFileName.set("Waves-${project.version}.jar")
-    archiveClassifier.set("plugin")
-
-    //configurations = listOf(project.configurations.compileClasspath.get())
-    /*
-    dependencies {
-        include(dependency("gg.aquatic.aquaticseries:aquaticlib"))
-        include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
-        include(dependency("com.github.retrooper:packetevents-spigot"))
-    }
-     */
-    //configurations = listOf(project.configurations.implementation.get(), project.configurations.runtimeOnly.get())
-    /*
-    from({
-        project.configurations.runtimeClasspath.get().filter { it.name.contains("kotlinx-coroutines-core") }
-            .map { project.zipTree(it) }
-    })
-     */
-    // Relocate packages
-    relocate("kotlinx.coroutines", "gg.aquatic.waves.shadow.kotlinx.coroutines")
-    relocate("com.github.retrooper", "gg.aquatic.waves.shadow.com.retrooper")
-    relocate("io.github.retrooper", "gg.aquatic.waves.shadow.io.retrooper")
-
-    // Exclude the original (unrelocated) kotlinx-coroutines-core package
-    exclude("META-INF/versions/9/module-info.class")
-    exclude("kotlin/**")
-    exclude("com/google/**","com/typesafe/**", "io/netty/**", "org/slf4j/**")
-}
-
 
 val maven_username = if (env.isPresent("MAVEN_USERNAME")) env.fetch("MAVEN_USERNAME") else ""
 val maven_password = if (env.isPresent("MAVEN_PASSWORD")) env.fetch("MAVEN_PASSWORD") else ""
@@ -161,6 +165,10 @@ publishing {
             artifactId = "Waves"
             version = "${project.version}"
             from(components["java"])
+            artifact(tasks["shadowJarPublish"]) {
+                classifier = "publish"
+            }
         }
     }
 }
+
