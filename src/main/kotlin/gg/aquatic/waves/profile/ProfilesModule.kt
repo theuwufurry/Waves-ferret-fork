@@ -212,10 +212,12 @@ object ProfilesModule : WaveModule {
 
                 val player = AquaticPlayer(id, uuid, username)
                 player.updated = true
+                /*
                 for ((_,value) in modules) {
                     val entry = value.loadEntry(player)
                     player.entries[value.id] = entry
                 }
+                 */
                 player
             }
         }
