@@ -19,8 +19,9 @@ open class FakeBlock(block: AquaticBlock, location: Location,
 
     override fun destroy() {
         for (player in isViewing) {
-            show(player)
+            hide(player)
         }
+        FakeObjectHandler.tickableObjects -= this
         unregister()
     }
 

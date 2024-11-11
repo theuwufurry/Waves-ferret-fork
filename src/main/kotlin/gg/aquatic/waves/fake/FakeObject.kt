@@ -13,8 +13,10 @@ abstract class FakeObject {
 
     // List of players that can see the object
     val viewers = ConcurrentHashMap.newKeySet<Player>()
+
     // List of players that currently got the chunk loaded
     val loadedChunkViewers = ConcurrentHashMap.newKeySet<Player>()
+
     // List of players that are currently viewing the object
     val isViewing = ConcurrentHashMap.newKeySet<Player>()
 
@@ -32,6 +34,7 @@ abstract class FakeObject {
         tick()
         tickRange()
     }
+
     protected fun tickRange() {
         rangeTick++
         if (rangeTick % 4 == 0) {
@@ -41,6 +44,10 @@ abstract class FakeObject {
         }
 
         for (loadedChunkViewer in loadedChunkViewers.toSet()) {
+            if (!loadedChunkViewer.isOnline) {
+                FakeObjectHandler.handlePlayerRemove(loadedChunkViewer, this, true)
+                continue
+            }
             if (loadedChunkViewer.world != location.world) {
                 FakeObjectHandler.handlePlayerRemove(loadedChunkViewer, this)
                 continue

@@ -29,8 +29,9 @@ class FakeEntity(
 
     override fun destroy() {
         for (player in isViewing) {
-            show(player)
+            hide(player)
         }
+        FakeObjectHandler.tickableObjects -= this
         unregister()
     }
 
@@ -101,10 +102,15 @@ class FakeEntity(
 
     override fun removeViewer(uuid: UUID) {
         viewers.removeIf { it.uniqueId == uuid }
+        loadedChunkViewers.removeIf { it.uniqueId == uuid }
+        isViewing.removeIf { it.uniqueId == uuid }
     }
 
     override fun removeViewer(player: Player) {
-        hide(player)
+        if (isViewing.contains(player)) {
+            hide(player)
+        }
+        FakeObjectHandler.handlePlayerRemove(player, this, true)
     }
 
     override fun show(player: Player) {
