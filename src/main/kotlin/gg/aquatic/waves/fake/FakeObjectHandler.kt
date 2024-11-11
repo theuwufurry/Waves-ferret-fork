@@ -17,6 +17,7 @@ import gg.aquatic.waves.util.player
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import java.util.concurrent.ConcurrentHashMap
@@ -107,14 +108,16 @@ object FakeObjectHandler : WaveModule {
 
     private fun handlePlayerRemove(player: Player) {
         for (tickableObject in tickableObjects) {
-            handlePlayerRemove(player, tickableObject)
+            handlePlayerRemove(player, tickableObject, true)
         }
     }
 
-    internal fun handlePlayerRemove(player: Player, fakeObject: FakeObject) {
+    internal fun handlePlayerRemove(player: Player, fakeObject: FakeObject, removeViewer: Boolean = false) {
         fakeObject.loadedChunkViewers -= player
         fakeObject.isViewing -= player
-        fakeObject.viewers -= player
+        if (removeViewer) {
+            fakeObject.viewers -= player
+        }
 
         if (fakeObject.loadedChunkViewers.isEmpty() && fakeObject.isViewing.isEmpty()) {
             objectRemovalQueue += fakeObject

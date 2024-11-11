@@ -2,9 +2,7 @@ package gg.aquatic.waves.packetevents
 
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType
-import gg.aquatic.waves.packetevents.type.BlockDisplayEntityDataBuilder
-import gg.aquatic.waves.packetevents.type.ItemDisplayEntityDataBuilder
-import gg.aquatic.waves.packetevents.type.TextDisplayEntityDataBuilder
+import gg.aquatic.waves.packetevents.type.*
 
 abstract class EntityDataBuilder {
 
@@ -30,6 +28,14 @@ abstract class EntityDataBuilder {
         val TEXT_DISPLAY: TextDisplayEntityDataBuilder
             get() {
                 return TextDisplayEntityDataBuilder()
+            }
+        val ANY: BaseEntityDataBuilder
+            get() {
+                return BaseEntityDataBuilder()
+            }
+        val INTERACTION: InteractionEntityDataBuilder
+            get() {
+                return InteractionEntityDataBuilder()
             }
     }
 }

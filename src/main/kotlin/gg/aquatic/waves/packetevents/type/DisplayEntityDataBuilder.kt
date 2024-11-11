@@ -4,8 +4,10 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
 import com.github.retrooper.packetevents.util.Quaternion4f
 import com.github.retrooper.packetevents.util.Vector3f
 import gg.aquatic.waves.packetevents.EntityDataBuilder
+import gg.aquatic.waves.util.math.MatrixUtil
 import org.bukkit.entity.Display.Billboard
 import org.bukkit.util.Transformation
+import org.joml.*
 
 abstract class DisplayEntityDataBuilder : EntityDataBuilder() {
 
@@ -48,6 +50,24 @@ abstract class DisplayEntityDataBuilder : EntityDataBuilder() {
         setRotationLeft(Quaternion4f(transformation.leftRotation.x, transformation.leftRotation.y, transformation.leftRotation.z, transformation.leftRotation.w))
         setRotationRight(Quaternion4f(transformation.rightRotation.x, transformation.rightRotation.y, transformation.rightRotation.z, transformation.rightRotation.w))
     }
+
+    fun setTransformation(matrix4f: Matrix4f) {
+        val f = 1.0F / matrix4f.m33()
+        val triple = MatrixUtil.svdDecompose(Matrix3f(matrix4f).scale(f))
+        val translation = matrix4f.getTranslation(org.joml.Vector3f()).mul(f)
+        val leftRotation = Quaternionf(triple.first as Quaternionfc)
+        val scale = Vector3f(triple.second as Vector3fc)
+        val rightRotation = Quaternionf(triple.third as Quaternionfc)
+
+        setTransformation(
+            Transformation(
+                translation,
+                leftRotation,
+                scale,
+                rightRotation
+            ))
+    }
+
     fun setBillboard(billboard: Billboard) {
         addData(15, EntityDataTypes.BYTE, billboard.ordinal.toByte())
     }
