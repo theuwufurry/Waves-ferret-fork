@@ -1,6 +1,7 @@
 package gg.aquatic.waves
 
 import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
 import gg.aquatic.aquaticseries.lib.AquaticSeriesLib
 import gg.aquatic.aquaticseries.lib.betterinventory2.InventoryHandler
 import gg.aquatic.aquaticseries.lib.data.MySqlDriver
@@ -8,8 +9,10 @@ import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
 import gg.aquatic.aquaticseries.lib.interactable2.InteractableHandler
 import gg.aquatic.aquaticseries.lib.packet.PacketHandler
 import gg.aquatic.aquaticseries.lib.util.*
+import gg.aquatic.waves.chunk.ChunkTracker
 import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
+import gg.aquatic.waves.fake.block.FakeEntity
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
@@ -26,7 +29,8 @@ class Waves : JavaPlugin() {
         WaveModules.PROFILES to ProfilesModule,
         WaveModules.ITEMS to ItemHandler,
         WaveModules.ENTITIES to EntityHandler,
-        WaveModules.FAKE_OBJECTS to FakeObjectHandler
+        WaveModules.FAKE_OBJECTS to FakeObjectHandler,
+        WaveModules.CHUNK_TRACKER to ChunkTracker
     )
     lateinit var configValues: WavesConfig
 
@@ -46,7 +50,7 @@ class Waves : JavaPlugin() {
     }
 
     override fun onEnable() {
-        PacketEvents.getAPI().init();
+        PacketEvents.getAPI().init()
         AquaticSeriesLib.init(
             this,
             listOf(
@@ -74,6 +78,7 @@ class Waves : JavaPlugin() {
             }
         }
          */
+        //val fakeEntity = FakeEntity(EntityTypes.PIG, )
     }
 
     override fun onDisable() {

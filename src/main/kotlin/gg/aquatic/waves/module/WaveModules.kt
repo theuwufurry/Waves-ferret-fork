@@ -4,5 +4,6 @@ enum class WaveModules {
     PROFILES,
     ITEMS,
     ENTITIES,
-    FAKE_OBJECTS
+    FAKE_OBJECTS,
+    CHUNK_TRACKER
 }

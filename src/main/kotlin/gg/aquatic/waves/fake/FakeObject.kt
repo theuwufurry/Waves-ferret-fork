@@ -1,5 +1,6 @@
 package gg.aquatic.waves.fake
 
+import gg.aquatic.waves.chunk.trackedByPlayers
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.UUID
@@ -14,9 +15,6 @@ abstract class FakeObject {
 
     // List of players that can see the object
     val viewers = ConcurrentHashMap.newKeySet<Player>()
-
-    // List of players that currently got the chunk loaded
-    val loadedChunkViewers = ConcurrentHashMap.newKeySet<Player>()
 
     // List of players that are currently viewing the object
     val isViewing = ConcurrentHashMap.newKeySet<Player>()
@@ -44,6 +42,7 @@ abstract class FakeObject {
             return
         }
 
+        val loadedChunkViewers = location.chunk.trackedByPlayers()
         for (loadedChunkViewer in loadedChunkViewers.toSet()) {
             if (!loadedChunkViewer.isOnline) {
                 FakeObjectHandler.handlePlayerRemove(loadedChunkViewer, this, true)

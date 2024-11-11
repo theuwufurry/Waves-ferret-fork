@@ -1,23 +1,20 @@
 package gg.aquatic.waves.fake
 
-import com.github.retrooper.packetevents.event.PacketListenerPriority
-import com.github.retrooper.packetevents.event.PacketSendEvent
-import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData
 import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
 import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationCacheHandler
 import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationChunkObject
 import gg.aquatic.aquaticseries.lib.util.event
+import gg.aquatic.aquaticseries.lib.util.runAsync
 import gg.aquatic.aquaticseries.lib.util.runAsyncTimer
 import gg.aquatic.waves.Waves
+import gg.aquatic.waves.chunk.PlayerChunkUnloadEvent
+import gg.aquatic.waves.chunk.chunkId
+import gg.aquatic.waves.chunk.trackedByPlayers
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
-import gg.aquatic.waves.util.packetEvent
-import gg.aquatic.waves.util.player
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import java.util.concurrent.ConcurrentHashMap
@@ -41,28 +38,29 @@ object FakeObjectHandler : WaveModule {
             }
         }
 
-        packetEvent<PacketSendEvent>(priority = PacketListenerPriority.LOWEST) {
-            if (packetType != PacketType.Play.Server.CHUNK_DATA) {
-                return@packetEvent
-            }
-
-            val packet = WrapperPlayServerChunkData(this)
-            val player = player()
-            val chunk = player.world.getChunkAt(packet.column.x, packet.column.z)
-            val obj = ChunkCacheHandler.getObject(chunk, LocationChunkObject::class.java) as? LocationChunkObject
-                ?: return@packetEvent
-            for ((_, locMap) in obj.cache) {
-                for ((_, inst) in locMap) {
-                    if (inst !is FakeObject) {
-                        continue
+        event<ChunkLoadEvent> {
+            runAsync {
+                val obj = ChunkCacheHandler.getObject(it.chunk, LocationChunkObject::class.java) as? LocationChunkObject
+                    ?: return@runAsync
+                for ((_, locMap) in obj.cache) {
+                    for ((_, inst) in locMap) {
+                        if (inst !is FakeObject) {
+                            continue
+                        }
+                        tickableObjects += inst
                     }
-                    if (inst.viewers.contains(player)) {
-                        inst.loadedChunkViewers += player
-                    }
-                    tickableObjects += inst
                 }
             }
         }
+        event<PlayerChunkUnloadEvent> {
+            runAsync {
+                for (tickableObject in tickableObjects) {
+                    if (tickableObject.location.chunk.chunkId() != it.chunk.chunkId()) continue
+                    handlePlayerRemove(it.player, tickableObject, false)
+                }
+            }
+        }
+
         event<PlayerQuitEvent> {
             handlePlayerRemove(it.player)
         }
@@ -75,7 +73,6 @@ object FakeObjectHandler : WaveModule {
                         continue
                     }
                     inst.isViewing.clear()
-                    inst.loadedChunkViewers.clear()
                     objectRemovalQueue += inst
                 }
             }
@@ -94,7 +91,10 @@ object FakeObjectHandler : WaveModule {
         }
         event<PlayerInteractEvent> {
             val block = it.clickedBlock ?: return@event
-            val bundle = LocationCacheHandler.getObject(block.location, FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle ?: return@event
+            val bundle = LocationCacheHandler.getObject(
+                block.location,
+                FakeObjectLocationBundle::class.java
+            ) as? FakeObjectLocationBundle ?: return@event
             it.isCancelled = true
             for (block1 in bundle.blocks) {
                 if (block1.viewers.contains(it.player)) {
@@ -113,13 +113,12 @@ object FakeObjectHandler : WaveModule {
     }
 
     internal fun handlePlayerRemove(player: Player, fakeObject: FakeObject, removeViewer: Boolean = false) {
-        fakeObject.loadedChunkViewers -= player
         fakeObject.isViewing -= player
         if (removeViewer) {
             fakeObject.viewers -= player
         }
 
-        if (fakeObject.loadedChunkViewers.isEmpty() && fakeObject.isViewing.isEmpty()) {
+        if (fakeObject.location.chunk.trackedByPlayers().isEmpty() && fakeObject.isViewing.isEmpty()) {
             objectRemovalQueue += fakeObject
         }
     }
