@@ -33,6 +33,7 @@ class FakeEntity(
         }
         FakeObjectHandler.tickableObjects -= this
         unregister()
+        destroyed = true
     }
 
     val entityId = SpigotReflectionUtil.generateEntityId()

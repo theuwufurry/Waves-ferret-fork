@@ -10,6 +10,7 @@ abstract class FakeObject {
     abstract val location: Location
     protected var registered: Boolean = false
     abstract val viewRange: Int
+    var destroyed: Boolean = false
 
     // List of players that can see the object
     val viewers = ConcurrentHashMap.newKeySet<Player>()

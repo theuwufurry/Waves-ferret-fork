@@ -23,6 +23,7 @@ open class FakeBlock(block: AquaticBlock, location: Location,
         }
         FakeObjectHandler.tickableObjects -= this
         unregister()
+        destroyed = true
     }
 
     var block = block
