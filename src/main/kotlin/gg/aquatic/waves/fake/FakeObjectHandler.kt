@@ -44,9 +44,7 @@ object FakeObjectHandler : WaveModule {
                     ?: return@runAsync
                 for ((_, locMap) in obj.cache) {
                     for ((_, inst) in locMap) {
-                        if (inst !is FakeObject) {
-                            continue
-                        }
+                        if (inst !is FakeObject) continue
                         tickableObjects += inst
                     }
                 }

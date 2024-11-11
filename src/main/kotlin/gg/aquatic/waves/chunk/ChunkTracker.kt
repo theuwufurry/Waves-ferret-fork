@@ -28,9 +28,7 @@ object ChunkTracker : WaveModule {
 
     override fun initialize(waves: Waves) {
         packetEvent<PacketSendEvent> {
-            if (this.packetType != Play.Server.CHUNK_DATA) {
-                return@packetEvent
-            }
+            if (this.packetType != Play.Server.CHUNK_DATA) return@packetEvent
             val packet = WrapperPlayServerChunkData(this)
             val player = this.player()
             val chunkId = ChunkId(packet.column.x, packet.column.z)
@@ -38,15 +36,13 @@ object ChunkTracker : WaveModule {
             var playerPair = playerToChunks.getOrPut(player.uniqueId) { player.world.name to ConcurrentHashMap.newKeySet() }
             if (playerPair.first != player.location.world!!.name) {
                 for (chunkId1 in playerPair.second) {
-                    val chunkList = chunks[playerPair.first]?.get(chunkId1)
-                    if (chunkList != null) {
-                        chunkList -= player.uniqueId
-                        runSync {
-                            PlayerChunkUnloadEvent(player,chunkId1.toChunk(player.world)).call()
-                        }
-                        if (chunkList.isEmpty()) {
-                            chunks[playerPair.first]?.remove(chunkId1)
-                        }
+                    val chunkList = chunks[playerPair.first]?.get(chunkId1) ?: continue
+                    chunkList -= player.uniqueId
+                    runSync {
+                        PlayerChunkUnloadEvent(player,chunkId1.toChunk(player.world)).call()
+                    }
+                    if (chunkList.isEmpty()) {
+                        chunks[playerPair.first]?.remove(chunkId1)
                     }
                 }
                 playerPair = player.world.name to ConcurrentHashMap.newKeySet()
@@ -74,14 +70,11 @@ object ChunkTracker : WaveModule {
             val playerPair = playerToChunks.remove(it.player.uniqueId) ?: return@event
             runAsync {
                 for (chunkId in playerPair.second) {
-                    val chunkList = chunks[playerPair.first]?.get(chunkId)
-                    if (chunkList != null) {
-                        chunkList -= it.player.uniqueId
-                        if (chunkList.isEmpty()) {
-                            chunks[playerPair.first]?.remove(chunkId)
-                            PlayerChunkUnloadEvent(it.player,chunkId.toChunk(it.player.world)).call()
-                        }
-                    }
+                    val chunkList = chunks[playerPair.first]?.get(chunkId) ?: continue
+                    chunkList -= it.player.uniqueId
+                    if (chunkList.isNotEmpty()) continue
+                    chunks[playerPair.first]?.remove(chunkId)
+                    PlayerChunkUnloadEvent(it.player,chunkId.toChunk(it.player.world)).call()
                 }
                 playerToChunks.remove(it.player.uniqueId)
             }
