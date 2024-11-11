@@ -74,7 +74,9 @@ object ChunkTracker : WaveModule {
                     chunkList -= it.player.uniqueId
                     if (chunkList.isNotEmpty()) continue
                     chunks[playerPair.first]?.remove(chunkId)
-                    PlayerChunkUnloadEvent(it.player,chunkId.toChunk(it.player.world)).call()
+                    runSync {
+                        PlayerChunkUnloadEvent(it.player,chunkId.toChunk(it.player.world)).call()
+                    }
                 }
                 playerToChunks.remove(it.player.uniqueId)
             }

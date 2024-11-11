@@ -1,10 +1,11 @@
 package gg.aquatic.waves.fake.entity
 
 import gg.aquatic.aquaticseries.lib.block.AquaticBlock
+import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
 import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationCacheHandler
 import gg.aquatic.waves.fake.FakeObject
 import gg.aquatic.waves.fake.FakeObjectHandler
-import gg.aquatic.waves.fake.FakeObjectLocationBundle
+import gg.aquatic.waves.fake.FakeObjectChunkBundle
 import gg.aquatic.waves.util.blockLocation
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -36,24 +37,20 @@ open class FakeBlock(block: AquaticBlock, location: Location,
     fun register() {
         if (registered) return
         registered = true
-        var bundle = LocationCacheHandler.getObject(location,
-            FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle
+        var bundle = ChunkCacheHandler.getObject(location.chunk,
+            FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle
         if (bundle == null) {
-            bundle = FakeObjectLocationBundle()
-            LocationCacheHandler.registerObject(bundle, FakeObjectLocationBundle::class.java, location)
+            bundle = FakeObjectChunkBundle()
+            ChunkCacheHandler.registerObject(bundle, location.chunk)
         }
         bundle.blocks += this
     }
     fun unregister() {
         if (!registered) return
         registered = false
-        val bundle = LocationCacheHandler.getObject(location,
-            FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle ?: return
+        val bundle = ChunkCacheHandler.getObject(location.chunk,
+            FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle ?: return
         bundle.blocks -= this
-
-        if (bundle.blocks.isEmpty() && bundle.entities.isEmpty()) {
-            LocationCacheHandler.unregisterObject(FakeObjectLocationBundle::class.java, location)
-        }
     }
 
     fun changeBlock(aquaticBlock: AquaticBlock) {
@@ -90,6 +87,6 @@ open class FakeBlock(block: AquaticBlock, location: Location,
     }
 
     override fun tick() {
-        tickRange()
+
     }
 }

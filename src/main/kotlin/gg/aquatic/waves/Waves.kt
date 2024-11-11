@@ -20,6 +20,8 @@ import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
+import org.bukkit.Bukkit
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -69,16 +71,13 @@ class Waves : JavaPlugin() {
         /*
         event<AsyncPlayerChatEvent> {
             runSync {
-                it.player.getNearbyEntities(10.0, 10.0, 10.0).forEach { entity ->
-                    val data = entity.getEntityData().toMutableList()
-                    data.add(EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(Component.text("Example Name!"))))
-                    data.add(EntityData(3, EntityDataTypes.BOOLEAN, true))
-                    entity.setEntityData(data)
-                }
+                val fakeEntity = FakeEntity(EntityTypes.PIG,it.player.location, 30)
+                fakeEntity.register()
+                Bukkit.broadcastMessage("Spawned!")
             }
         }
          */
-        //val fakeEntity = FakeEntity(EntityTypes.PIG, )
+
     }
 
     override fun onDisable() {

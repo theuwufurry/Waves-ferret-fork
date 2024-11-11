@@ -8,6 +8,7 @@ import org.bukkit.event.Event
 class AquaticItemInteractEvent(
     val player: Player,
     val item: AquaticItem,
+    val itemStack: org.bukkit.inventory.ItemStack,
     var originalEvent: Event,
     val isLeftClick: Boolean
 ): AquaticEvent() {

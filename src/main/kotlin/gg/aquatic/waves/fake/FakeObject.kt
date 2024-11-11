@@ -1,6 +1,7 @@
 package gg.aquatic.waves.fake
 
 import gg.aquatic.waves.chunk.trackedByPlayers
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.UUID
@@ -34,7 +35,7 @@ abstract class FakeObject {
         tickRange()
     }
 
-    protected fun tickRange() {
+    private fun tickRange() {
         rangeTick++
         if (rangeTick % 4 == 0) {
             rangeTick = 0
@@ -44,6 +45,7 @@ abstract class FakeObject {
 
         val loadedChunkViewers = location.chunk.trackedByPlayers()
         for (loadedChunkViewer in loadedChunkViewers.toSet()) {
+            Bukkit.broadcastMessage("Checking player")
             if (!loadedChunkViewer.isOnline) {
                 FakeObjectHandler.handlePlayerRemove(loadedChunkViewer, this, true)
                 continue
@@ -55,11 +57,13 @@ abstract class FakeObject {
             val distance = loadedChunkViewer.location.distanceSquared(location)
             if (isViewing.contains(loadedChunkViewer)) {
                 if (distance > viewRange * viewRange) {
+                    Bukkit.broadcastMessage("Player is out of the range")
                     hide(loadedChunkViewer)
                     isViewing.remove(loadedChunkViewer)
                 }
             } else {
                 if (distance <= viewRange * viewRange) {
+                    Bukkit.broadcastMessage("Player is in the range")
                     show(loadedChunkViewer)
                     isViewing.add(loadedChunkViewer)
                 }

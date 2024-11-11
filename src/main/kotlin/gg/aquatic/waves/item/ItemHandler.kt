@@ -37,7 +37,7 @@ object ItemHandler : WaveModule {
                 val interaction = listenInteractions[registry] ?: return@event
 
                 val aitemEvent = AquaticItemInteractEvent(
-                    it.player, aitem, it, it.action == Action.LEFT_CLICK_AIR || it.action == Action.LEFT_CLICK_BLOCK,
+                    it.player, aitem, item, it, it.action == Action.LEFT_CLICK_AIR || it.action == Action.LEFT_CLICK_BLOCK,
                 )
                 interaction(aitemEvent)
                 aitemEvent.call()

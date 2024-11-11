@@ -7,11 +7,13 @@ import gg.aquatic.aquaticseries.lib.util.event
 import gg.aquatic.aquaticseries.lib.util.runAsync
 import gg.aquatic.aquaticseries.lib.util.runAsyncTimer
 import gg.aquatic.waves.Waves
+import gg.aquatic.waves.chunk.PlayerChunkLoadEvent
 import gg.aquatic.waves.chunk.PlayerChunkUnloadEvent
 import gg.aquatic.waves.chunk.chunkId
 import gg.aquatic.waves.chunk.trackedByPlayers
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -38,16 +40,14 @@ object FakeObjectHandler : WaveModule {
             }
         }
 
-        event<ChunkLoadEvent> {
+        event<PlayerChunkLoadEvent> {
             runAsync {
-                val obj = ChunkCacheHandler.getObject(it.chunk, LocationChunkObject::class.java) as? LocationChunkObject
+                val obj = ChunkCacheHandler.getObject(it.chunk, FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle
                     ?: return@runAsync
-                for ((_, locMap) in obj.cache) {
-                    for ((_, inst) in locMap) {
-                        if (inst !is FakeObject) continue
-                        tickableObjects += inst
-                    }
-                }
+                val before = tickableObjects.size
+                tickableObjects += obj.blocks
+                tickableObjects += obj.entities
+                Bukkit.broadcastMessage("Loaded ${tickableObjects.size - before} fake objects")
             }
         }
         event<PlayerChunkUnloadEvent> {
@@ -89,10 +89,10 @@ object FakeObjectHandler : WaveModule {
         }
         event<PlayerInteractEvent> {
             val block = it.clickedBlock ?: return@event
-            val bundle = LocationCacheHandler.getObject(
-                block.location,
-                FakeObjectLocationBundle::class.java
-            ) as? FakeObjectLocationBundle ?: return@event
+            val bundle = ChunkCacheHandler.getObject(
+                block.location.chunk,
+                FakeObjectChunkBundle::class.java
+            ) as? FakeObjectChunkBundle ?: return@event
             it.isCancelled = true
             for (block1 in bundle.blocks) {
                 if (block1.viewers.contains(it.player)) {

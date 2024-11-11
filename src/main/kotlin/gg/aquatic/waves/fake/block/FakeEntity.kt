@@ -8,11 +8,13 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
+import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
 import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationCacheHandler
+import gg.aquatic.waves.chunk.chunkId
+import gg.aquatic.waves.chunk.trackedChunks
 import gg.aquatic.waves.fake.FakeObject
 import gg.aquatic.waves.fake.FakeObjectHandler
-import gg.aquatic.waves.fake.FakeObjectLocationBundle
-import gg.aquatic.waves.util.blockLocation
+import gg.aquatic.waves.fake.FakeObjectChunkBundle
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil
@@ -22,9 +24,10 @@ import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.collections.HashMap
 
-class FakeEntity(
+open class FakeEntity(
     val type: EntityType, override val location: Location,
-    override val viewRange: Int
+    override val viewRange: Int,
+    consumer: FakeEntity.() -> Unit = {}
 ) : FakeObject() {
 
     override fun destroy() {
@@ -42,17 +45,23 @@ class FakeEntity(
     val equipment = HashMap<EquipmentSlot, ItemStack>()
 
     init {
+        consumer(this)
         FakeObjectHandler.tickableObjects += this
+        for (viewer in viewers) {
+            if (viewer.trackedChunks().contains(location.chunk.chunkId())) {
+                show(viewer)
+            }
+        }
     }
 
     fun register() {
         if (registered) return
         registered = true
         var bundle =
-            LocationCacheHandler.getObject(location, FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle
+            ChunkCacheHandler.getObject(location.chunk, FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle
         if (bundle == null) {
-            bundle = FakeObjectLocationBundle()
-            LocationCacheHandler.registerObject(bundle, FakeObjectLocationBundle::class.java, location)
+            bundle = FakeObjectChunkBundle()
+            ChunkCacheHandler.registerObject(bundle, location.chunk)
         }
         bundle.entities += this
     }
@@ -61,13 +70,9 @@ class FakeEntity(
         if (!registered) return
         registered = false
         val bundle =
-            LocationCacheHandler.getObject(location, FakeObjectLocationBundle::class.java) as? FakeObjectLocationBundle
+            ChunkCacheHandler.getObject(location.chunk, FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle
                 ?: return
         bundle.entities -= this
-
-        if (bundle.blocks.isEmpty() && bundle.entities.isEmpty()) {
-            LocationCacheHandler.unregisterObject(FakeObjectLocationBundle::class.java, location)
-        }
     }
 
     fun updateEntity(func: FakeEntity.() -> Unit) {
@@ -103,7 +108,6 @@ class FakeEntity(
 
     override fun removeViewer(uuid: UUID) {
         viewers.removeIf { it.uniqueId == uuid }
-        loadedChunkViewers.removeIf { it.uniqueId == uuid }
         isViewing.removeIf { it.uniqueId == uuid }
     }
 
@@ -136,6 +140,6 @@ class FakeEntity(
     }
 
     override fun tick() {
-        tickRange()
+
     }
 }
