@@ -2,7 +2,6 @@ package gg.aquatic.waves.item
 
 import gg.aquatic.aquaticseries.lib.util.setSpawnerType
 import gg.aquatic.aquaticseries.lib.util.toAquatic
-import gg.aquatic.waves.registry.WavesRegistry
 import gg.aquatic.waves.util.toComponent
 import net.advancedplugins.ae.api.AEAPI
 import net.kyori.adventure.text.format.TextDecoration
@@ -14,7 +13,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
-import org.bukkit.persistence.PersistentDataType
 import java.util.*
 
 class AquaticItem(
@@ -27,24 +25,6 @@ class AquaticItem(
     val flags: MutableList<ItemFlag>?,
     val spawnerEntityType: EntityType?,
 ) {
-
-
-    val registryId: String?
-        get() {
-            val meta = item.itemMeta
-            val pdc = meta?.persistentDataContainer ?: return null
-            return pdc.get(ItemHandler.NAMESPACE_KEY, PersistentDataType.STRING)
-        }
-
-    fun register(namespace: String, id: String): Boolean {
-        if (this.registryId != null) return false
-        val meta = item.itemMeta ?: return false
-        meta.persistentDataContainer.set(ItemHandler.NAMESPACE_KEY, PersistentDataType.STRING, "$namespace:$id")
-        this.item.itemMeta = meta
-        WavesRegistry.ITEM[this.registryId!!] = this
-        return true
-    }
-
 
     fun giveItem(player: Player) {
         giveItem(player, amount)
