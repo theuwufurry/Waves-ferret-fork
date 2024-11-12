@@ -1,8 +1,10 @@
 package gg.aquatic.waves.profile.module.impl.economy
 
+import gg.aquatic.aquaticseries.lib.data.MySqlDriver
 import gg.aquatic.waves.economy.CustomCurrency
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.profile.AquaticPlayer
+import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.profile.module.ProfileModule
 import gg.aquatic.waves.profile.module.ProfileModuleEntry
 import kotlinx.coroutines.Dispatchers
@@ -47,15 +49,28 @@ object EconomyProfileModule : ProfileModule {
     }
 
     override fun initialize(connection: Connection) {
-        connection.prepareStatement(
-            "CREATE TABLE IF NOT EXISTS " +
-                    "aquaticcurrency_type (" +
-                    "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                    "currency_id NVARCHAR(64) NOT NULL UNIQUE" +
-                    ")"
-        ).use { preparedStatement ->
-            preparedStatement.execute()
+        if (ProfilesModule.driver is MySqlDriver) {
+            connection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS " +
+                        "aquaticcurrency_type (" +
+                        "id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+                        "currency_id NVARCHAR(64) NOT NULL UNIQUE" +
+                        ")"
+            ).use { preparedStatement ->
+                preparedStatement.execute()
+            }
+        } else {
+            connection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS " +
+                        "aquaticcurrency_type (" +
+                        "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+                        "currency_id NVARCHAR(64) NOT NULL UNIQUE" +
+                        ")"
+            ).use { preparedStatement ->
+                preparedStatement.execute()
+            }
         }
+
         connection.prepareStatement(
             "CREATE TABLE IF NOT EXISTS " +
                     "aquaticcurrency (" +

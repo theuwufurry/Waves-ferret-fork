@@ -45,6 +45,7 @@ class Waves : JavaPlugin() {
         INSTANCE = this
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this))
         PacketEvents.getAPI().load()
+        loadConfig()
     }
 
     override fun onEnable() {
@@ -57,15 +58,10 @@ class Waves : JavaPlugin() {
                 InteractableHandler
             )
         )
-        runAsync {
-            loadConfig()
-            for ((_, module) in modules) {
-                module.initialize(this@Waves)
-            }
-            runSync {
-                WavesInitializeEvent().call()
-            }
+        for ((_, module) in modules) {
+            module.initialize(this@Waves)
         }
+        WavesInitializeEvent().call()
 
         /*
         event<AsyncPlayerChatEvent> {
@@ -85,7 +81,7 @@ class Waves : JavaPlugin() {
 
     fun loadConfig() {
         dataFolder.mkdirs()
-        val config = Config("config.yml")
+        val config = Config("config.yml", this)
         config.load()
 
         val cfg = config.getConfiguration()!!
@@ -103,7 +99,7 @@ class Waves : JavaPlugin() {
             file.createNewFile()
             SQLiteDriver(file)
         } else {
-            MySqlDriver(ip, port, userName, password, database, maxPoolSize, poolName)
+            MySqlDriver(ip, port, database, userName, password, maxPoolSize, poolName)
         }
 
         val syncEnabled = cfg.getBoolean("sync.enabled", false)

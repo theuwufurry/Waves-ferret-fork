@@ -1,6 +1,7 @@
 package gg.aquatic.waves.profile
 
 import gg.aquatic.aquaticseries.lib.data.DataDriver
+import gg.aquatic.aquaticseries.lib.data.MySqlDriver
 import gg.aquatic.aquaticseries.lib.logger.type.InfoLogger
 import gg.aquatic.aquaticseries.lib.util.*
 import gg.aquatic.waves.Waves
@@ -16,6 +17,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import java.sql.Statement
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -24,9 +26,10 @@ import java.util.concurrent.ConcurrentHashMap
 object ProfilesModule : WaveModule {
     override val type: WaveModules = WaveModules.PROFILES
 
-    val driver: DataDriver by lazy {
-        Waves.INSTANCE.configValues.profilesDriver
-    }
+    val driver: DataDriver
+        get() {
+            return Waves.INSTANCE.configValues.profilesDriver
+        }
 
     val cache = ConcurrentHashMap<UUID, AquaticPlayer>()
     val playersSaving = HashSet<UUID>()
@@ -35,16 +38,29 @@ object ProfilesModule : WaveModule {
     val modules = HashMap<String, ProfileModule>()
 
     override fun initialize(waves: Waves) {
-        driver.execute(
-            "" +
-                    "CREATE TABLE IF NOT EXISTS " +
-                    "aquaticprofiles (" +
-                    "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                    "uuid BINARY(16) NOT NULL UNIQUE," +
-                    "username NVARCHAR(64) NOT NULL" +
-                    ")"
+        if (driver is MySqlDriver) {
+            driver.execute(
+                "" +
+                        "CREATE TABLE IF NOT EXISTS " +
+                        "aquaticprofiles (" +
+                        "id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+                        "uuid BINARY(16) NOT NULL UNIQUE," +
+                        "username NVARCHAR(64) NOT NULL" +
+                        ")"
 
-        ) {}
+            ) {}
+        } else {
+            driver.execute(
+                "" +
+                        "CREATE TABLE IF NOT EXISTS " +
+                        "aquaticprofiles (" +
+                        "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+                        "uuid BINARY(16) NOT NULL UNIQUE," +
+                        "username NVARCHAR(64) NOT NULL" +
+                        ")"
+
+            ) {}
+        }
 
         event<PlayerJoinEvent>(ignoredCancelled = true) {
             if (playersLoading.contains(it.player.uniqueId)) {
@@ -78,7 +94,12 @@ object ProfilesModule : WaveModule {
                         } else {
                             val aquaticPlayer = loadPlayer()
                             val cachedPlayer =
-                                SyncedPlayer(aquaticPlayer.uuid, aquaticPlayer.username, syncSettings.serverId, HashMap())
+                                SyncedPlayer(
+                                    aquaticPlayer.uuid,
+                                    aquaticPlayer.username,
+                                    syncSettings.serverId,
+                                    HashMap()
+                                )
                             SyncHandler.client.cachePlayer(cachedPlayer)
                         }
                     }
@@ -202,6 +223,24 @@ object ProfilesModule : WaveModule {
         }
         return optionalPlayer.orElseGet {
             InfoLogger.send("Player was not found in the database!")
+            driver.useConnection {
+                prepareStatement(
+                    "INSERT INTO aquaticprofiles (uuid, username) VALUES (?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+                ).use { preparedStatement ->
+                    preparedStatement.setBytes(1, uuid.toBytes())
+                    preparedStatement.setString(2, username)
+                    preparedStatement.executeUpdate()
+                    val keys = preparedStatement.generatedKeys
+                    keys.next()
+                    val id = keys.getInt(1)
+
+                    val player = AquaticPlayer(id, uuid, username)
+                    player.updated = true
+                    player
+                }
+            }
+            /*
             driver.preparedStatement("INSERT INTO aquaticprofiles (uuid, username) VALUES (?, ?)") {
                 setBytes(1, uuid.toBytes())
                 setString(2, username)
@@ -220,6 +259,7 @@ object ProfilesModule : WaveModule {
                  */
                 player
             }
+             */
         }
     }
 
