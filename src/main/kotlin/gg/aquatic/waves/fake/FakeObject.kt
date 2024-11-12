@@ -43,7 +43,7 @@ abstract class FakeObject {
             return
         }
 
-        val loadedChunkViewers = location.chunk.trackedByPlayers()
+        val loadedChunkViewers = location.chunk.trackedByPlayers().filter { viewers.contains(it) }
         for (loadedChunkViewer in loadedChunkViewers.toSet()) {
             if (!loadedChunkViewer.isOnline) {
                 FakeObjectHandler.handlePlayerRemove(loadedChunkViewer, this, true)

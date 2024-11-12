@@ -12,7 +12,7 @@ import gg.aquatic.aquaticseries.lib.util.*
 import gg.aquatic.waves.chunk.ChunkTracker
 import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
-import gg.aquatic.waves.fake.block.FakeEntity
+import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules

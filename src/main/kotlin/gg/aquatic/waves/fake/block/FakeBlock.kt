@@ -1,8 +1,7 @@
-package gg.aquatic.waves.fake.entity
+package gg.aquatic.waves.fake.block
 
 import gg.aquatic.aquaticseries.lib.block.AquaticBlock
 import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
-import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationCacheHandler
 import gg.aquatic.waves.fake.FakeObject
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.fake.FakeObjectChunkBundle
