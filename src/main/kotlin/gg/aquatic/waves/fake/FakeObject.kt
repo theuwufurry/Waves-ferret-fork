@@ -45,7 +45,6 @@ abstract class FakeObject {
 
         val loadedChunkViewers = location.chunk.trackedByPlayers()
         for (loadedChunkViewer in loadedChunkViewers.toSet()) {
-            Bukkit.broadcastMessage("Checking player")
             if (!loadedChunkViewer.isOnline) {
                 FakeObjectHandler.handlePlayerRemove(loadedChunkViewer, this, true)
                 continue
@@ -57,13 +56,11 @@ abstract class FakeObject {
             val distance = loadedChunkViewer.location.distanceSquared(location)
             if (isViewing.contains(loadedChunkViewer)) {
                 if (distance > viewRange * viewRange) {
-                    Bukkit.broadcastMessage("Player is out of the range")
                     hide(loadedChunkViewer)
                     isViewing.remove(loadedChunkViewer)
                 }
             } else {
                 if (distance <= viewRange * viewRange) {
-                    Bukkit.broadcastMessage("Player is in the range")
                     show(loadedChunkViewer)
                     isViewing.add(loadedChunkViewer)
                 }

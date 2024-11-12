@@ -44,10 +44,8 @@ object FakeObjectHandler : WaveModule {
             runAsync {
                 val obj = ChunkCacheHandler.getObject(it.chunk, FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle
                     ?: return@runAsync
-                val before = tickableObjects.size
                 tickableObjects += obj.blocks
                 tickableObjects += obj.entities
-                Bukkit.broadcastMessage("Loaded ${tickableObjects.size - before} fake objects")
             }
         }
         event<PlayerChunkUnloadEvent> {
