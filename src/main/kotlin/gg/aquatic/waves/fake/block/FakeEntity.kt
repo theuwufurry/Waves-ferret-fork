@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.player.EquipmentSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
 import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
 import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationCacheHandler
@@ -25,7 +26,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 open class FakeEntity(
-    val type: EntityType, override val location: Location,
+    val type: EntityType, override var location: Location,
     override val viewRange: Int,
     consumer: FakeEntity.() -> Unit = {}
 ) : FakeObject() {
@@ -141,5 +142,19 @@ open class FakeEntity(
 
     override fun tick() {
 
+    }
+
+    fun teleport(location: Location) {
+        this.location = location
+        if (registered) {
+            unregister()
+            register()
+        }
+        val packet = WrapperPlayServerEntityTeleport(
+            entityId, SpigotConversionUtil.fromBukkitLocation(location), false
+        )
+        for (player in isViewing) {
+            player.toUser().sendPacket(packet)
+        }
     }
 }
