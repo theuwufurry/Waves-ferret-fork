@@ -35,6 +35,8 @@ class Waves : JavaPlugin() {
         WaveModules.CHUNK_TRACKER to ChunkTracker
     )
     lateinit var configValues: WavesConfig
+    var initialized = false
+        private set
 
     companion object {
         lateinit var INSTANCE: Waves
@@ -65,6 +67,7 @@ class Waves : JavaPlugin() {
         for ((_, module) in modules) {
             module.initialize(this@Waves)
         }
+        initialized = true
         WavesInitializeEvent().call()
     }
 
