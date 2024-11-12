@@ -8,7 +8,7 @@ import java.util.function.Consumer
 import java.util.function.Function
 
 abstract class ButtonSettings(
-    val id: String,
+    var id: String,
     var priority: Int,
     var viewConditions: HashMap<Function<Player, Boolean>, ButtonSettings?>,
     var failItem: ButtonSettings?,

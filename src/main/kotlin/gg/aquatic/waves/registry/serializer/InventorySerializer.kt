@@ -8,6 +8,7 @@ import gg.aquatic.aquaticseries.lib.util.getSectionList
 import gg.aquatic.aquaticseries.lib.util.toAquatic
 import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.item.loadFromYml
+import gg.aquatic.waves.registry.serializer.ItemSerializer.fromSection
 import gg.aquatic.waves.util.inventory.AnimatedButtonSettings
 import gg.aquatic.waves.util.inventory.ButtonSettings
 import gg.aquatic.waves.util.inventory.ClickSettings
@@ -68,12 +69,16 @@ object InventorySerializer {
         return SlotSelection.of(slots)
     }
 
-    fun loadButton(section: ConfigurationSection, id: String): ButtonSettings? {
+    fun loadButton(
+        section: ConfigurationSection,
+        id: String,
+        modifier: (ConfigurationSection, ButtonSettings) -> Unit = { _, _ -> }
+    ): ButtonSettings? {
         val priority = section.getInt("priority", 0)
         val failItemSection = section.getConfigurationSection("fail-item")
 
         val failItem = if (failItemSection != null) {
-            loadButton(failItemSection, "fail-item")
+            loadButton(failItemSection, "fail-item", modifier)
         } else null
 
         val conditions = HashMap<Function<Player, Boolean>, ButtonSettings?>()
@@ -81,7 +86,7 @@ object InventorySerializer {
             val condition = RequirementSerializer.fromSection<Player>(conditionSection) ?: continue
             val conditionFailItemSection = conditionSection.getConfigurationSection("fail-item")
             val conditionFailItem: ButtonSettings? = if (conditionFailItemSection != null) {
-                loadButton(conditionFailItemSection, "fail-item")
+                loadButton(conditionFailItemSection, "fail-item", modifier)
             } else null
             conditions += Function<Player, Boolean> { t: Player ->
                 condition.check(t)
@@ -96,25 +101,29 @@ object InventorySerializer {
             for (key in framesSection.getKeys(false)) {
                 val frameSection = framesSection.getConfigurationSection(key) ?: continue
                 val time = key.toInt()
-                val btn = loadButton(frameSection, "frame") ?: continue
+                val btn = loadButton(frameSection, "frame", modifier) ?: continue
                 frames[time] = btn
             }
             if (frames.isEmpty()) return null
-            return AnimatedButtonSettings(
+            val settings = AnimatedButtonSettings(
                 id, priority, conditions, failItem, clickSettings, updateEvery,
                 frames
             )
+            modifier(section, settings)
+            return settings
         } else {
             val item = AquaticItem.loadFromYml(section) ?: return null
             val slots = loadSlotSelection(section.getStringList("slots"))
             if (slots.slots.isEmpty()) {
                 slots.slots += section.getInt("slot")
             }
-            return StaticButtonSettings(
+            val settings = StaticButtonSettings(
                 id, priority, conditions, failItem, clickSettings, updateEvery,
                 item,
                 slots
             )
+            modifier(section, settings)
+            return settings
         }
     }
 
@@ -161,7 +170,7 @@ object InventorySerializer {
         val failActions = if (section.isConfigurationSection("fail") && conditions.isNotEmpty()) {
             loadActionsWithConditions(section.getConfigurationSection("fail")!!)
         } else null
-        return ConfiguredActionWithConditions(action,conditions,failActions)
+        return ConfiguredActionWithConditions(action, conditions, failActions)
     }
 
     fun loadConditionWithFailActions(section: ConfigurationSection): ConfiguredConditionWithFailActions? {
