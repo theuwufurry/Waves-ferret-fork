@@ -66,17 +66,6 @@ class Waves : JavaPlugin() {
             module.initialize(this@Waves)
         }
         WavesInitializeEvent().call()
-
-
-        event<AsyncPlayerChatEvent> {
-            runSync {
-                val fakeEntity = FakeEntity(EntityTypes.PIG,it.player.location, 30)
-                fakeEntity.register()
-                Bukkit.broadcastMessage("Spawned!")
-            }
-        }
-
-
     }
 
     override fun onDisable() {
