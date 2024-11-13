@@ -9,6 +9,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
+import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
 import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
 import gg.aquatic.waves.chunk.chunkId
 import gg.aquatic.waves.chunk.trackedChunks
@@ -18,6 +19,7 @@ import gg.aquatic.waves.fake.FakeObjectChunkBundle
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -27,8 +29,24 @@ import kotlin.collections.HashMap
 open class FakeEntity(
     val type: EntityType, override var location: Location,
     override val viewRange: Int,
+    audience: AquaticAudience,
     consumer: FakeEntity.() -> Unit = {}
 ) : FakeObject() {
+
+
+    var audience = audience
+        set(value) {
+            field = value
+            for (viewer in viewers.toMutableList()) {
+                if (field.canBeApplied(viewer)) continue
+                removeViewer(viewer)
+            }
+            for (player in
+            Bukkit.getOnlinePlayers().filter { !viewers.contains(it) }) {
+                if (!field.canBeApplied(player)) continue
+                addViewer(player)
+            }
+        }
 
     override fun destroy() {
         for (player in isViewing) {
@@ -46,6 +64,7 @@ open class FakeEntity(
 
     init {
         consumer(this)
+        this.audience = audience
         FakeObjectHandler.tickableObjects += this
         for (viewer in viewers) {
             if (viewer.trackedChunks().contains(location.chunk.chunkId())) {
@@ -101,6 +120,7 @@ open class FakeEntity(
     override fun addViewer(player: Player) {
         if (viewers.contains(player)) return
         viewers.add(player)
+        if (player.world.name != location.world!!.name) return
         if (player.location.distanceSquared(location) <= viewRange * viewRange) {
             show(player)
         }

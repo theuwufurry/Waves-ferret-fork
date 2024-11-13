@@ -5,5 +5,6 @@ enum class WaveModules {
     ITEMS,
     ENTITIES,
     FAKE_OBJECTS,
-    CHUNK_TRACKER
+    CHUNK_TRACKER,
+    INTERACTABLES
 }

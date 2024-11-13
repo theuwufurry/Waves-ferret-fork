@@ -1,6 +1,7 @@
 package gg.aquatic.waves.interactable.settings
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
+import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
 import gg.aquatic.aquaticseries.lib.util.mapPair
 import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.interactable.type.EntityInteractable
@@ -13,7 +14,7 @@ class OraxenEntityInteractableSettings(
     val furniture: FurnitureMechanic,
 ): InteractableSettings {
 
-    override fun build(location: Location): EntityInteractable {
+    override fun build(location: Location, audience: AquaticAudience): EntityInteractable {
         val item = OraxenItems.getItemById(furniture.itemID).build()
         val displaySettings = furniture.displayEntityProperties
         val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location, 50) {
@@ -28,7 +29,7 @@ class OraxenEntityInteractableSettings(
                 .mapPair { it.index to it }
         }
 
-        val interactable = EntityInteractable(fakeEntity)
+        val interactable = EntityInteractable(fakeEntity, audience)
         return interactable
     }
 
