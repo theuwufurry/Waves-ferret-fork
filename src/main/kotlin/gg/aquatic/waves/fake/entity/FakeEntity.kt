@@ -33,8 +33,7 @@ open class FakeEntity(
     consumer: FakeEntity.() -> Unit = {}
 ) : FakeObject() {
 
-
-    var audience = audience
+    override var audience = audience
         set(value) {
             field = value
             for (viewer in viewers.toMutableList()) {

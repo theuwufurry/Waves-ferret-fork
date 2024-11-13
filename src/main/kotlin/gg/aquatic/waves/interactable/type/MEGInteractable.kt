@@ -55,7 +55,6 @@ class MEGInteractable(
             return dummy.location
         }
 
-
     override fun addViewer(player: Player) {
         viewers.add(player)
         dummy.setForceViewing(player, true)

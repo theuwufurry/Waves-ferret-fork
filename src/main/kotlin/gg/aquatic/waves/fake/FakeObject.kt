@@ -1,7 +1,7 @@
 package gg.aquatic.waves.fake
 
+import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
 import gg.aquatic.waves.chunk.trackedByPlayers
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.UUID
@@ -13,6 +13,7 @@ abstract class FakeObject {
     protected var registered: Boolean = false
     abstract val viewRange: Int
     var destroyed: Boolean = false
+    abstract var audience: AquaticAudience
 
     // List of players that can see the object
     val viewers = ConcurrentHashMap.newKeySet<Player>()
