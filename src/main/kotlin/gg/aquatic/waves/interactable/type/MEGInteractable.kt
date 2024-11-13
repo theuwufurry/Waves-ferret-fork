@@ -14,6 +14,8 @@ class MEGInteractable(
     val modelId: String, audience: AquaticAudience,
 ) : Interactable() {
 
+    override val viewers: MutableSet<Player> = mutableSetOf()
+
     override var audience: AquaticAudience = audience
         set(value) {
             field = value
@@ -33,12 +35,18 @@ class MEGInteractable(
         isDetectingPlayers = false
     }
     val modeledEntity: ModeledEntity
+        get() {
+            return ModelEngineAPI.getModeledEntity(dummy.uuid)
+        }
     val activeModel: ActiveModel
+        get() {
+            return modeledEntity.getModel(modelId).get()
+        }
 
     init {
         this.audience = audience
-        modeledEntity = ModelEngineAPI.createModeledEntity(dummy)
-        activeModel = ModelEngineAPI.createActiveModel(modelId)
+        val modeledEntity = ModelEngineAPI.createModeledEntity(dummy)
+        val activeModel = ModelEngineAPI.createActiveModel(modelId)
         modeledEntity.addModel(activeModel, true)
     }
 
@@ -47,7 +55,6 @@ class MEGInteractable(
             return dummy.location
         }
 
-    override val viewers: MutableSet<Player> = mutableSetOf()
 
     override fun addViewer(player: Player) {
         viewers.add(player)
