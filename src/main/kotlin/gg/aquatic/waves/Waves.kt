@@ -17,7 +17,10 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
+import gg.aquatic.waves.util.openBook
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
+import net.kyori.adventure.text.Component
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -66,6 +69,20 @@ class Waves : JavaPlugin() {
         }
         initialized = true
         WavesInitializeEvent().call()
+
+        /*
+        event<AsyncPlayerChatEvent> {
+            runSync {
+                val player = it.player
+                player.openBook(
+                    listOf(
+                        Component.text("Example Page 1"),
+                        Component.text("Example Page 2"),
+                    )
+                )
+            }
+        }
+         */
     }
 
     override fun onDisable() {

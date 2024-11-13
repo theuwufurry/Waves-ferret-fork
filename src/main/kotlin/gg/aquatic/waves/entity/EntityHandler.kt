@@ -52,11 +52,11 @@ object EntityHandler : WaveModule {
             val equipmentPacket = WrapperPlayServerEntityEquipment(entityId, state.equipment.values.toMutableList())
             user.sendPacket(equipmentPacket)
         }
-        if (state.team != null) {
+        if (state._team != null) {
             val teamPacket = WrapperPlayServerTeams(
                 UUID.randomUUID().toString(),
                 WrapperPlayServerTeams.TeamMode.CREATE,
-                state.team,
+                state._team,
                 state.entityUUID.toString()
             )
             user.sendPacket(teamPacket)
