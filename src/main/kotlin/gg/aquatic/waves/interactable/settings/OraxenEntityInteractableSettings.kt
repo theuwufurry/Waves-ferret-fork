@@ -17,7 +17,7 @@ class OraxenEntityInteractableSettings(
     override fun build(location: Location, audience: AquaticAudience): EntityInteractable {
         val item = OraxenItems.getItemById(furniture.itemID).build()
         val displaySettings = furniture.displayEntityProperties
-        val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location, 50) {
+        val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location, 50, audience) {
             entityData += EntityDataBuilder.ITEM_DISPLAY
                 .setItem(item)
                 .setItemTransformation(displaySettings.displayTransform)
@@ -29,7 +29,7 @@ class OraxenEntityInteractableSettings(
                 .mapPair { it.index to it }
         }
 
-        val interactable = EntityInteractable(fakeEntity, audience)
+        val interactable = EntityInteractable(fakeEntity)
         return interactable
     }
 

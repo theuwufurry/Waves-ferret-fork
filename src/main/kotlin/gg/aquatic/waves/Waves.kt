@@ -1,18 +1,16 @@
 package gg.aquatic.waves
 
 import com.github.retrooper.packetevents.PacketEvents
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
 import gg.aquatic.aquaticseries.lib.AquaticSeriesLib
 import gg.aquatic.aquaticseries.lib.betterinventory2.InventoryHandler
 import gg.aquatic.aquaticseries.lib.data.MySqlDriver
 import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
-import gg.aquatic.aquaticseries.lib.interactable2.InteractableHandler
 import gg.aquatic.aquaticseries.lib.packet.PacketHandler
 import gg.aquatic.aquaticseries.lib.util.*
 import gg.aquatic.waves.chunk.ChunkTracker
 import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
-import gg.aquatic.waves.fake.entity.FakeEntity
+import gg.aquatic.waves.interactable.InteractableHandler
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
@@ -20,8 +18,6 @@ import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
-import org.bukkit.Bukkit
-import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -32,7 +28,8 @@ class Waves : JavaPlugin() {
         WaveModules.ITEMS to ItemHandler,
         WaveModules.ENTITIES to EntityHandler,
         WaveModules.FAKE_OBJECTS to FakeObjectHandler,
-        WaveModules.CHUNK_TRACKER to ChunkTracker
+        WaveModules.CHUNK_TRACKER to ChunkTracker,
+        WaveModules.INTERACTABLES to InteractableHandler
     )
     lateinit var configValues: WavesConfig
     var initialized = false
@@ -61,7 +58,7 @@ class Waves : JavaPlugin() {
             listOf(
                 PacketHandler,
                 InventoryHandler,
-                InteractableHandler
+                gg.aquatic.aquaticseries.lib.interactable2.InteractableHandler
             )
         )
         for ((_, module) in modules) {
