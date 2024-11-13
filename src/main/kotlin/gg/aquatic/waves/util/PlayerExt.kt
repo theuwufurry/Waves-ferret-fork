@@ -34,11 +34,5 @@ fun Player.openBook(pages: List<Component>) {
     bookMeta.spigot().pages = newPages
     bookItem.itemMeta = bookMeta
 
-    val previousItem = this.inventory.itemInMainHand
-    this.inventory.setItemInMainHand(bookItem)
-    //sendItemChange(this.inventory.heldItemSlot, bookItem)
-    val packet = WrapperPlayServerOpenBook(InteractionHand.MAIN_HAND)
-    toUser().sendPacket(packet)
-    this.inventory.setItemInMainHand(previousItem)
-    //sendItemChange(this.inventory.heldItemSlot, previousItem)
+    this.openBook(bookItem)
 }
