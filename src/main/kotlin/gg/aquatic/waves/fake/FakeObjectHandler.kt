@@ -115,7 +115,7 @@ object FakeObjectHandler : WaveModule {
             fakeObject.viewers -= player
         }
 
-        if (fakeObject.location.chunk.trackedByPlayers().none { fakeObject.viewers.contains(it) } && fakeObject.isViewing.isEmpty()) {
+        if (fakeObject.location.chunk.trackedByPlayers().isEmpty() && fakeObject.isViewing.isEmpty()) {
             objectRemovalQueue += fakeObject
         }
     }

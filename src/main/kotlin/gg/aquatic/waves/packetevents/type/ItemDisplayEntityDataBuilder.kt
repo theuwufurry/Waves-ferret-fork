@@ -7,13 +7,15 @@ import org.bukkit.inventory.ItemStack
 
 class ItemDisplayEntityDataBuilder: DisplayEntityDataBuilder() {
 
-    fun setItem(item: ItemStack) {
+    fun setItem(item: ItemStack): ItemDisplayEntityDataBuilder {
         addData(
             23,EntityDataTypes.ITEMSTACK,SpigotConversionUtil.fromBukkitItemStack(item)
         )
+        return this
     }
-    fun setItemTransformation(transform: ItemDisplayTransform) {
+    fun setItemTransformation(transform: ItemDisplayTransform): ItemDisplayEntityDataBuilder {
         addData(24,EntityDataTypes.BYTE,transform.ordinal.toByte())
+        return this
     }
 
 }

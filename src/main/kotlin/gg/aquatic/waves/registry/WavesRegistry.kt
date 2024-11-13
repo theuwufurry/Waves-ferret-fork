@@ -1,5 +1,6 @@
 package gg.aquatic.waves.registry
 
+import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose
 import gg.aquatic.aquaticseries.lib.action.AbstractAction
 import gg.aquatic.aquaticseries.lib.economy.Currency
 import gg.aquatic.waves.item.factory.HDBFactory
@@ -8,19 +9,25 @@ import gg.aquatic.waves.item.factory.MMFactory
 import gg.aquatic.waves.item.factory.OraxenFactory
 import gg.aquatic.aquaticseries.lib.price.AbstractPrice
 import gg.aquatic.aquaticseries.lib.requirement.AbstractRequirement
+import gg.aquatic.aquaticseries.paper.adapt.PaperString
 import gg.aquatic.waves.economy.RegisteredCurrency
+import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
+import gg.aquatic.waves.interactable.settings.entityproperty.ItemDisplayEntityProperty
 import gg.aquatic.waves.item.AquaticItem
+import gg.aquatic.waves.packetevents.EntityDataBuilder
+import gg.aquatic.waves.packetevents.type.BaseEntityDataBuilder
 import gg.aquatic.waves.util.action.*
 import gg.aquatic.waves.util.price.ItemPrice
 import gg.aquatic.waves.util.price.VaultPrice
 import org.bukkit.Bukkit
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 
 object WavesRegistry {
 
     val INDEX_TO_CURRENCY = HashMap<Int, RegisteredCurrency>()
-    val ECONOMY = HashMap<String,Currency>()
-    val ACTION = HashMap<Class<*>,MutableMap<String,AbstractAction<*>>>().apply {
+    val ECONOMY = HashMap<String, Currency>()
+    val ACTION = HashMap<Class<*>, MutableMap<String, AbstractAction<*>>>().apply {
         val p = getOrPut(Player::class.java) { HashMap() }
         p["actionbar"] = ActionbarAction()
         p["bossbar"] = BossbarAction()
@@ -32,9 +39,9 @@ object WavesRegistry {
         p["sound"] = SoundAction()
 
     }
-    val REQUIREMENT = HashMap<Class<*>,MutableMap<String,AbstractRequirement<*>>>()
+    val REQUIREMENT = HashMap<Class<*>, MutableMap<String, AbstractRequirement<*>>>()
     val PRICE by lazy {
-        HashMap<Class<*>,MutableMap<String,AbstractPrice<*>>>().apply {
+        HashMap<Class<*>, MutableMap<String, AbstractPrice<*>>>().apply {
             val p = getOrPut(Player::class.java) { HashMap() }
             p["item"] = ItemPrice()
             if (Bukkit.getPluginManager().getPlugin("Vault") != null)
@@ -47,6 +54,60 @@ object WavesRegistry {
         "HDB" to HDBFactory,
         "ITEMSADDER" to IAFactory
     )
+    val ENTITY_PROPERTY_FACTORIES = hashMapOf(
+        createProperty("is-on-fire") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).isOnFire(s.getBoolean(str))
+        },
+        createProperty("is-sneaking") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).isSneaking(s.getBoolean(str))
+        },
+        createProperty("is-sprinting") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).isSprinting(s.getBoolean(str))
+        },
+        createProperty("is-swimming") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).isSwimming(s.getBoolean(str))
+        },
+        createProperty("invisible") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).isInvisible(s.getBoolean(str))
+        },
+        createProperty("glowing") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).isGlowing(s.getBoolean(str))
+        },
+        createProperty("is-flying") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).isFlying(s.getBoolean(str))
+        },
+        createProperty("custom-name") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).setCustomName(PaperString(s.getString(str) ?: "").convert())
+        },
+        createProperty("custom-name-visible") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).isCustomNameVisible(s.getBoolean(str))
+        },
+        createProperty("is-silent") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).isSilent(s.getBoolean(str))
+        },
+        createProperty("no-gravity") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).hasNoGravity(s.getBoolean(str))
+        },
+        createProperty("pose") { s, str, builder ->
+            (builder as BaseEntityDataBuilder).setPose(EntityPose.valueOf(s.getString(str, "STANDING")!!.uppercase()))
+        },
+        "ITEM" to ItemDisplayEntityProperty.Item.Companion,
+        "ITEM-TRANSFORM" to ItemDisplayEntityProperty.ItemTransformation.Companion
+    )
     val ITEM = HashMap<String, AquaticItem>()
 
+    private fun createProperty(
+        path: String,
+        factory: (ConfigurationSection, String, EntityDataBuilder) -> Unit
+    ): Pair<String, EntityProperty.Serializer> {
+        return path to object : EntityProperty.Serializer {
+            override fun serialize(section: ConfigurationSection): EntityProperty {
+                return object : EntityProperty {
+                    override fun apply(builder: EntityDataBuilder) {
+                        factory(section, path, builder)
+                    }
+                }
+            }
+        }
+    }
 }
