@@ -1,7 +1,6 @@
 package gg.aquatic.waves.fake
 
 import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
-import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationCacheHandler
 import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationChunkObject
 import gg.aquatic.aquaticseries.lib.util.event
 import gg.aquatic.aquaticseries.lib.util.runAsync
@@ -13,9 +12,9 @@ import gg.aquatic.waves.chunk.chunkId
 import gg.aquatic.waves.chunk.trackedByPlayers
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
@@ -61,6 +60,13 @@ object FakeObjectHandler : WaveModule {
         event<PlayerQuitEvent> {
             handlePlayerRemove(it.player)
         }
+        event<PlayerJoinEvent> {
+            for (tickableObject in tickableObjects) {
+                if (tickableObject.audience.canBeApplied(it.player)) {
+                    tickableObject.addViewer(it.player)
+                }
+            }
+        }
         event<ChunkUnloadEvent> {
             val obj = ChunkCacheHandler.getObject(it.chunk, LocationChunkObject::class.java) as? LocationChunkObject
                 ?: return@event
@@ -69,6 +75,7 @@ object FakeObjectHandler : WaveModule {
                     if (inst !is FakeObject) {
                         continue
                     }
+                    inst.viewers.clear()
                     inst.isViewing.clear()
                     objectRemovalQueue += inst
                 }
@@ -82,6 +89,7 @@ object FakeObjectHandler : WaveModule {
                     if (inst !is FakeObject) {
                         continue
                     }
+                    inst.audience = inst.audience
                     tickableObjects += inst
                 }
             }

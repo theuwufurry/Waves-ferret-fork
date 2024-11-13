@@ -26,7 +26,7 @@ open class FakeBlock(
         set(value) {
             field = value
             for (viewer in viewers.toMutableList()) {
-                if (field.canBeApplied(viewer)) continue
+                if (field.canBeApplied(viewer) && viewer.isOnline) continue
                 removeViewer(viewer)
             }
             for (player in
