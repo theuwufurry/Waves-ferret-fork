@@ -18,8 +18,7 @@ open class FakeBlock(
     override val viewRange: Int,
     audience: AquaticAudience,
     val onInteract: (PlayerInteractEvent) -> Unit = {}
-) :
-    FakeObject() {
+) : FakeObject() {
     override val location: Location = location.blockLocation()
 
     override var audience = audience
@@ -42,6 +41,7 @@ open class FakeBlock(
         }
         FakeObjectHandler.tickableObjects -= this
         unregister()
+        FakeObjectHandler.locationToBlock -= location
         destroyed = true
     }
 
@@ -51,6 +51,7 @@ open class FakeBlock(
 
     init {
         this.audience = audience
+        FakeObjectHandler.locationToBlock += location to this
         FakeObjectHandler.tickableObjects += this
     }
 

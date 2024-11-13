@@ -53,6 +53,7 @@ open class FakeEntity(
         }
         FakeObjectHandler.tickableObjects -= this
         unregister()
+        FakeObjectHandler.idToEntity -= entityId
         destroyed = true
     }
 
@@ -65,6 +66,7 @@ open class FakeEntity(
         consumer(this)
         this.audience = audience
         FakeObjectHandler.tickableObjects += this
+        FakeObjectHandler.idToEntity += entityId to this
         for (viewer in viewers) {
             if (viewer.trackedChunks().contains(location.chunk.chunkId())) {
                 show(viewer)

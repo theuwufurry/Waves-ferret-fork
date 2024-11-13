@@ -10,8 +10,11 @@ import gg.aquatic.waves.chunk.PlayerChunkLoadEvent
 import gg.aquatic.waves.chunk.PlayerChunkUnloadEvent
 import gg.aquatic.waves.chunk.chunkId
 import gg.aquatic.waves.chunk.trackedByPlayers
+import gg.aquatic.waves.fake.block.FakeBlock
+import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -24,6 +27,8 @@ object FakeObjectHandler : WaveModule {
     override val type: WaveModules = WaveModules.FAKE_OBJECTS
 
     internal val tickableObjects = ConcurrentHashMap.newKeySet<FakeObject>()
+    internal val idToEntity = ConcurrentHashMap<Int, FakeEntity>()
+    internal val locationToBlock = ConcurrentHashMap<Location, FakeBlock>()
     val objectRemovalQueue = ConcurrentHashMap.newKeySet<FakeObject>()
 
     override fun initialize(waves: Waves) {
@@ -95,18 +100,11 @@ object FakeObjectHandler : WaveModule {
             }
         }
         event<PlayerInteractEvent> {
-            val block = it.clickedBlock ?: return@event
-            val bundle = ChunkCacheHandler.getObject(
-                block.location.chunk,
-                FakeObjectChunkBundle::class.java
-            ) as? FakeObjectChunkBundle ?: return@event
+            val block = locationToBlock[it.clickedBlock?.location ?: return@event] ?: return@event
             it.isCancelled = true
-            for (block1 in bundle.blocks) {
-                if (block1.viewers.contains(it.player)) {
-                    block1.show(it.player)
-                    block1.onInteract(it)
-                    break
-                }
+            if (block.viewers.contains(it.player)) {
+                block.show(it.player)
+                block.onInteract(it)
             }
         }
     }
