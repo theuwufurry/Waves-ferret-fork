@@ -17,7 +17,7 @@ open class FakeBlock(
     block: AquaticBlock, location: Location,
     override val viewRange: Int,
     audience: AquaticAudience,
-    val onInteract: (PlayerInteractEvent) -> Unit = {}
+    var onInteract: (FakeBlockInteractEvent) -> Unit = {}
 ) : FakeObject() {
     override val location: Location = location.blockLocation()
 

@@ -3,15 +3,18 @@ package gg.aquatic.waves.interactable.type
 import com.ticxo.modelengine.api.ModelEngineAPI
 import com.ticxo.modelengine.api.model.ActiveModel
 import com.ticxo.modelengine.api.model.ModeledEntity
+import com.ticxo.modelengine.api.model.bone.BoneBehaviorTypes
 import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
 import gg.aquatic.waves.interactable.Interactable
+import gg.aquatic.waves.interactable.InteractableHandler
+import gg.aquatic.waves.interactable.InteractableInteractEvent
 import gg.aquatic.waves.interactable.MEGInteractableDummy
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
 class MEGInteractable(
-    val modelId: String, audience: AquaticAudience,
+    val modelId: String, audience: AquaticAudience, override val onInteract: (InteractableInteractEvent) -> Unit,
 ) : Interactable() {
 
     override val viewers: MutableSet<Player> = mutableSetOf()
@@ -32,8 +35,25 @@ class MEGInteractable(
         }
 
     val dummy = MEGInteractableDummy(this).apply {
+        location = this@MEGInteractable.location
+        bodyRotationController.yBodyRot = location.yaw
+        bodyRotationController.xHeadRot = location.pitch
+        bodyRotationController.yHeadRot = location.yaw
+        yHeadRot = location.yaw
+        yBodyRot = location.yaw
         isDetectingPlayers = false
     }
+
+    fun setSkin(player: Player) {
+        activeModel.apply {
+            for (value in bones.values) {
+                value.getBoneBehavior(BoneBehaviorTypes.PLAYER_LIMB).ifPresent {
+                    setSkin(player)
+                }
+            }
+        }
+    }
+
     val modeledEntity: ModeledEntity
         get() {
             return ModelEngineAPI.getModeledEntity(dummy.uuid)
@@ -47,6 +67,7 @@ class MEGInteractable(
         this.audience = audience
         val modeledEntity = ModelEngineAPI.createModeledEntity(dummy)
         val activeModel = ModelEngineAPI.createActiveModel(modelId)
+        InteractableHandler.megInteractables += this
         modeledEntity.addModel(activeModel, true)
     }
 
@@ -63,5 +84,14 @@ class MEGInteractable(
     override fun removeViewer(player: Player) {
         viewers.remove(player)
         dummy.setForceViewing(player, false)
+    }
+
+
+    override fun destroy() {
+        this.activeModel.destroy()
+        this.activeModel.isRemoved = true
+        dummy.isRemoved = true
+        InteractableHandler.megInteractables -= this
+        viewers.clear()
     }
 }

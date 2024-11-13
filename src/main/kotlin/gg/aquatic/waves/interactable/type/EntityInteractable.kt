@@ -3,10 +3,11 @@ package gg.aquatic.waves.interactable.type
 import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
 import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.interactable.Interactable
+import gg.aquatic.waves.interactable.InteractableInteractEvent
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
-class EntityInteractable(val entity: FakeEntity) : Interactable() {
+class EntityInteractable(val entity: FakeEntity, override val onInteract: (InteractableInteractEvent) -> Unit) : Interactable() {
 
     override var audience: AquaticAudience
         get() {
@@ -25,11 +26,27 @@ class EntityInteractable(val entity: FakeEntity) : Interactable() {
             return entity.viewers
         }
 
+    init {
+        entity.onInteract = { e ->
+            this.onInteract(
+                InteractableInteractEvent(
+                    this,
+                    e.player,
+                    e.isLeftClick
+                )
+            )
+        }
+    }
+
     override fun addViewer(player: Player) {
         entity.addViewer(player)
     }
 
     override fun removeViewer(player: Player) {
         entity.removeViewer(player)
+    }
+
+    override fun destroy() {
+        this.entity.destroy()
     }
 }

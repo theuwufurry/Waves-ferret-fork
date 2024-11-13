@@ -30,7 +30,8 @@ open class FakeEntity(
     val type: EntityType, override var location: Location,
     override val viewRange: Int,
     audience: AquaticAudience,
-    consumer: FakeEntity.() -> Unit = {}
+    consumer: FakeEntity.() -> Unit = {},
+    var onInteract: (FakeEntityInteractEvent) -> Unit = {}
 ) : FakeObject() {
 
     override var audience = audience
