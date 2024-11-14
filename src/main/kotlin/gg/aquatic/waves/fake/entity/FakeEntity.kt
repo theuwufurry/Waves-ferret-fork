@@ -31,7 +31,8 @@ open class FakeEntity(
     override val viewRange: Int,
     audience: AquaticAudience,
     consumer: FakeEntity.() -> Unit = {},
-    var onInteract: (FakeEntityInteractEvent) -> Unit = {}
+    var onInteract: (FakeEntityInteractEvent) -> Unit = {},
+    var onUpdate: (Player) -> Unit = {},
 ) : FakeObject() {
 
     override var audience = audience
@@ -117,6 +118,7 @@ open class FakeEntity(
                 equipment.map { Equipment(it.key, SpigotConversionUtil.fromBukkitItemStack(it.value)) })
             user.sendPacket(packet)
         }
+        onUpdate(player)
     }
 
     override fun addViewer(player: Player) {
