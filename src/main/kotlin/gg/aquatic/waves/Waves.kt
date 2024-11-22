@@ -80,6 +80,7 @@ class Waves : JavaPlugin() {
         initialized = true
         WavesInitializeEvent().call()
 
+        /*
         event<AsyncPlayerChatEvent> {
             runSync {
                 val fakeEntity = FakeEntity(
@@ -118,6 +119,7 @@ class Waves : JavaPlugin() {
             entity.location = player.location
             entity.onUpdate(player)
         }
+         */
     }
 
     override fun onDisable() {

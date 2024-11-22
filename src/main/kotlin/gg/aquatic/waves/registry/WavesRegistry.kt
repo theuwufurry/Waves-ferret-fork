@@ -11,8 +11,11 @@ import gg.aquatic.aquaticseries.lib.price.AbstractPrice
 import gg.aquatic.aquaticseries.lib.requirement.AbstractRequirement
 import gg.aquatic.aquaticseries.paper.adapt.PaperString
 import gg.aquatic.waves.economy.RegisteredCurrency
+import gg.aquatic.waves.interactable.settings.EntityInteractableSettings
+import gg.aquatic.waves.interactable.settings.OraxenEntityInteractableSettings
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
-import gg.aquatic.waves.interactable.settings.entityproperty.ItemDisplayEntityProperty
+import gg.aquatic.waves.interactable.settings.entityproperty.display.DisplayEntityProperty
+import gg.aquatic.waves.interactable.settings.entityproperty.display.ItemDisplayEntityProperty
 import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.BaseEntityDataBuilder
@@ -54,6 +57,12 @@ object WavesRegistry {
         "HDB" to HDBFactory,
         "ITEMSADDER" to IAFactory
     )
+
+    val INTERACTABLE_FACTORIES = hashMapOf(
+        "ORAXEN_FURNITURE" to OraxenEntityInteractableSettings.Companion,
+        "ENTITY" to EntityInteractableSettings.Companion,
+    )
+
     val ENTITY_PROPERTY_FACTORIES = hashMapOf(
         createProperty("is-on-fire") { s, str, builder ->
             (builder as BaseEntityDataBuilder).isOnFire(s.getBoolean(str))
@@ -91,8 +100,13 @@ object WavesRegistry {
         createProperty("pose") { s, str, builder ->
             (builder as BaseEntityDataBuilder).setPose(EntityPose.valueOf(s.getString(str, "STANDING")!!.uppercase()))
         },
-        "ITEM" to ItemDisplayEntityProperty.Item.Companion,
-        "ITEM-TRANSFORM" to ItemDisplayEntityProperty.ItemTransformation.Companion
+        "item" to ItemDisplayEntityProperty.Item.Companion,
+        "item-transform" to ItemDisplayEntityProperty.ItemTransformation.Companion,
+        "billboard" to DisplayEntityProperty.Billboard.Companion,
+        "interpolation-delay" to DisplayEntityProperty.InterpolationDelay.Companion,
+        "interpolation-duration" to DisplayEntityProperty.InterpolationDuration.Companion,
+        "teleport-interpolation-duration" to DisplayEntityProperty.TeleportInterpolationDuration.Companion,
+        "transformation" to DisplayEntityProperty.Transformation.Companion,
     )
     val ITEM = HashMap<String, AquaticItem>()
 

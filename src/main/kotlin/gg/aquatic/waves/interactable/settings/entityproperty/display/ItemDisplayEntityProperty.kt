@@ -1,5 +1,6 @@
-package gg.aquatic.waves.interactable.settings.entityproperty
+package gg.aquatic.waves.interactable.settings.entityproperty.display
 
+import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.item.loadFromYml
 import gg.aquatic.waves.packetevents.EntityDataBuilder
@@ -33,7 +34,6 @@ interface ItemDisplayEntityProperty : EntityProperty {
                 val transformation = ItemDisplayTransform.valueOf(section.getString("item-transform", "NONE")!!)
                 return ItemTransformation(transformation)
             }
-
         }
 
         override fun apply(builder: EntityDataBuilder) {
@@ -41,7 +41,6 @@ interface ItemDisplayEntityProperty : EntityProperty {
                 builder.setItemTransformation(transform)
             }
         }
-
     }
 
 }

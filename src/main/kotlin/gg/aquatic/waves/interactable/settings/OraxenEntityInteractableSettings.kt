@@ -7,9 +7,11 @@ import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.interactable.InteractableInteractEvent
 import gg.aquatic.waves.interactable.type.EntityInteractable
 import gg.aquatic.waves.packetevents.EntityDataBuilder
+import io.th0rgal.oraxen.api.OraxenFurniture
 import io.th0rgal.oraxen.api.OraxenItems
 import io.th0rgal.oraxen.mechanics.provided.gameplay.furniture.FurnitureMechanic
 import org.bukkit.Location
+import org.bukkit.configuration.ConfigurationSection
 
 class OraxenEntityInteractableSettings(
     val furniture: FurnitureMechanic,
@@ -32,6 +34,14 @@ class OraxenEntityInteractableSettings(
 
         val interactable = EntityInteractable(fakeEntity, onInteract)
         return interactable
+    }
+
+    companion object: InteractableSettingsFactory {
+        override fun load(section: ConfigurationSection): InteractableSettings? {
+            val id = section.getString("id")
+            val furnitureMechanic = OraxenFurniture.getFurnitureMechanic(id) ?: return null
+            return OraxenEntityInteractableSettings(furnitureMechanic)
+        }
     }
 
 }

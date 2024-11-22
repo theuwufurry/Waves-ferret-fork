@@ -80,9 +80,11 @@ object FakeObjectHandler : WaveModule {
                 }
             }
         }
+        /*
         event<ChunkUnloadEvent> {
-            val obj = ChunkCacheHandler.getObject(it.chunk, LocationChunkObject::class.java) as? LocationChunkObject
+            val obj = ChunkCacheHandler.getObject(it.chunk, FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle
                 ?: return@event
+
             for ((_, locMap) in obj.cache) {
                 for ((_, inst) in locMap) {
                     if (inst !is FakeObject) {
@@ -107,6 +109,7 @@ object FakeObjectHandler : WaveModule {
                 }
             }
         }
+         */
         event<PlayerInteractEvent> {
             val block = locationToBlock[it.clickedBlock?.location ?: return@event] ?: return@event
             it.isCancelled = true
