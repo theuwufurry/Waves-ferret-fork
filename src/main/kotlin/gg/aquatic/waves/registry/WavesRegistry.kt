@@ -20,6 +20,7 @@ import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.BaseEntityDataBuilder
 import gg.aquatic.waves.util.action.*
+import gg.aquatic.waves.util.action.discord.DiscordWebhookAction
 import gg.aquatic.waves.util.price.ItemPrice
 import gg.aquatic.waves.util.price.VaultPrice
 import org.bukkit.Bukkit
@@ -40,7 +41,7 @@ object WavesRegistry {
         p["message"] = MessageAction()
         p["title"] = TitleAction()
         p["sound"] = SoundAction()
-
+        p["discord-webhook"] = DiscordWebhookAction()
     }
     val REQUIREMENT = HashMap<Class<*>, MutableMap<String, AbstractRequirement<*>>>()
     val PRICE by lazy {
