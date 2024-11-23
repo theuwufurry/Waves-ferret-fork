@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "gg.aquatic.waves"
-version = "1.0.53"
+version = "1.0.54"
 
 val ktor_version: String by project
 
@@ -81,6 +81,7 @@ dependencies {
     compileOnly ("com.ticxo.modelengine:ModelEngine:R4.0.4")
     compileOnly("io.lumine:Mythic-Dist:5.6.1")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
+    implementation("com.github.micartey:webhookly:master-SNAPSHOT")
 }
 
 

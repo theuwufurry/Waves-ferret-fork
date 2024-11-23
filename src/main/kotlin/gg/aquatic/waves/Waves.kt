@@ -25,6 +25,7 @@ import gg.aquatic.waves.sync.SyncSettings
 import gg.aquatic.waves.util.openBook
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
+import me.micartey.webhookly.DiscordWebhook
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Display
 import org.bukkit.entity.Player
