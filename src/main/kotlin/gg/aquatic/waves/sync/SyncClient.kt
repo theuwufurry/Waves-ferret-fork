@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import gg.aquatic.waves.sync.packet.PacketResponse
+import gg.aquatic.waves.util.map
 import gg.aquatic.wavessync.api.packet.SyncPacket
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -131,7 +132,7 @@ class SyncClient(
                 method = HttpMethod.Get
             }
             val json = response.bodyAsText()
-            Gson().fromJson(json, HashMap::class.java) as HashMap<String, String>
+            Gson().fromJson(json, HashMap::class.java).map { key, value -> key.toString() to value.toString() } as HashMap<String, String>
         }
     }
 
