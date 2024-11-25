@@ -12,15 +12,17 @@ import io.th0rgal.oraxen.api.OraxenItems
 import io.th0rgal.oraxen.mechanics.provided.gameplay.furniture.FurnitureMechanic
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.util.Vector
 
 class OraxenEntityInteractableSettings(
     val furniture: FurnitureMechanic,
+    val offset: Vector
 ): InteractableSettings {
 
     override fun build(location: Location, audience: AquaticAudience, onInteract: (InteractableInteractEvent) -> Unit): EntityInteractable {
         val item = OraxenItems.getItemById(furniture.itemID).build()
         val displaySettings = furniture.displayEntityProperties
-        val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location, 50, audience, consumer =  {
+        val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location.clone().add(offset), 50, audience, consumer =  {
             entityData += EntityDataBuilder.ITEM_DISPLAY
                 .setItem(item)
                 .setItemTransformation(displaySettings.displayTransform)
@@ -40,7 +42,13 @@ class OraxenEntityInteractableSettings(
         override fun load(section: ConfigurationSection): InteractableSettings? {
             val id = section.getString("id")
             val furnitureMechanic = OraxenFurniture.getFurnitureMechanic(id) ?: return null
-            return OraxenEntityInteractableSettings(furnitureMechanic)
+            val offsetStrs = section.getString("offset", "0;0;0")!!.split(";")
+            val offset = Vector(
+                offsetStrs.getOrElse(0) { "0" }.toDouble(),
+                offsetStrs.getOrElse(1) { "0" }.toDouble(),
+                offsetStrs.getOrElse(2) { "0" }.toDouble()
+            )
+            return OraxenEntityInteractableSettings(furnitureMechanic, offset)
         }
     }
 

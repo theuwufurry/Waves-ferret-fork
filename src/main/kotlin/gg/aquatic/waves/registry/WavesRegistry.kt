@@ -11,6 +11,7 @@ import gg.aquatic.aquaticseries.lib.price.AbstractPrice
 import gg.aquatic.aquaticseries.lib.requirement.AbstractRequirement
 import gg.aquatic.aquaticseries.paper.adapt.PaperString
 import gg.aquatic.waves.economy.RegisteredCurrency
+import gg.aquatic.waves.interactable.settings.BlockInteractableSettings
 import gg.aquatic.waves.interactable.settings.EntityInteractableSettings
 import gg.aquatic.waves.interactable.settings.OraxenEntityInteractableSettings
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
@@ -62,6 +63,7 @@ object WavesRegistry {
     val INTERACTABLE_FACTORIES = hashMapOf(
         "ORAXEN_FURNITURE" to OraxenEntityInteractableSettings.Companion,
         "ENTITY" to EntityInteractableSettings.Companion,
+        "BLOCK" to BlockInteractableSettings.Companion
     )
 
     val ENTITY_PROPERTY_FACTORIES = hashMapOf(
