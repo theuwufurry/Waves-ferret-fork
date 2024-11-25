@@ -15,6 +15,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 open class FakeBlock(
     block: AquaticBlock, location: Location,
@@ -44,7 +45,7 @@ open class FakeBlock(
         }
         FakeObjectHandler.tickableObjects -= this
         unregister()
-        FakeObjectHandler.locationToBlock -= location
+        FakeObjectHandler.locationToBlocks[location]?.remove(this)
         destroyed = true
     }
 
@@ -54,7 +55,14 @@ open class FakeBlock(
 
     init {
         this.audience = audience
-        FakeObjectHandler.locationToBlock += location to this
+        val set = if (FakeObjectHandler.locationToBlocks.contains(location)) {
+            FakeObjectHandler.locationToBlocks[location]!!
+        } else {
+            val set = ConcurrentHashMap.newKeySet<FakeBlock>()
+            FakeObjectHandler.locationToBlocks[location] = set
+            set
+        }
+        set += this
         FakeObjectHandler.tickableObjects += this
 
         for (viewer in viewers) {

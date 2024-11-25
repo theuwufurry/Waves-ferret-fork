@@ -36,7 +36,7 @@ object FakeObjectHandler : WaveModule {
 
     internal val tickableObjects = ConcurrentHashMap.newKeySet<FakeObject>()
     internal val idToEntity = ConcurrentHashMap<Int, FakeEntity>()
-    internal val locationToBlock = ConcurrentHashMap<Location, FakeBlock>()
+    internal val locationToBlocks = ConcurrentHashMap<Location, MutableSet<FakeBlock>>()
     val objectRemovalQueue = ConcurrentHashMap.newKeySet<FakeObject>()
 
     override fun initialize(waves: Waves) {
@@ -111,17 +111,23 @@ object FakeObjectHandler : WaveModule {
         }
          */
         event<PlayerInteractEvent> {
-            val block = locationToBlock[it.clickedBlock?.location ?: return@event] ?: return@event
-            it.isCancelled = true
-            if (block.viewers.contains(it.player)) {
-                block.show(it.player)
-                val event = FakeBlockInteractEvent(
-                    block,
-                    it.player,
-                    it.action == Action.LEFT_CLICK_BLOCK || it.action == Action.LEFT_CLICK_AIR
-                )
-                block.onInteract(event)
+            val blocks = locationToBlocks[it.clickedBlock?.location ?: return@event] ?: return@event
+            for (block in blocks) {
+                if (block.viewers.contains(it.player)) {
+                    it.isCancelled = true
+                    val event = FakeBlockInteractEvent(
+                        block,
+                        it.player,
+                        it.action == Action.LEFT_CLICK_BLOCK || it.action == Action.LEFT_CLICK_AIR
+                    )
+                    block.onInteract(event)
+                    if (block.destroyed) {
+                        block.show(it.player)
+                    }
+                    break
+                }
             }
+
         }
         packetEvent<PacketReceiveEvent> {
             if (this.packetType != Play.Client.INTERACT_ENTITY) return@packetEvent
