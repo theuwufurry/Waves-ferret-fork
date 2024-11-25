@@ -3,6 +3,9 @@ package gg.aquatic.waves.fake.block
 import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
 import gg.aquatic.aquaticseries.lib.block.AquaticBlock
 import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
+import gg.aquatic.aquaticseries.lib.util.runLaterAsync
+import gg.aquatic.waves.chunk.chunkId
+import gg.aquatic.waves.chunk.trackedChunks
 import gg.aquatic.waves.fake.FakeObject
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.fake.FakeObjectChunkBundle
@@ -53,6 +56,12 @@ open class FakeBlock(
         this.audience = audience
         FakeObjectHandler.locationToBlock += location to this
         FakeObjectHandler.tickableObjects += this
+
+        for (viewer in viewers) {
+            if (viewer.trackedChunks().contains(location.chunk.chunkId())) {
+                show(viewer)
+            }
+        }
     }
 
     fun register() {
@@ -89,6 +98,7 @@ open class FakeBlock(
     override fun addViewer(player: Player) {
         if (viewers.contains(player)) return
         viewers.add(player)
+        if (player.world.name != location.world!!.name) return
         if (player.location.distanceSquared(location) <= viewRange * viewRange) {
             show(player)
         }
@@ -104,7 +114,9 @@ open class FakeBlock(
 
     override fun show(player: Player) {
         isViewing.add(player)
-        player.sendBlockChange(location, block.blockData)
+        runLaterAsync(2) {
+            player.sendBlockChange(location, block.blockData)
+        }
     }
 
     override fun hide(player: Player) {

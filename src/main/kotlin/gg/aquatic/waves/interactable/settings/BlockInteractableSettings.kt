@@ -20,7 +20,9 @@ class BlockInteractableSettings(
         audience: AquaticAudience,
         onInteract: (InteractableInteractEvent) -> Unit
     ): Interactable {
-        return BlockInteractable(FakeBlock(block, location.clone().add(offset), 50, audience), onInteract)
+        val fb = FakeBlock(block, location.clone().add(offset), 50, audience)
+        fb.register()
+        return BlockInteractable(fb, onInteract)
     }
 
     companion object: InteractableSettingsFactory {

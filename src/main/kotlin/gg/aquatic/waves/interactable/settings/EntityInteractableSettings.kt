@@ -31,6 +31,7 @@ class EntityInteractableSettings(
             }
             entityData += builder.build().mapPair { it.index to it }
         })
+        fakeEntity.register()
 
         val interactable = EntityInteractable(fakeEntity, onInteract)
         return interactable

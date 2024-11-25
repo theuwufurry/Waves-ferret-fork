@@ -148,9 +148,11 @@ object FakeObjectHandler : WaveModule {
             fakeObject.viewers -= player
         }
 
+        /*
         if (fakeObject.location.chunk.trackedByPlayers().isEmpty() && fakeObject.isViewing.isEmpty()) {
             objectRemovalQueue += fakeObject
         }
+         */
     }
 
     override fun disable(waves: Waves) {
