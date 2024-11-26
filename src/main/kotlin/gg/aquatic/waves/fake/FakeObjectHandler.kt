@@ -71,6 +71,7 @@ object FakeObjectHandler : WaveModule {
                         block.location.z.toInt() and 0xf,
                         SpigotConversionUtil.fromBukkitBlockData(block.block.blockData)
                     )
+                    block.isViewing += it.player
                 }
             }
         }

@@ -36,6 +36,7 @@ dependencies {
     implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.43:all")
     implementation("gg.aquatic.aquaticseries.spigot:spigot:1.0.43")
     implementation("gg.aquatic.aquaticseries.paper:paper:1.0.43")
+    implementation("gg.aquatic.packeteventsext:PacketEventsExt:1.0.0")
     implementation("gg.aquatic.aquaticseries:aquaticlib-core:1.0.43:all") {
     }
     implementation("gg.aquatic.aquaticseries.nms:NMS_v1_17_1:$nmsVersion") {
