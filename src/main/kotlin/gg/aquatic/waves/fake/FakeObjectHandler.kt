@@ -1,18 +1,21 @@
 package gg.aquatic.waves.fake
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent
+import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.protocol.packettype.PacketType.Play
+import com.github.retrooper.packetevents.protocol.player.InteractionHand
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging
 import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
-import gg.aquatic.aquaticseries.lib.chunkcache.location.LocationChunkObject
 import gg.aquatic.aquaticseries.lib.util.event
 import gg.aquatic.aquaticseries.lib.util.runAsync
 import gg.aquatic.aquaticseries.lib.util.runAsyncTimer
+import gg.aquatic.aquaticseries.lib.util.runLaterSync
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.chunk.PlayerChunkLoadEvent
+import gg.aquatic.waves.chunk.AsyncPlayerChunkLoadEvent
 import gg.aquatic.waves.chunk.PlayerChunkUnloadEvent
 import gg.aquatic.waves.chunk.chunkId
-import gg.aquatic.waves.chunk.trackedByPlayers
 import gg.aquatic.waves.fake.block.FakeBlock
 import gg.aquatic.waves.fake.block.FakeBlockInteractEvent
 import gg.aquatic.waves.fake.entity.FakeEntity
@@ -21,14 +24,14 @@ import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player
+import io.github.retrooper.packetevents.util.SpigotConversionUtil
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.event.world.ChunkLoadEvent
-import org.bukkit.event.world.ChunkUnloadEvent
 import java.util.concurrent.ConcurrentHashMap
 
 object FakeObjectHandler : WaveModule {
@@ -52,13 +55,23 @@ object FakeObjectHandler : WaveModule {
             }
         }
 
-        event<PlayerChunkLoadEvent> {
-            runAsync {
-                val obj =
-                    ChunkCacheHandler.getObject(it.chunk, FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle
-                        ?: return@runAsync
-                tickableObjects += obj.blocks
-                tickableObjects += obj.entities
+        event<AsyncPlayerChunkLoadEvent> {
+            val obj =
+                ChunkCacheHandler.getObject(it.chunk, FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle
+                    ?: return@event
+            tickableObjects += obj.blocks
+            tickableObjects += obj.entities
+            for (block in obj.blocks) {
+                if (block.viewers.contains(it.player)) {
+                    val index = (block.location.y.toInt()+64) / 16
+                    val chunk = it.wrappedPacket.column.chunks[index]
+                    chunk.set(
+                        block.location.x.toInt() and 0xf,
+                        block.location.y.toInt() and 0xf,
+                        block.location.z.toInt() and 0xf,
+                        SpigotConversionUtil.fromBukkitBlockData(block.block.blockData)
+                    )
+                }
             }
         }
         event<PlayerChunkUnloadEvent> {
@@ -110,6 +123,66 @@ object FakeObjectHandler : WaveModule {
             }
         }
          */
+        packetEvent<PacketReceiveEvent> {
+            if (packetType == PacketType.Play.Client.PLAYER_DIGGING) {
+                val packet = WrapperPlayClientPlayerDigging(this)
+                Bukkit.broadcastMessage("Packet Interacted - RIGHT")
+
+                val player = player()
+
+                val blocks = locationToBlocks[player.world.getBlockAt(
+                    packet.blockPosition.x,
+                    packet.blockPosition.y,
+                    packet.blockPosition.z
+                ).location] ?: return@packetEvent
+
+                for (block in blocks) {
+                    if (block.viewers.contains(player)) {
+                        val event = FakeBlockInteractEvent(
+                            block,
+                            player,
+                            true
+                        )
+                        block.onInteract(event)
+                        if (!block.destroyed) {
+                            this.isCancelled = true
+                        }
+                        break
+                    }
+                }
+            } else if (packetType == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
+                val packet = WrapperPlayClientPlayerBlockPlacement(this)
+                val isOffhand = (packet.hand == InteractionHand.OFF_HAND)
+                Bukkit.broadcastMessage("Packet Interacted - RIGHT")
+
+                val player = player()
+
+                val blocks = locationToBlocks[player.world.getBlockAt(
+                    packet.blockPosition.x,
+                    packet.blockPosition.y,
+                    packet.blockPosition.z
+                ).location] ?: return@packetEvent
+
+                for (block in blocks) {
+                    if (block.viewers.contains(player)) {
+                        if (isOffhand) {
+                            this.isCancelled = true
+                            break
+                        }
+                        val event = FakeBlockInteractEvent(
+                            block,
+                            player,
+                            false
+                        )
+                        block.onInteract(event)
+                        if (!block.destroyed) {
+                            this.isCancelled = true
+                        }
+                        break
+                    }
+                }
+            }
+        }
         event<PlayerInteractEvent> {
             val blocks = locationToBlocks[it.clickedBlock?.location ?: return@event] ?: return@event
             for (block in blocks) {
@@ -121,7 +194,12 @@ object FakeObjectHandler : WaveModule {
                         it.action == Action.LEFT_CLICK_BLOCK || it.action == Action.LEFT_CLICK_AIR
                     )
                     block.onInteract(event)
-                    if (block.destroyed) {
+                    if (!block.destroyed) {
+                        if (it.action == Action.RIGHT_CLICK_AIR || it.action == Action.RIGHT_CLICK_BLOCK) {
+                            runLaterSync(1) {
+                                block.show(it.player)
+                            }
+                        }
                         block.show(it.player)
                     }
                     break

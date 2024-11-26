@@ -62,9 +62,7 @@ object ChunkTracker : WaveModule {
             }
             playerPair.second -= toRemove
             playerPair.second += chunkId
-            runSync {
-                PlayerChunkLoadEvent(player,chunkId.toChunk(player.world)).call()
-            }
+            AsyncPlayerChunkLoadEvent(player,chunkId.toChunk(player.world),packet).call()
         }
         event<PlayerQuitEvent> {
             val playerPair = playerToChunks.remove(it.player.uniqueId) ?: return@event

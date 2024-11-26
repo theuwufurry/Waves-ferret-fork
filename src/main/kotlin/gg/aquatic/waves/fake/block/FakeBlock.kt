@@ -12,6 +12,7 @@ import gg.aquatic.waves.fake.FakeObjectChunkBundle
 import gg.aquatic.waves.util.blockLocation
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import java.util.*
@@ -122,9 +123,7 @@ open class FakeBlock(
 
     override fun show(player: Player) {
         isViewing.add(player)
-        runLaterAsync(2) {
-            player.sendBlockChange(location, block.blockData)
-        }
+        player.sendBlockChange(location, block.blockData)
     }
 
     override fun hide(player: Player) {
