@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "gg.aquatic.waves"
-version = "1.0.55"
+version = "1.0.56"
 
 val ktor_version: String by project
 
@@ -33,11 +33,11 @@ val nmsVersion = "1.0.39"
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("net.kyori:adventure-text-serializer-gson:4.17.0")
-    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.43:all")
-    implementation("gg.aquatic.aquaticseries.spigot:spigot:1.0.43")
-    implementation("gg.aquatic.aquaticseries.paper:paper:1.0.43")
+    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.44:all")
+    implementation("gg.aquatic.aquaticseries.spigot:spigot:1.0.44")
+    implementation("gg.aquatic.aquaticseries.paper:paper:1.0.44")
     implementation("gg.aquatic.packeteventsext:PacketEventsExt:1.0.0")
-    implementation("gg.aquatic.aquaticseries:aquaticlib-core:1.0.43:all") {
+    implementation("gg.aquatic.aquaticseries:aquaticlib-core:1.0.44:all") {
     }
     implementation("gg.aquatic.aquaticseries.nms:NMS_v1_17_1:$nmsVersion") {
         exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")

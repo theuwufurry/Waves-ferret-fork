@@ -125,9 +125,10 @@ object FakeObjectHandler : WaveModule {
         }
          */
         packetEvent<PacketReceiveEvent> {
+            /*
             if (packetType == PacketType.Play.Client.PLAYER_DIGGING) {
                 val packet = WrapperPlayClientPlayerDigging(this)
-                Bukkit.broadcastMessage("Packet Interacted - RIGHT")
+                Bukkit.broadcastMessage("Packet Interacted - LEFT")
 
                 val player = player()
 
@@ -147,14 +148,18 @@ object FakeObjectHandler : WaveModule {
                         block.onInteract(event)
                         if (!block.destroyed) {
                             this.isCancelled = true
+                            runLaterSync(40) {
+                                Bukkit.broadcastMessage("Showing the block")
+                                block.show(player)
+                            }
                         }
                         break
                     }
                 }
-            } else if (packetType == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
+            } else */
+            if (packetType == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
                 val packet = WrapperPlayClientPlayerBlockPlacement(this)
                 val isOffhand = (packet.hand == InteractionHand.OFF_HAND)
-                Bukkit.broadcastMessage("Packet Interacted - RIGHT")
 
                 val player = player()
 
