@@ -24,6 +24,7 @@ import gg.aquatic.waves.util.action.*
 import gg.aquatic.waves.util.action.discord.DiscordWebhookAction
 import gg.aquatic.waves.util.price.ItemPrice
 import gg.aquatic.waves.util.price.VaultPrice
+import gg.aquatic.waves.util.requirement.ExpressionPlayerRequirement
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
@@ -44,7 +45,10 @@ object WavesRegistry {
         p["sound"] = SoundAction()
         p["discord-webhook"] = DiscordWebhookAction()
     }
-    val REQUIREMENT = HashMap<Class<*>, MutableMap<String, AbstractRequirement<*>>>()
+    val REQUIREMENT = HashMap<Class<*>, MutableMap<String, AbstractRequirement<*>>>().apply {
+        val p = getOrPut(Player::class.java) { HashMap() }
+        p += "expression" to ExpressionPlayerRequirement()
+    }
     val PRICE by lazy {
         HashMap<Class<*>, MutableMap<String, AbstractPrice<*>>>().apply {
             val p = getOrPut(Player::class.java) { HashMap() }
