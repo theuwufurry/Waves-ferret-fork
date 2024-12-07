@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow.WindowClickType
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
+import gg.aquatic.aquaticseries.lib.util.event
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
@@ -15,9 +16,8 @@ import gg.aquatic.waves.util.player
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.inventory.Inventory
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import java.util.Optional
 import java.util.concurrent.ConcurrentHashMap
@@ -28,15 +28,17 @@ object InventoryManager : WaveModule {
     override val type: WaveModules = WaveModules.INVENTORIES
 
     override fun initialize(waves: Waves) {
+        event<PlayerQuitEvent> {
+            onCloseMenu(it.player)
+        }
         packetEvent<PacketReceiveEvent> {
             val packetType = packetType
             val player = player()
 
             if (packetType == PacketType.Play.Client.CLOSE_WINDOW) {
                 onCloseMenu(player)
-                clearAccumulatedDrag(player)
+                return@packetEvent
             }
-
             if (packetType != PacketType.Play.Client.CLICK_WINDOW) return@packetEvent
             val packet = WrapperPlayClientClickWindow(this)
             if (shouldIgnore(packet.windowId, player)) return@packetEvent
@@ -48,35 +50,15 @@ object InventoryManager : WaveModule {
                 return@packetEvent
             }
 
-            val menuClickData = isMenuClick(InventoryClickData(player, packet, clickData.second, clickData.first))
+            val menuClickData = isMenuClick(packet, Pair(clickData.first, clickData.second), player)
             if (menuClickData) {
-                val response = onClickMenu(WindowClick(player, clickData.second, packet.slot))
-                Bukkit.getScheduler().run { player.updateInventory() }
-                if (response != null) {
-                    user.sendPacket(response)
-                    /*
-                    response.execute?.let {
-                        it(
-                            ExecuteComponent(
-                                player,
-                                clickData.buttonType,
-                                packet.slot,
-                                menuService.getCarriedItem(player)
-                            )
-                        )
-                    }
-                     */
-                }
+                handleClickMenu(WindowClick(player, clickData.second, packet.slot))
+                player.updateInventory()
             } else { // isInventoryClick
-                val response = onClickInventory(
-                    InventoryClickData(
-                        player,
-                        packet,
-                        clickData.second,
-                        clickData.first
-                    )
+                handleClickInventory(
+                    player,
+                    packet
                 )
-                PacketEvents.getAPI().playerManager.receivePacketSilently(this, response)
             }
         }
     }
@@ -113,27 +95,27 @@ object InventoryManager : WaveModule {
         removed?.viewers?.remove(player.uniqueId)
     }
 
-    fun onClickInventory(click: InventoryClickData): WrapperPlayClientClickWindow {
-        val menu = openedInventories[click.player] ?: error("Menu under player key not found.")
-        val clickData = getClickType(click.wrapper)
+    fun handleClickInventory(player: Player, packet: WrapperPlayClientClickWindow) {
+        val menu = openedInventories[player] ?: error("Menu under player key not found.")
+        val clickData = getClickType(packet)
 
-        updateCarriedItem(click.player, click.wrapper.carriedItemStack, clickData.second)
+        updateCarriedItem(player, packet.carriedItemStack, clickData.second)
 
         if (clickData.second == ClickType.DRAG_END) {
-            handleDragEnd(click.player, menu)
+            handleDragEnd(player, menu)
         }
 
-        return createAdjustedClickPacket(click, menu)
+        PacketEvents.getAPI().playerManager.receivePacketSilently(this, createAdjustedClickPacket(packet, menu))
     }
 
 
-    fun onClickMenu(click: WindowClick): WrapperPlayServerWindowItems? {
+    fun handleClickMenu(click: WindowClick) {
 
         if (click.clickType == ClickType.DRAG_END) {
             clearAccumulatedDrag(click.player)
         }
         val menu = openedInventories[click.player] ?: error("Menu under player key not found.")
-        val viewer = menu.viewers[click.player.uniqueId] ?: return null
+        val viewer = menu.viewers[click.player.uniqueId] ?: return
         val carriedItem = viewer.carriedItem ?: com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY
         val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
         for (i in 0 until menu.type.size + 36) {
@@ -141,7 +123,13 @@ object InventoryManager : WaveModule {
                 SpigotConversionUtil.fromBukkitItemStack(it)
             }
         }
-        return WrapperPlayServerWindowItems(126, 0, items, carriedItem)
+        val packet = WrapperPlayServerWindowItems(126, 0, items, carriedItem)
+        //val clickedItem = menu.content[click.slot]
+        click.player.toUser().sendPacket(packet)
+        /*if (clickedItem == null) {
+            return
+        }
+         */
     }
 
 
@@ -164,7 +152,8 @@ object InventoryManager : WaveModule {
 
     fun updateItems(inventory: AquaticInventory, items: HashMap<Int, ItemStack>) {
         for ((slot, item) in items) {
-            updateItem(inventory, item, slot)
+            inventory.addItem(slot, item)
+            //updateItem(inventory, item, slot)
         }
 
         val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
@@ -182,7 +171,6 @@ object InventoryManager : WaveModule {
             )
             viewer.player.toUser().sendPacket(packet)
         }
-
     }
 
     private fun handleDragEnd(player: Player, inventory: AquaticInventory) {
@@ -216,18 +204,18 @@ object InventoryManager : WaveModule {
     }
 
     private fun createAdjustedClickPacket(
-        click: InventoryClickData,
+        packet: WrapperPlayClientClickWindow,
         inventory: AquaticInventory
     ): WrapperPlayClientClickWindow {
-        val slotOffset = if (click.wrapper.slot != -999) click.wrapper.slot - inventory.type.size + 9 else -999
-        val adjustedSlots = click.wrapper.slots.orElse(emptyMap()).mapKeys { (slot, _) ->
+        val slotOffset = if (packet.slot != -999) packet.slot - inventory.type.size + 9 else -999
+        val adjustedSlots = packet.slots.orElse(emptyMap()).mapKeys { (slot, _) ->
             slot - inventory.type.size + 9
         }
 
         return WrapperPlayClientClickWindow(
-            0, click.wrapper.stateId, slotOffset, click.wrapper.button,
-            click.wrapper.actionNumber, click.wrapper.windowClickType,
-            Optional.of(adjustedSlots), click.wrapper.carriedItemStack
+            0, packet.stateId, slotOffset, packet.button,
+            packet.actionNumber, packet.windowClickType,
+            Optional.of(adjustedSlots), packet.carriedItemStack
         )
     }
 
@@ -237,7 +225,13 @@ object InventoryManager : WaveModule {
         viewer.accumulatedDrag.add(AccumulatedDrag(packet, type))
     }
 
-    fun shouldIgnore(id: Int, player: Player): Boolean =  id != 126 || !openedInventories.containsKey(player)
+    fun shouldIgnore(id: Int, player: Player): Boolean = id != 126 || !openedInventories.containsKey(player)
+
+    fun reRenderCarriedItem(player: Player) {
+        val menu = openedInventories[player] ?: error("Menu under player key not found.")
+        val carriedItem = menu.viewers[player.uniqueId]?.carriedItem ?: return
+        player.toUser().sendPacket(WrapperPlayServerSetSlot(-1, 0, -1, carriedItem))
+    }
 
     private fun updateCarriedItem(
         player: Player,
@@ -251,7 +245,7 @@ object InventoryManager : WaveModule {
                 carriedItemStack
             }
 
-            else -> com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY
+            else -> null
         }
     }
 
@@ -322,12 +316,20 @@ object InventoryManager : WaveModule {
         }
     }
 
-    fun isMenuClick(click: InventoryClickData): Boolean {
-        val menu = openedInventories[click.player] ?: error("Menu under player key not found.")
-        return when (click.clickType) {
+    fun isMenuClick(
+        wrapper: WrapperPlayClientClickWindow,
+        clickType: Pair<ButtonType, ClickType>,
+        player: Player
+    ): Boolean {
+        val menu = openedInventories[player] ?: error("Menu under player key not found.")
+        val slotRange = 0..menu.type.lastIndex
+
+        return when (clickType.second) {
             ClickType.SHIFT_CLICK -> true
-            ClickType.PICKUP, ClickType.PLACE -> click.wrapper.slot in 0..menu.type.lastIndex + 36
-            ClickType.DRAG_END, ClickType.PICKUP_ALL -> click.wrapper.slots.orElse(emptyMap()).keys.any { it in 0..menu.type.lastIndex + 36 }
+            in listOf(ClickType.PICKUP, ClickType.PLACE) -> wrapper.slot in slotRange
+            ClickType.DRAG_END, ClickType.PICKUP_ALL ->
+                wrapper.slot in slotRange || wrapper.slots.orElse(emptyMap()).keys.any { it in slotRange }
+
             else -> false
         }
     }
