@@ -161,7 +161,7 @@ object FakeObjectHandler : WaveModule {
                 val packet = WrapperPlayClientPlayerBlockPlacement(this)
                 val isOffhand = (packet.hand == InteractionHand.OFF_HAND)
 
-                val player = player()
+                val player = player() ?: return@packetEvent
 
                 val blocks = locationToBlocks[player.world.getBlockAt(
                     packet.blockPosition.x,
@@ -219,7 +219,7 @@ object FakeObjectHandler : WaveModule {
             val entity = idToEntity[packet.entityId] ?: return@packetEvent
             val event = FakeEntityInteractEvent(
                 entity,
-                this.player(),
+                this.player() ?: return@packetEvent,
                 (packet.action == WrapperPlayClientInteractEntity.InteractAction.ATTACK)
             )
             entity.onInteract(event)

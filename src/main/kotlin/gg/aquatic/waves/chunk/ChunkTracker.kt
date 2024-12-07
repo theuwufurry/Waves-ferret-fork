@@ -30,7 +30,7 @@ object ChunkTracker : WaveModule {
         packetEvent<PacketSendEvent> {
             if (this.packetType != Play.Server.CHUNK_DATA) return@packetEvent
             val packet = WrapperPlayServerChunkData(this)
-            val player = this.player()
+            val player = this.player() ?: return@packetEvent
             val chunkId = ChunkId(packet.column.x, packet.column.z)
             chunks.getOrPut(player.world.name) { hashMapOf() }.getOrPut(chunkId) { ConcurrentHashMap.newKeySet() }.add(player.uniqueId)
             var playerPair = playerToChunks.getOrPut(player.uniqueId) { player.world.name to ConcurrentHashMap.newKeySet() }

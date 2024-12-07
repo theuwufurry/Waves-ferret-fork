@@ -5,6 +5,9 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow.WindowClickType
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindowButton
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSlotStateChange
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientWindowConfirmation
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
 import gg.aquatic.aquaticseries.lib.util.event
@@ -32,8 +35,7 @@ object InventoryManager : WaveModule {
             onCloseMenu(it.player)
         }
         packetEvent<PacketReceiveEvent> {
-            val packetType = packetType
-            val player = player()
+            val player = player() ?: return@packetEvent
 
             if (packetType == PacketType.Play.Client.CLOSE_WINDOW) {
                 onCloseMenu(player)
@@ -107,7 +109,6 @@ object InventoryManager : WaveModule {
 
         PacketEvents.getAPI().playerManager.receivePacketSilently(this, createAdjustedClickPacket(packet, menu))
     }
-
 
     fun handleClickMenu(click: WindowClick) {
 

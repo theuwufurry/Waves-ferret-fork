@@ -33,6 +33,6 @@ fun PacketListenerCommon.unregister() {
     PacketEvents.getAPI().eventManager.unregisterListener(this)
 }
 
-fun ProtocolPacketEvent.player(): Player {
-    return this.getPlayer() as Player
+fun ProtocolPacketEvent.player(): Player? {
+    return this.getPlayer() as? Player
 }

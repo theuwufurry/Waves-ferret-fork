@@ -142,7 +142,7 @@ object EntityHandler : WaveModule {
                         isCancelled = true
                         return@packetEvent
                     }
-                    updateEntity(player(), packet.entityId)
+                    updateEntity(player() ?: return@packetEvent, packet.entityId)
                 }
             }
         }
