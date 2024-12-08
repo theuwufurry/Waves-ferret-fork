@@ -57,13 +57,11 @@ object InventoryManager : WaveModule {
             val menuClickData = isMenuClick(packet, Pair(clickData.first, clickData.second), player)
             if (menuClickData) {
                 handleClickMenu(WindowClick(player, clickData.second, packet.slot))
-                //player.updateInventory()
             } else { // isInventoryClick
                 handleClickInventory(
                     player,
                     packet,
-                    clickData.second,
-                    clickData.first
+                    clickData.second
                 )
             }
         }
@@ -102,11 +100,8 @@ object InventoryManager : WaveModule {
         removed?.viewers?.remove(player.uniqueId)
     }
 
-    fun handleClickInventory(player: Player, packet: WrapperPlayClientClickWindow, clickType: ClickType, buttonType: ButtonType) {
+    fun handleClickInventory(player: Player, packet: WrapperPlayClientClickWindow, clickType: ClickType) {
         val menu = openedInventories[player] ?: error("Menu under player key not found.")
-        //val viewer = menu.viewers[player.uniqueId] ?: error("Viewer under player key not found.")
-        //val clickData = getClickType(packet, viewer)
-
         updateCarriedItem(player, packet.carriedItemStack, clickType)
 
         if (clickType == ClickType.DRAG_END) {
@@ -118,7 +113,7 @@ object InventoryManager : WaveModule {
 
     private fun updateInventoryContent(inventory: AquaticInventory, viewer: InventoryViewer) {
         val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
-        for (i in 0 until inventory.type.size + 35) {
+        for (i in 0 until inventory.type.size + 36) {
             val contentItem = inventory.content[i]
             if (contentItem == null && i > inventory.type.lastIndex) {
                 val playerItemIndex = playerSlotFromMenuSlot(i, inventory)
