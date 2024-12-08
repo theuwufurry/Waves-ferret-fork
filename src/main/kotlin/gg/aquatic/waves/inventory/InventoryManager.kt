@@ -50,7 +50,6 @@ object InventoryManager : WaveModule {
             val viewer = inventory.viewers[player.uniqueId] ?: return@packetEvent
 
             val clickData = getClickType(packet, viewer)
-            Bukkit.broadcastMessage("ButtonType: ${clickData.first}, ClickType: ${clickData.second}")
             if (clickData.second == ClickType.DRAG_START || clickData.second == ClickType.DRAG_ADD) {
                 accumulateDrag(player, packet, clickData.second)
                 return@packetEvent
@@ -130,7 +129,6 @@ object InventoryManager : WaveModule {
             val contentItem = inventory.content[i]
             if (contentItem == null && i > inventory.type.lastIndex) {
                 val playerItemIndex = playerSlotFromMenuSlot(i, inventory)
-                Bukkit.broadcastMessage("Raw slot: $i, Player slot: $playerItemIndex")
                 val playerItem = viewer.player.inventory.getItem(playerItemIndex)
                 items += playerItem?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
             } else {
