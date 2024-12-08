@@ -3,7 +3,6 @@ package gg.aquatic.waves.inventory
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow
 import gg.aquatic.waves.util.toUser
 import net.kyori.adventure.text.Component
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -12,6 +11,9 @@ class AquaticInventory(
     title: Component,
     val type: InventoryType
 ) : Cloneable {
+
+    val viewers: ConcurrentHashMap<UUID, InventoryViewer> = ConcurrentHashMap<UUID, InventoryViewer>()
+    val content: ConcurrentHashMap<Int,ItemStack> = ConcurrentHashMap<Int,ItemStack>()
 
     var title = title
         set(value) {
@@ -33,8 +35,6 @@ class AquaticInventory(
         return packet
     }
 
-    val viewers: ConcurrentHashMap<UUID, InventoryViewer> = ConcurrentHashMap<UUID, InventoryViewer>()
-    val content: ConcurrentHashMap<Int,ItemStack> = ConcurrentHashMap<Int,ItemStack>()
 
     fun addItem(slot: Int, item: ItemStack) {
         val previous = content[slot]

@@ -1,10 +1,7 @@
 package gg.aquatic.waves
 
 import com.github.retrooper.packetevents.PacketEvents
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers
 import gg.aquatic.aquaticseries.lib.AquaticSeriesLib
-import gg.aquatic.aquaticseries.lib.audience.GlobalAudience
 import gg.aquatic.aquaticseries.lib.betterinventory2.InventoryHandler
 import gg.aquatic.aquaticseries.lib.data.MySqlDriver
 import gg.aquatic.aquaticseries.lib.data.SQLiteDriver
@@ -13,28 +10,20 @@ import gg.aquatic.aquaticseries.lib.util.*
 import gg.aquatic.waves.chunk.ChunkTracker
 import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
-import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.interactable.InteractableHandler
+import gg.aquatic.waves.inventory.AquaticInventory
 import gg.aquatic.waves.inventory.InventoryType
-import gg.aquatic.waves.inventory2.InventoryManager
-import gg.aquatic.waves.inventory2.PacketInventory
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
-import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
-import gg.aquatic.waves.util.openBook
-import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
-import me.micartey.webhookly.DiscordWebhook
 import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
-import org.bukkit.entity.Display
-import org.bukkit.entity.Player
-import org.bukkit.event.Listener
+import org.bukkit.Material
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -47,7 +36,7 @@ class Waves : JavaPlugin() {
         WaveModules.FAKE_OBJECTS to FakeObjectHandler,
         WaveModules.CHUNK_TRACKER to ChunkTracker,
         WaveModules.INTERACTABLES to InteractableHandler,
-        WaveModules.INVENTORIES to InventoryManager
+        WaveModules.INVENTORIES to gg.aquatic.waves.inventory.InventoryManager
     )
     lateinit var configValues: WavesConfig
     var initialized = false
@@ -87,8 +76,9 @@ class Waves : JavaPlugin() {
 
         event<AsyncPlayerChatEvent> {
             if (it.message.contains("open menu")) {
-                val inv = PacketInventory(Component.text("Example"), InventoryType.GENERIC9X6)
-                InventoryManager.openMenu(it.player,inv)
+                val inv = AquaticInventory(Component.text("Example"), InventoryType.GENERIC9X6)
+                inv.content[0] = ItemStack(Material.DIAMOND)
+                gg.aquatic.waves.inventory.InventoryManager.openMenu(it.player,inv)
             }
         }
 

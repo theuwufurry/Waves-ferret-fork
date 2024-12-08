@@ -23,11 +23,15 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
 import kotlin.collections.set
+import kotlin.jvm.optionals.getOrNull
 
 object InventoryManager : WaveModule {
 
@@ -35,6 +39,7 @@ object InventoryManager : WaveModule {
     override val type: WaveModules = WaveModules.INVENTORIES
 
     override fun initialize(waves: Waves) {
+        /*
         packetEvent<PacketReceiveEvent> {
             val player = player() ?: return@packetEvent
 
@@ -58,18 +63,7 @@ object InventoryManager : WaveModule {
             val type = getClickType(packet, viewer)
             Bukkit.broadcastMessage("ButtonType: ${type.first} ClickType: ${type.second}")
 
-            val cursor = viewer.carriedItem?.let {SpigotConversionUtil.toBukkitItemStack(it)}
-            val item: ItemStack?
-            val isRealItem: Boolean
-            if (inventory.content.contains(packet.slot)) {
-                item = inventory.content[packet.slot]
-                isRealItem = false
-            } else {
-                val slot = playerSlotFromMenuSlot(packet.slot, inventory)
-                item = player.inventory.getItem(slot)
-                isRealItem = true
-            }
-            val inventoryItem = InventoryItem(isRealItem,item)
+            val cursor = packet.carriedItemStack?.let { SpigotConversionUtil.toBukkitItemStack(it) }
             val event = AsyncPacketInventoryClickEvent(
                 viewer,
                 cursor,
@@ -77,25 +71,106 @@ object InventoryManager : WaveModule {
                 packet.slot,
                 type.first,
                 type.second,
-                inventoryItem
+                Optional.ofNullable(
+                    packet.slots.getOrNull()?.mapValues { (_, item) -> SpigotConversionUtil.toBukkitItemStack(item) }
+                        ?.toMutableMap()
+                )
             )
             event.call()
             if (!event.isCancelled) {
                 // TODO: HANDLE CLICK
             } else {
-                if (event.buttonType == ButtonType.RIGHT)
-
-                if (type.second == ClickType.PICKUP && type.first == ButtonType.RIGHT) {
+                if (type.second == ClickType.PICKUP) {
                     Bukkit.broadcastMessage("Setting carried item to instance")
+                    viewer.carriedItem = event.cursor?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
+                    val isPacketItem = inventory.content.contains(packet.slot)
+                    val slots = event.slots.getOrNull()
+                    if (isPacketItem) {
+                        Bukkit.broadcastMessage("Cancelling packet")
+                        isCancelled = true
+                        Bukkit.broadcastMessage("Fake item - setting to real cursor")
+                        if (inventory.content[packet.slot] != event.item.item) {
+                            if (event.item.isRealItem) {
+                                player.inventory.setItem(
+                                    playerSlotFromMenuSlot(packet.slot, inventory),
+                                    event.item.item
+                                )
+                            } else {
+                                val i = event.item.item
+                                val slotPacket = WrapperPlayServerSetSlot(
+                                    126,
+                                    0,
+                                    event.slot,
+                                    i?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
+                                        ?: com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY
+                                )
+                                player.toUser().sendPacket(
+                                    slotPacket
+                                )
+                            }
+                        }
+                        player.openInventory.cursor = event.cursor
+                    }
+                } else if (type.second == ClickType.PLACE) {
+                    Bukkit.broadcastMessage("Setting carried item to instance")
+                    viewer.carriedItem = event.cursor?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
+                    val isPacketItem = inventory.content.contains(packet.slot)
+                    val slots = event.slots.getOrNull()
+
+                    if (isPacketItem) {
+                        Bukkit.broadcastMessage("Cancelling packet")
+                        isCancelled = true
+                        Bukkit.broadcastMessage("Fake item - setting to real cursor")
+                        if (inventory.content[packet.slot] != event.item.item) {
+                            if (event.item.isRealItem) {
+                                player.inventory.setItem(
+                                    playerSlotFromMenuSlot(packet.slot, inventory),
+                                    event.item.item
+                                )
+                            } else {
+                                val i = event.item.item
+                                val slotPacket = WrapperPlayServerSetSlot(
+                                    126,
+                                    0,
+                                    event.slot,
+                                    i?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
+                                        ?: com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY
+                                )
+                                player.toUser().sendPacket(slotPacket)
+                            }
+                        }
+                    }
+                    if (slots != null) {
+                        for ((slot, item) in slots) {
+                            if (inventory.content.contains(slot)) {
+                                inventory.content[slot] = item
+                            } else {
+                                val slotPacket = WrapperPlayServerSetSlot(
+                                    126,
+                                    0,
+                                    slot,
+                                    SpigotConversionUtil.fromBukkitItemStack(item)
+                                )
+                                player.toUser().sendPacket(
+                                    slotPacket
+                                )
+                            }
+                        }
+                    }
+                }
+                if (type.second == ClickType.PICKUP && type.first == ButtonType.RIGHT) {
                     val previous =
-                    player.inventory.contents[]
+                        player.inventory.contents[]
 
                     viewer.carriedItem = event.cursor?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
 
                     if (player.openInventory.cursor != event.cursor) {
                         player.openInventory.cursor = event.cursor
                     }
-                } else if (type.second == ClickType.PLACE && packet.carriedItemStack == com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY || SpigotConversionUtil.toBukkitItemStack(packet.carriedItemStack).type == Material.AIR) {
+                } else if (type.second == ClickType.PLACE && packet.carriedItemStack == com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY || SpigotConversionUtil.toBukkitItemStack(
+                        packet.carriedItemStack
+                    ).type == Material.AIR
+                ) {
                     Bukkit.broadcastMessage("Setting carried item to nothing")
                     viewer.carriedItem = null
                     player.openInventory.cursor = null
@@ -122,6 +197,7 @@ object InventoryManager : WaveModule {
                 }
             }
         }
+         */
     }
 
     private fun menuSlotFromPlayerSlot(slot: Int, inventory: PacketInventory): Int {
@@ -215,15 +291,24 @@ object InventoryManager : WaveModule {
             WindowClickType.PICKUP -> {
                 val cursorItem = viewer.carriedItem?.let { SpigotConversionUtil.toBukkitItemStack(it) }
                 Bukkit.broadcastMessage("Cursor: ${cursorItem?.type}")
-                if (packet.carriedItemStack != com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY && SpigotConversionUtil.toBukkitItemStack(packet.carriedItemStack).type != Material.AIR) {
+                if (packet.carriedItemStack != com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY && SpigotConversionUtil.toBukkitItemStack(
+                        packet.carriedItemStack
+                    ).type != Material.AIR
+                ) {
                     Bukkit.broadcastMessage("It is not empty")
                     if (packet.button == 0) Pair(ButtonType.LEFT, ClickType.PICKUP)
-                    else if (cursorItem != null && cursorItem.type != Material.AIR) Pair(ButtonType.RIGHT, ClickType.PLACE)
+                    else if (cursorItem != null && cursorItem.type != Material.AIR) Pair(
+                        ButtonType.RIGHT,
+                        ClickType.PLACE
+                    )
                     else Pair(ButtonType.RIGHT, ClickType.PICKUP)
                 } else {
                     Bukkit.broadcastMessage("It is empty")
                     if (packet.button == 0) Pair(ButtonType.LEFT, ClickType.PLACE)
-                    else Pair(ButtonType.RIGHT, if (cursorItem?.type == Material.AIR) ClickType.PICKUP else ClickType.PLACE)
+                    else Pair(
+                        ButtonType.RIGHT,
+                        if (cursorItem?.type == Material.AIR) ClickType.PICKUP else ClickType.PLACE
+                    )
                 }
             }
 

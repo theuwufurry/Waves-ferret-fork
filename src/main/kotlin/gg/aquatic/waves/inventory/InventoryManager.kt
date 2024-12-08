@@ -5,9 +5,6 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow.WindowClickType
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindowButton
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSlotStateChange
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientWindowConfirmation
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
 import gg.aquatic.aquaticseries.lib.util.event
@@ -55,7 +52,7 @@ object InventoryManager : WaveModule {
             val menuClickData = isMenuClick(packet, Pair(clickData.first, clickData.second), player)
             if (menuClickData) {
                 handleClickMenu(WindowClick(player, clickData.second, packet.slot))
-                player.updateInventory()
+                //player.updateInventory()
             } else { // isInventoryClick
                 handleClickInventory(
                     player,
@@ -74,22 +71,22 @@ object InventoryManager : WaveModule {
         val viewer = InventoryViewer(player)
         inventory.viewers[player.uniqueId] = viewer
 
-        player.toUser().let {
-            it.sendPacket(inventory.inventoryOpenPacket)
-            val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
-            for (i in 0 until inventory.type.size + 36) {
-                items += inventory.content[i]?.let {
-                    SpigotConversionUtil.fromBukkitItemStack(it)
-                }
-            }
-            val packet = WrapperPlayServerWindowItems(
-                126,
-                0,
-                items,
-                viewer.carriedItem
-            )
-            it.sendPacket(packet)
+        player.toUser().let { user ->
+            user.sendPacket(inventory.inventoryOpenPacket)
+            updateInventoryContent(inventory, player)
         }
+    }
+    private fun menuSlotFromPlayerSlot(slot: Int, inventory: AquaticInventory): Int {
+        return if (slot < 9) {
+            slot + 27
+        } else {
+            slot - 9
+        } + inventory.type.lastIndex
+    }
+
+    private fun playerSlotFromMenuSlot(slot: Int, inventory: AquaticInventory): Int {
+        val offsetSlot = slot - inventory.type.size
+        return if (offsetSlot < 27) offsetSlot + 9 else offsetSlot - 27
     }
 
     fun onCloseMenu(player: Player) {
@@ -107,7 +104,23 @@ object InventoryManager : WaveModule {
             handleDragEnd(player, menu)
         }
 
-        PacketEvents.getAPI().playerManager.receivePacketSilently(this, createAdjustedClickPacket(packet, menu))
+        PacketEvents.getAPI().playerManager.receivePacketSilently(player, createAdjustedClickPacket(packet, menu))
+    }
+
+    private fun updateInventoryContent(inventory: AquaticInventory, player: Player) {
+        val viewer = inventory.viewers[player.uniqueId] ?: return
+        val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
+        for (i in 0 until inventory.type.size + 35) {
+            val contentItem = inventory.content[i]
+            if (contentItem == null && i > inventory.type.lastIndex) {
+                val playerItemIndex = playerSlotFromMenuSlot(i, inventory)
+                Bukkit.broadcastMessage("Raw slot: $i, Player slot: $playerItemIndex")
+                val playerItem = player.inventory.getItem(playerItemIndex)
+                items += playerItem?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
+            }
+        }
+        val packet = WrapperPlayServerWindowItems(126, 0, items, viewer.carriedItem)
+        viewer.player.toUser().sendPacket(packet)
     }
 
     fun handleClickMenu(click: WindowClick) {
@@ -115,22 +128,8 @@ object InventoryManager : WaveModule {
         if (click.clickType == ClickType.DRAG_END) {
             clearAccumulatedDrag(click.player)
         }
-        val menu = openedInventories[click.player] ?: error("Menu under player key not found.")
-        val viewer = menu.viewers[click.player.uniqueId] ?: return
-        val carriedItem = viewer.carriedItem ?: com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY
-        val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
-        for (i in 0 until menu.type.size + 36) {
-            items += menu.content[i]?.let {
-                SpigotConversionUtil.fromBukkitItemStack(it)
-            }
-        }
-        val packet = WrapperPlayServerWindowItems(126, 0, items, carriedItem)
-        //val clickedItem = menu.content[click.slot]
-        click.player.toUser().sendPacket(packet)
-        /*if (clickedItem == null) {
-            return
-        }
-         */
+        val inventory = openedInventories[click.player] ?: error("Menu under player key not found.")
+        updateInventoryContent(inventory, click.player)
     }
 
 
@@ -151,26 +150,14 @@ object InventoryManager : WaveModule {
         }
     }
 
-    fun updateItems(inventory: AquaticInventory, items: HashMap<Int, ItemStack>) {
-        for ((slot, item) in items) {
+    fun updateItems(inventory: AquaticInventory, iS: HashMap<Int, ItemStack>) {
+        for ((slot, item) in iS) {
             inventory.addItem(slot, item)
             //updateItem(inventory, item, slot)
         }
 
-        val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
-        for (i in 0 until inventory.type.size + 36) {
-            items += inventory.content[i]?.let {
-                SpigotConversionUtil.fromBukkitItemStack(it)
-            }
-        }
         for ((_, viewer) in inventory.viewers) {
-            val packet = WrapperPlayServerWindowItems(
-                126,
-                0,
-                items,
-                viewer.carriedItem
-            )
-            viewer.player.toUser().sendPacket(packet)
+            updateInventoryContent(inventory, viewer.player)
         }
     }
 
@@ -182,7 +169,7 @@ object InventoryManager : WaveModule {
             } else {
                 createDragPacket(drag.packet, -inventory.type.size + 9)
             }
-            PacketEvents.getAPI().playerManager.receivePacketSilently(this, packet)
+            PacketEvents.getAPI().playerManager.receivePacketSilently(player, packet)
         }
         clearAccumulatedDrag(player)
     }
