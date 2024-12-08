@@ -8,8 +8,10 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow.WindowClickType
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
+import gg.aquatic.aquaticseries.lib.util.call
 import gg.aquatic.aquaticseries.lib.util.event
 import gg.aquatic.waves.Waves
+import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.packetEvent
@@ -17,16 +19,16 @@ import gg.aquatic.waves.util.player
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import java.util.Optional
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.jvm.optionals.getOrNull
 
 object InventoryManager : WaveModule {
 
-    val openedInventories = ConcurrentHashMap<Player, AquaticInventory>()
+    val openedInventories = ConcurrentHashMap<Player, PacketInventory>()
     override val type: WaveModules = WaveModules.INVENTORIES
 
     override fun initialize(waves: Waves) {
@@ -57,6 +59,17 @@ object InventoryManager : WaveModule {
             val menuClickData = isMenuClick(packet, Pair(clickData.first, clickData.second), player)
             if (menuClickData) {
                 handleClickMenu(WindowClick(player, clickData.second, packet.slot))
+                val event = AsyncPacketInventoryInteractEvent(
+                    viewer,
+                    inventory,
+                    packet.slot,
+                    clickData.first,
+                    packet.carriedItemStack?.let { SpigotConversionUtil.toBukkitItemStack(it) },
+                    packet.slots.getOrNull()?.mapValues { (_, item) ->
+                        SpigotConversionUtil.toBukkitItemStack(item)
+                    } ?: emptyMap()
+                )
+                event.call()
             } else { // isInventoryClick
                 handleClickInventory(
                     player,
@@ -71,7 +84,7 @@ object InventoryManager : WaveModule {
 
     }
 
-    fun openMenu(player: Player, inventory: AquaticInventory) {
+    fun openMenu(player: Player, inventory: PacketInventory) {
         openedInventories[player] = inventory
         val viewer = InventoryViewer(player)
         inventory.viewers[player.uniqueId] = viewer
@@ -82,7 +95,7 @@ object InventoryManager : WaveModule {
         }
     }
 
-    private fun menuSlotFromPlayerSlot(slot: Int, inventory: AquaticInventory): Int {
+    private fun menuSlotFromPlayerSlot(slot: Int, inventory: PacketInventory): Int {
         return if (slot < 9) {
             slot + 27
         } else {
@@ -90,7 +103,7 @@ object InventoryManager : WaveModule {
         } + inventory.type.lastIndex
     }
 
-    private fun playerSlotFromMenuSlot(slot: Int, inventory: AquaticInventory): Int {
+    private fun playerSlotFromMenuSlot(slot: Int, inventory: PacketInventory): Int {
         val offsetSlot = slot - inventory.type.size
         return if (offsetSlot < 27) offsetSlot + 9 else offsetSlot - 27
     }
@@ -111,7 +124,7 @@ object InventoryManager : WaveModule {
         PacketEvents.getAPI().playerManager.receivePacketSilently(player, createAdjustedClickPacket(packet, menu))
     }
 
-    internal fun updateInventoryContent(inventory: AquaticInventory, viewer: InventoryViewer) {
+    internal fun updateInventoryContent(inventory: PacketInventory, viewer: InventoryViewer) {
         val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
         for (i in 0 until inventory.type.size + 36) {
             val contentItem = inventory.content[i]
@@ -135,28 +148,35 @@ object InventoryManager : WaveModule {
         }
         val inventory = openedInventories[click.player] ?: error("Menu under player key not found.")
         val viewer = inventory.viewers[click.player.uniqueId] ?: return
+
         updateInventoryContent(inventory, viewer)
     }
 
 
-    fun updateItem(inventory: AquaticInventory, item: ItemStack, slot: Int) {
+    fun updateItem(inventory: PacketInventory, item: ItemStack?, slot: Int) {
         if (slot > inventory.type.size + 36) return
-        inventory.addItem(slot, item)
+        if (item == null) {
+            inventory.content.remove(slot)
+        } else {
+            inventory.addItem(slot, item)
+        }
 
         val packet = WrapperPlayServerSetSlot(
             126,
             0,
             slot,
-            SpigotConversionUtil.fromBukkitItemStack(
-                item
-            )
+            item?.let {
+                SpigotConversionUtil.fromBukkitItemStack(
+                    it
+                )
+            } ?: com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY
         )
         for ((_, viewer) in inventory.viewers) {
             viewer.player.toUser().sendPacket(packet)
         }
     }
 
-    fun updateItems(inventory: AquaticInventory, iS: Map<Int, ItemStack>) {
+    fun updateItems(inventory: PacketInventory, iS: Map<Int, ItemStack>) {
         for ((slot, item) in iS) {
             inventory.addItem(slot, item)
             //updateItem(inventory, item, slot)
@@ -167,7 +187,7 @@ object InventoryManager : WaveModule {
         }
     }
 
-    private fun handleDragEnd(player: Player, inventory: AquaticInventory) {
+    private fun handleDragEnd(player: Player, inventory: PacketInventory) {
         val viewer = inventory.viewers[player.uniqueId] ?: return
         viewer.accumulatedDrag.forEach { drag ->
             val packet = if (drag.type == ClickType.DRAG_START) {
@@ -199,7 +219,7 @@ object InventoryManager : WaveModule {
 
     private fun createAdjustedClickPacket(
         packet: WrapperPlayClientClickWindow,
-        inventory: AquaticInventory
+        inventory: PacketInventory
     ): WrapperPlayClientClickWindow {
         val slotOffset = if (packet.slot != -999) packet.slot - inventory.type.size + 9 else -999
         val adjustedSlots = packet.slots.orElse(emptyMap()).mapKeys { (slot, _) ->
@@ -238,9 +258,11 @@ object InventoryManager : WaveModule {
             ClickType.PICKUP, ClickType.PICKUP_ALL, ClickType.DRAG_START, ClickType.DRAG_END -> {
                 carriedItemStack
             }
+
             ClickType.PLACE -> {
                 if (carriedItemStack == com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY || carriedItemStack.type == ItemTypes.AIR) null else carriedItemStack
             }
+
             else -> {
                 null
             }

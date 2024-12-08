@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-class AquaticInventory(
+class PacketInventory(
     title: Component,
     val type: InventoryType
 ) : Cloneable {
@@ -49,12 +49,19 @@ class AquaticInventory(
     fun setItem(slot: Int, item: ItemStack) {
         InventoryManager.updateItem(this, item, slot)
     }
-    fun setItems(items: Map<Int,ItemStack>) {
+    fun changeItems(items: Map<Int,ItemStack>) {
         InventoryManager.updateItems(this, items)
     }
+    fun setItems(items: Map<Int, ItemStack>) {
+        this.content.clear()
+        this.content.putAll(items)
+        for ((_, viewer) in viewers) {
+            InventoryManager.updateInventoryContent(this, viewer)
+        }
+    }
 
-    override fun clone(): AquaticInventory {
-        val inv = AquaticInventory(title, type)
+    override fun clone(): PacketInventory {
+        val inv = PacketInventory(title, type)
         val clonedMap = ConcurrentHashMap<Int, ItemStack>()
         content.forEach { (key, value) -> clonedMap[key] = value.clone() }
         inv.content.putAll(clonedMap)

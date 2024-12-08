@@ -11,8 +11,6 @@ import gg.aquatic.waves.chunk.ChunkTracker
 import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.interactable.InteractableHandler
-import gg.aquatic.waves.inventory.AquaticInventory
-import gg.aquatic.waves.inventory.InventoryType
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
@@ -20,11 +18,6 @@ import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
-import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
-import org.bukkit.Material
-import org.bukkit.event.player.AsyncPlayerChatEvent
-import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
