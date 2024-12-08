@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-class PacketInventory(
+open class PacketInventory(
     title: Component,
     val type: InventoryType
 ) : Cloneable {
