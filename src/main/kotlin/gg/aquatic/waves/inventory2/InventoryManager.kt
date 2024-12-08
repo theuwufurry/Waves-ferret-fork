@@ -7,10 +7,12 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow.WindowClickType
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
+import gg.aquatic.aquaticseries.lib.util.call
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.inventory.ButtonType
 import gg.aquatic.waves.inventory.ClickType
 import gg.aquatic.waves.inventory.InventoryViewer
+import gg.aquatic.waves.inventory2.event.AsyncPacketInventoryClickEvent
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.packetEvent
@@ -40,7 +42,7 @@ object InventoryManager : WaveModule {
             val packet = WrapperPlayClientClickWindow(this)
             if (packet.windowId != 126) return@packetEvent
 
-            isCancelled = true
+            //isCancelled = true
             val inventory = openedInventories[player] ?: return@packetEvent
             val viewer = inventory.viewers[player.uniqueId] ?: return@packetEvent
 
@@ -56,12 +58,48 @@ object InventoryManager : WaveModule {
             val type = getClickType(packet, viewer)
             Bukkit.broadcastMessage("ButtonType: ${type.first} ClickType: ${type.second}")
 
-            if (type.second == ClickType.PICKUP && type.first == ButtonType.RIGHT) {
-                Bukkit.broadcastMessage("Setting carried item to instance")
-                viewer.carriedItem = packet.carriedItemStack
-            } else if (type.second == ClickType.PLACE && packet.carriedItemStack == com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY || SpigotConversionUtil.toBukkitItemStack(packet.carriedItemStack).type == Material.AIR) {
-                Bukkit.broadcastMessage("Setting carried item to nothing")
-                viewer.carriedItem = null
+            val cursor = viewer.carriedItem?.let {SpigotConversionUtil.toBukkitItemStack(it)}
+            val item: ItemStack?
+            val isRealItem: Boolean
+            if (inventory.content.contains(packet.slot)) {
+                item = inventory.content[packet.slot]
+                isRealItem = false
+            } else {
+                val slot = playerSlotFromMenuSlot(packet.slot, inventory)
+                item = player.inventory.getItem(slot)
+                isRealItem = true
+            }
+            val inventoryItem = InventoryItem(isRealItem,item)
+            val event = AsyncPacketInventoryClickEvent(
+                viewer,
+                cursor,
+                inventory,
+                packet.slot,
+                type.first,
+                type.second,
+                inventoryItem
+            )
+            event.call()
+            if (!event.isCancelled) {
+                // TODO: HANDLE CLICK
+            } else {
+                if (event.buttonType == ButtonType.RIGHT)
+
+                if (type.second == ClickType.PICKUP && type.first == ButtonType.RIGHT) {
+                    Bukkit.broadcastMessage("Setting carried item to instance")
+                    val previous =
+                    player.inventory.contents[]
+
+                    viewer.carriedItem = event.cursor?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
+
+                    if (player.openInventory.cursor != event.cursor) {
+                        player.openInventory.cursor = event.cursor
+                    }
+                } else if (type.second == ClickType.PLACE && packet.carriedItemStack == com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY || SpigotConversionUtil.toBukkitItemStack(packet.carriedItemStack).type == Material.AIR) {
+                    Bukkit.broadcastMessage("Setting carried item to nothing")
+                    viewer.carriedItem = null
+                    player.openInventory.cursor = null
+                }
             }
         }
         packetEvent<PacketSendEvent> {
