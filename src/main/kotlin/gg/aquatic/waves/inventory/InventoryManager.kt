@@ -2,6 +2,7 @@ package gg.aquatic.waves.inventory
 
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketReceiveEvent
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow.WindowClickType
@@ -16,6 +17,7 @@ import gg.aquatic.waves.util.player
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
@@ -42,8 +44,11 @@ object InventoryManager : WaveModule {
             val packet = WrapperPlayClientClickWindow(this)
             if (shouldIgnore(packet.windowId, player)) return@packetEvent
             isCancelled = true
+            val inventory = openedInventories[player] ?: return@packetEvent
+            val viewer = inventory.viewers[player.uniqueId] ?: return@packetEvent
 
-            val clickData = getClickType(packet)
+            val clickData = getClickType(packet, viewer)
+            Bukkit.broadcastMessage("ButtonType: ${clickData.first}, ClickType: ${clickData.second}")
             if (clickData.second == ClickType.DRAG_START || clickData.second == ClickType.DRAG_ADD) {
                 accumulateDrag(player, packet, clickData.second)
                 return@packetEvent
@@ -56,7 +61,9 @@ object InventoryManager : WaveModule {
             } else { // isInventoryClick
                 handleClickInventory(
                     player,
-                    packet
+                    packet,
+                    clickData.second,
+                    clickData.first
                 )
             }
         }
@@ -73,9 +80,10 @@ object InventoryManager : WaveModule {
 
         player.toUser().let { user ->
             user.sendPacket(inventory.inventoryOpenPacket)
-            updateInventoryContent(inventory, player)
+            updateInventoryContent(inventory, viewer)
         }
     }
+
     private fun menuSlotFromPlayerSlot(slot: Int, inventory: AquaticInventory): Int {
         return if (slot < 9) {
             slot + 27
@@ -94,29 +102,31 @@ object InventoryManager : WaveModule {
         removed?.viewers?.remove(player.uniqueId)
     }
 
-    fun handleClickInventory(player: Player, packet: WrapperPlayClientClickWindow) {
+    fun handleClickInventory(player: Player, packet: WrapperPlayClientClickWindow, clickType: ClickType, buttonType: ButtonType) {
         val menu = openedInventories[player] ?: error("Menu under player key not found.")
-        val clickData = getClickType(packet)
+        //val viewer = menu.viewers[player.uniqueId] ?: error("Viewer under player key not found.")
+        //val clickData = getClickType(packet, viewer)
 
-        updateCarriedItem(player, packet.carriedItemStack, clickData.second)
+        updateCarriedItem(player, packet.carriedItemStack, clickType)
 
-        if (clickData.second == ClickType.DRAG_END) {
+        if (clickType == ClickType.DRAG_END) {
             handleDragEnd(player, menu)
         }
 
         PacketEvents.getAPI().playerManager.receivePacketSilently(player, createAdjustedClickPacket(packet, menu))
     }
 
-    private fun updateInventoryContent(inventory: AquaticInventory, player: Player) {
-        val viewer = inventory.viewers[player.uniqueId] ?: return
+    private fun updateInventoryContent(inventory: AquaticInventory, viewer: InventoryViewer) {
         val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
         for (i in 0 until inventory.type.size + 35) {
             val contentItem = inventory.content[i]
             if (contentItem == null && i > inventory.type.lastIndex) {
                 val playerItemIndex = playerSlotFromMenuSlot(i, inventory)
                 Bukkit.broadcastMessage("Raw slot: $i, Player slot: $playerItemIndex")
-                val playerItem = player.inventory.getItem(playerItemIndex)
+                val playerItem = viewer.player.inventory.getItem(playerItemIndex)
                 items += playerItem?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
+            } else {
+                items += contentItem?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
             }
         }
         val packet = WrapperPlayServerWindowItems(126, 0, items, viewer.carriedItem)
@@ -129,7 +139,8 @@ object InventoryManager : WaveModule {
             clearAccumulatedDrag(click.player)
         }
         val inventory = openedInventories[click.player] ?: error("Menu under player key not found.")
-        updateInventoryContent(inventory, click.player)
+        val viewer = inventory.viewers[click.player.uniqueId] ?: return
+        updateInventoryContent(inventory, viewer)
     }
 
 
@@ -157,7 +168,7 @@ object InventoryManager : WaveModule {
         }
 
         for ((_, viewer) in inventory.viewers) {
-            updateInventoryContent(inventory, viewer.player)
+            updateInventoryContent(inventory, viewer)
         }
     }
 
@@ -232,19 +243,32 @@ object InventoryManager : WaveModule {
             ClickType.PICKUP, ClickType.PICKUP_ALL, ClickType.DRAG_START, ClickType.DRAG_END -> {
                 carriedItemStack
             }
-
-            else -> null
+            ClickType.PLACE -> {
+                if (carriedItemStack == com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY || carriedItemStack.type == ItemTypes.AIR) null else carriedItemStack
+            }
+            else -> {
+                null
+            }
         }
     }
 
-    fun getClickType(packet: WrapperPlayClientClickWindow): Pair<ButtonType, ClickType> {
+    fun getClickType(packet: WrapperPlayClientClickWindow, viewer: InventoryViewer): Pair<ButtonType, ClickType> {
         return when (packet.windowClickType) {
             WindowClickType.PICKUP -> {
-                if (packet.carriedItemStack != com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY) {
+                val cursorItem = viewer.carriedItem
+                if (packet.carriedItemStack != com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY && packet.carriedItemStack != ItemTypes.AIR
+                ) {
                     if (packet.button == 0) Pair(ButtonType.LEFT, ClickType.PICKUP)
-                    else Pair(ButtonType.RIGHT, ClickType.PICKUP)
+                    else Pair(
+                        ButtonType.RIGHT,
+                        if (cursorItem != null && cursorItem.type != ItemTypes.AIR) ClickType.PLACE else ClickType.PICKUP
+                    )
                 } else {
-                    Pair(ButtonType.RIGHT, ClickType.PLACE)
+                    if (packet.button == 0) Pair(ButtonType.LEFT, ClickType.PLACE)
+                    else Pair(
+                        ButtonType.RIGHT,
+                        if (cursorItem?.type == ItemTypes.AIR) ClickType.PICKUP else ClickType.PLACE
+                    )
                 }
             }
 
