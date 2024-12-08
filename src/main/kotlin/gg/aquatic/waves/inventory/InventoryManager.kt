@@ -111,7 +111,7 @@ object InventoryManager : WaveModule {
         PacketEvents.getAPI().playerManager.receivePacketSilently(player, createAdjustedClickPacket(packet, menu))
     }
 
-    private fun updateInventoryContent(inventory: AquaticInventory, viewer: InventoryViewer) {
+    internal fun updateInventoryContent(inventory: AquaticInventory, viewer: InventoryViewer) {
         val items = ArrayList<com.github.retrooper.packetevents.protocol.item.ItemStack?>()
         for (i in 0 until inventory.type.size + 36) {
             val contentItem = inventory.content[i]
@@ -156,7 +156,7 @@ object InventoryManager : WaveModule {
         }
     }
 
-    fun updateItems(inventory: AquaticInventory, iS: HashMap<Int, ItemStack>) {
+    fun updateItems(inventory: AquaticInventory, iS: Map<Int, ItemStack>) {
         for ((slot, item) in iS) {
             inventory.addItem(slot, item)
             //updateItem(inventory, item, slot)

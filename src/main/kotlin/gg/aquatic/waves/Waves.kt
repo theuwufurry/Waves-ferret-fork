@@ -21,6 +21,7 @@ import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.inventory.ItemStack
@@ -73,14 +74,6 @@ class Waves : JavaPlugin() {
         }
         initialized = true
         WavesInitializeEvent().call()
-
-        event<AsyncPlayerChatEvent> {
-            if (it.message.contains("open menu")) {
-                val inv = AquaticInventory(Component.text("Example"), InventoryType.GENERIC9X6)
-                inv.content[0] = ItemStack(Material.DIAMOND)
-                gg.aquatic.waves.inventory.InventoryManager.openMenu(it.player,inv)
-            }
-        }
 
         /*
         event<AsyncPlayerChatEvent> {

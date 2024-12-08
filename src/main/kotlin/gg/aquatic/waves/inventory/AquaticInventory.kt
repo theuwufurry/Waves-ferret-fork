@@ -13,30 +13,30 @@ class AquaticInventory(
 ) : Cloneable {
 
     val viewers: ConcurrentHashMap<UUID, InventoryViewer> = ConcurrentHashMap<UUID, InventoryViewer>()
-    val content: ConcurrentHashMap<Int,ItemStack> = ConcurrentHashMap<Int,ItemStack>()
+    val content: ConcurrentHashMap<Int, ItemStack> = ConcurrentHashMap<Int, ItemStack>()
 
     var title = title
         set(value) {
             field = value
-            viewers.forEach {
-                //it.openInventory(this)
-            }
+            inventoryOpenPacket = updateTitle()
         }
 
     var inventoryOpenPacket: WrapperPlayServerOpenWindow = updateTitle()
+        private set
 
     private fun updateTitle(): WrapperPlayServerOpenWindow {
-        val packet = WrapperPlayServerOpenWindow(126,type.id(), title)
+        val packet = WrapperPlayServerOpenWindow(126, type.id(), title)
 
         for ((_, viewer) in viewers) {
             viewer.player.toUser().sendPacket(packet)
+            InventoryManager.updateInventoryContent(this, viewer)
         }
 
         return packet
     }
 
 
-    fun addItem(slot: Int, item: ItemStack) {
+    internal fun addItem(slot: Int, item: ItemStack) {
         val previous = content[slot]
         if (previous != null) {
             if (previous.isSimilar(item) && previous.amount == item.amount) {
@@ -44,6 +44,13 @@ class AquaticInventory(
             }
         }
         content[slot] = item
+    }
+
+    fun setItem(slot: Int, item: ItemStack) {
+        InventoryManager.updateItem(this, item, slot)
+    }
+    fun setItems(items: Map<Int,ItemStack>) {
+        InventoryManager.updateItems(this, items)
     }
 
     override fun clone(): AquaticInventory {
