@@ -83,6 +83,7 @@ dependencies {
     compileOnly("io.lumine:Mythic-Dist:5.6.1")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
     implementation("com.github.micartey:webhookly:master-SNAPSHOT")
+    implementation("net.kyori:adventure-text-minimessage:4.17.0")
 }
 
 
