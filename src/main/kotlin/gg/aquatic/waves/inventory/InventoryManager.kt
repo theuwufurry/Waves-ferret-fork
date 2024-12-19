@@ -2,6 +2,7 @@ package gg.aquatic.waves.inventory
 
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketReceiveEvent
+import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow
@@ -35,6 +36,19 @@ object InventoryManager : WaveModule {
     override fun initialize(waves: Waves) {
         event<PlayerQuitEvent> {
             onCloseMenu(it.player)
+        }
+        packetEvent<PacketSendEvent> {
+            val player = player() ?: return@packetEvent
+            if (packetType != PacketType.Play.Server.WINDOW_ITEMS) {
+                return@packetEvent
+            }
+            val packet = WrapperPlayServerWindowItems(this)
+            if (shouldIgnore(packet.windowId, player)) return@packetEvent
+
+            val menu = openedInventories[player] ?: return@packetEvent
+            val viewer = menu.viewers[player.uniqueId] ?: return@packetEvent
+            isCancelled = true
+            updateInventoryContent(menu, viewer)
         }
         packetEvent<PacketReceiveEvent> {
             val player = player() ?: return@packetEvent
@@ -137,7 +151,7 @@ object InventoryManager : WaveModule {
             }
         }
         val packet = WrapperPlayServerWindowItems(126, 0, items, viewer.carriedItem)
-        viewer.player.toUser().sendPacket(packet)
+        viewer.player.toUser().sendPacketSilently(packet)
     }
 
     fun handleClickMenu(click: WindowClick) {
@@ -358,9 +372,13 @@ object InventoryManager : WaveModule {
 
         return when (clickType.second) {
             ClickType.SHIFT_CLICK -> true
-            in listOf(ClickType.PICKUP, ClickType.PLACE) -> wrapper.slot in slotRange
+            in listOf(
+                ClickType.PICKUP,
+                ClickType.PLACE
+            ) -> wrapper.slot in slotRange || wrapper.slot in menu.content.keys
+
             ClickType.DRAG_END, ClickType.PICKUP_ALL ->
-                wrapper.slot in slotRange || wrapper.slots.orElse(emptyMap()).keys.any { it in slotRange }
+                (wrapper.slot in slotRange || wrapper.slot in menu.content.keys) || wrapper.slots.orElse(emptyMap()).keys.any { it in slotRange }
 
             else -> false
         }

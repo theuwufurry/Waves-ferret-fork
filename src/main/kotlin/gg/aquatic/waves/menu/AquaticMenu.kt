@@ -24,7 +24,7 @@ open class AquaticMenu(
         InventoryManager.openMenu(player, this)
     }
 
-    internal fun updateComponent(component: MenuComponent) {
+    fun updateComponent(component: MenuComponent) {
         val item = component.itemstack(this) ?: ItemStack(Material.AIR)
         val state = ComponentState(component.slots, item)
 
@@ -43,7 +43,7 @@ open class AquaticMenu(
                         continue
                     }
                 }
-                Bukkit.broadcastMessage("Setting item at $slot")
+                Bukkit.broadcastMessage("Setting item at $slot to ${item.type}")
                 this.setItem(slot,item)
                 continue
             }
@@ -54,7 +54,7 @@ open class AquaticMenu(
                         continue
                     }
                 }
-                Bukkit.broadcastMessage("Setting item at $slot")
+                Bukkit.broadcastMessage("Setting item at $slot to ${item.type}")
                 this.setItem(slot,item)
             }
         }

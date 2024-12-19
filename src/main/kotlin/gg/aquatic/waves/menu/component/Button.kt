@@ -56,7 +56,7 @@ class Button(
     private var itemstack: ItemStack? = itemstack
 
     override fun itemstack(menu: AquaticMenu): ItemStack? {
-        if (viewRequirements(menu)) {
+        if (!viewRequirements(menu)) {
             currentComponent = failComponent
             return currentComponent?.itemstack(menu)
         }

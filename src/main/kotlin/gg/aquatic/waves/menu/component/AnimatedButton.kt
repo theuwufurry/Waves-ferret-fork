@@ -56,7 +56,7 @@ class AnimatedButton(
 
     private var currentFrame = frames.firstEntry().value
     override fun itemstack(menu: AquaticMenu): ItemStack? {
-        if (viewRequirements(menu)) {
+        if (!viewRequirements(menu)) {
             currentComponent = failComponent
             return currentComponent?.itemstack(menu)
         }

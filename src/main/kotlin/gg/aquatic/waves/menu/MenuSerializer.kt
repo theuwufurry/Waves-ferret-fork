@@ -74,7 +74,7 @@ object MenuSerializer {
             }
             return AnimatedButtonSettings(id, frames, viewRequirements, clickActions, priority, updateEvery, failComponent)
         } else {
-            val item = ItemSerializer.fromSection(section.getConfigurationSection("item"))
+            val item = ItemSerializer.fromSection(section)
             val slots = loadSlotSelection(section.getStringList("slots")).slots
             return ButtonSettings(id, item,slots,viewRequirements,clickActions,priority,updateEvery,failComponent)
         }
