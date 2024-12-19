@@ -23,7 +23,7 @@ object MenuSerializer {
 
     fun loadPrivateInventory(section: ConfigurationSection): PrivateMenuSettings {
         val type = if (section.contains("size")) {
-            val size = section.getInt("size")
+            val size = section.getInt("size",54)
             when(size) {
                 54 -> InventoryType.GENERIC9X6
                 45 -> InventoryType.GENERIC9X5
