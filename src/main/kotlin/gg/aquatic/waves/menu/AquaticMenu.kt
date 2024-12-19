@@ -6,6 +6,7 @@ import gg.aquatic.waves.inventory.PacketInventory
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
 
 open class AquaticMenu(
@@ -15,6 +16,7 @@ open class AquaticMenu(
 
     val components = ConcurrentHashMap<String,MenuComponent>()
     val renderedComponents = ConcurrentHashMap<Int,String>()
+    val componentStates = ConcurrentHashMap<String,ComponentState>()
 
     open fun open(player: Player) {
         InventoryManager.openMenu(player, this)
@@ -22,11 +24,17 @@ open class AquaticMenu(
 
     internal fun updateComponent(component: MenuComponent) {
         val item = component.itemstack(this)
+        val state = ComponentState(component.slots, item)
+
+        val previousComponentState = componentStates[component.id]
+        val remainingSlots = previousComponentState?.slots?.subtract(state.slots.toSet())
+        componentStates[component.id] = state
         for (slot in component.slots) {
             val previousComponentId = renderedComponents[slot]
             val previousComponent = components[previousComponentId]
+
             val currentItem = this.content[slot]
-            if (previousComponent == null) {
+            if (previousComponent == null || previousComponentState == null) {
                 renderedComponents[slot] = component.id
                 if (currentItem != null) {
                     if (currentItem.isSimilar(item)) {
@@ -46,6 +54,25 @@ open class AquaticMenu(
                 this.setItem(slot,item)
             }
         }
+        remainingSlots ?: return
+        for (slot in remainingSlots) {
+            var comp: Pair<MenuComponent,ComponentState>? = null
+            for ((id, value) in components) {
+                if (!value.slots.contains(slot)) continue
+                if (comp == null || comp.first.priority < value.priority) {
+                    val compState = componentStates[id] ?: continue
+                    comp = value to compState
+                }
+            }
+            if (comp == null) {
+                renderedComponents.remove(slot)
+                this.setItem(slot,null)
+                continue
+            }
+            val i = comp.second.itemStack
+            this.setItem(slot,i)
+            renderedComponents[slot] = comp.first.id
+        }
     }
 
     internal fun tick() {
@@ -59,4 +86,9 @@ open class AquaticMenu(
             components[it]?.onClick?.invoke(event)
         }
     }
+
+    class ComponentState(
+        val slots: Collection<Int>,
+        val itemStack: ItemStack?
+    )
 }

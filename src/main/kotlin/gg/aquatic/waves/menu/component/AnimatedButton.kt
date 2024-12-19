@@ -1,27 +1,79 @@
 package gg.aquatic.waves.menu.component
 
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
+import gg.aquatic.waves.item.modifyFastMeta
 import gg.aquatic.waves.menu.AquaticMenu
 import gg.aquatic.waves.menu.MenuComponent
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.inventory.ItemStack
+import java.util.TreeMap
 
-class AnimatedButton: MenuComponent() {
-    override val id: String
-        get() = TODO("Not yet implemented")
-    override val priority: Int
-        get() = TODO("Not yet implemented")
-    override val slots: Collection<Int>
-        get() = TODO("Not yet implemented")
-    override val onClick: (AsyncPacketInventoryInteractEvent) -> Unit
-        get() = TODO("Not yet implemented")
-    private val itemstack: ItemStack?
-        get() = TODO("Not yet implemented")
+class AnimatedButton(
+    override val id: String,
+    val frames: TreeMap<Int,MenuComponent>,
+    slots: Collection<Int>,
+    priority: Int,
+    val updateEvery: Int,
+    failComponent: MenuComponent?,
+    viewRequirements: Collection<(AquaticMenu) -> Boolean> = listOf(),
+    textUpdater: (String, AquaticMenu) -> String = { s, _ -> s },
+    onClick: (AsyncPacketInventoryInteractEvent) -> Unit = { _ -> }
+) : MenuComponent() {
 
+    override var priority: Int = priority
+        private set
+        get() {
+            if (currentComponent == null) {
+                return field
+            }
+            return currentComponent?.priority ?: field
+        }
+    override var slots: Collection<Int> = slots
+        private set
+        get() {
+            if (currentComponent == null) {
+                return field
+            }
+            return currentComponent?.slots ?: listOf()
+        }
+    override var onClick: (AsyncPacketInventoryInteractEvent) -> Unit = onClick
+        private set
+        get() {
+            if (currentComponent == null) {
+                return field
+            }
+            return currentComponent?.onClick ?: { _ -> }
+        }
+
+    var viewRequirements: Collection<(AquaticMenu) -> Boolean> = viewRequirements
+        private set
+    var textUpdater: (String, AquaticMenu) -> String = textUpdater
+        private set
+    var failComponent: MenuComponent? = failComponent
+        private set
+
+    private var currentComponent: MenuComponent? = null
+
+    private var currentFrame = frames.firstEntry().value
     override fun itemstack(menu: AquaticMenu): ItemStack? {
-        TODO("Not yet implemented")
+        if (viewRequirements.any { !it(menu) }) {
+            currentComponent = failComponent
+            return currentComponent?.itemstack(menu)
+        }
+        return currentFrame.itemstack(menu)
     }
 
+    private var animationTick = 0
+    private var tick = 0
     override fun tick(menu: AquaticMenu) {
-        TODO("Not yet implemented")
+        if (frames.containsKey(animationTick)) {
+            currentFrame = frames[animationTick]
+        }
+        if (tick >= updateEvery) {
+            tick = 0
+            menu.updateComponent(this)
+        }
+        animationTick++
+        tick++
     }
 }
