@@ -2,6 +2,7 @@ package gg.aquatic.waves.menu.settings
 
 import gg.aquatic.aquaticseries.lib.requirement.ConfiguredRequirement
 import gg.aquatic.aquaticseries.lib.util.checkRequirements
+import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.menu.AquaticMenu
 import gg.aquatic.waves.menu.PrivateAquaticMenu
@@ -19,7 +20,7 @@ class ButtonSettings(
     val failComponent: IButtonSettings?
 ) : IButtonSettings {
 
-    override fun create(updater: (String, AquaticMenu) -> String): Button {
+    override fun create(updater: (String, AquaticMenu) -> String, click: (AsyncPacketInventoryInteractEvent) -> Unit): Button {
         return Button(
             id,
             item?.getItem(),
@@ -35,7 +36,8 @@ class ButtonSettings(
             },
             updater,
             { e ->
-                click?.handleClick(e) { _, s -> updater(s, e.inventory as AquaticMenu) }
+                click(e)
+                this.click?.handleClick(e) { _, s -> updater(s, e.inventory as AquaticMenu) }
             }
         )
     }
