@@ -1,9 +1,11 @@
 package gg.aquatic.waves.menu
 
+import gg.aquatic.waves.inventory.InventoryManager
 import gg.aquatic.waves.inventory.InventoryType
 import gg.aquatic.waves.inventory.PacketInventory
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 import java.util.concurrent.ConcurrentHashMap
 
 open class AquaticMenu(
@@ -13,6 +15,10 @@ open class AquaticMenu(
 
     val components = ConcurrentHashMap<String,MenuComponent>()
     val renderedComponents = ConcurrentHashMap<Int,String>()
+
+    open fun open(player: Player) {
+        InventoryManager.openMenu(player, this)
+    }
 
     internal fun updateComponent(component: MenuComponent) {
         val item = component.itemstack(this)
