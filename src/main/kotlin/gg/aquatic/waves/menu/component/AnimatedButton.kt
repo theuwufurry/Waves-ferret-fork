@@ -11,11 +11,11 @@ import java.util.TreeMap
 class AnimatedButton(
     override val id: String,
     val frames: TreeMap<Int,MenuComponent>,
-    slots: Collection<Int>,
+    //slots: Collection<Int>,
     priority: Int,
     val updateEvery: Int,
     failComponent: MenuComponent?,
-    viewRequirements: Collection<(AquaticMenu) -> Boolean> = listOf(),
+    viewRequirements: (AquaticMenu) -> Boolean = { true },
     textUpdater: (String, AquaticMenu) -> String = { s, _ -> s },
     onClick: (AsyncPacketInventoryInteractEvent) -> Unit = { _ -> }
 ) : MenuComponent() {
@@ -28,13 +28,13 @@ class AnimatedButton(
             }
             return currentComponent?.priority ?: field
         }
-    override var slots: Collection<Int> = slots
+    override var slots: Collection<Int> = listOf()
         private set
         get() {
             if (currentComponent == null) {
-                return field
+                return currentFrame.slots
             }
-            return currentComponent?.slots ?: listOf()
+            return currentComponent?.slots ?: currentFrame.slots
         }
     override var onClick: (AsyncPacketInventoryInteractEvent) -> Unit = onClick
         private set
@@ -45,7 +45,7 @@ class AnimatedButton(
             return currentComponent?.onClick ?: { _ -> }
         }
 
-    var viewRequirements: Collection<(AquaticMenu) -> Boolean> = viewRequirements
+    var viewRequirements: (AquaticMenu) -> Boolean = viewRequirements
         private set
     var textUpdater: (String, AquaticMenu) -> String = textUpdater
         private set
@@ -56,7 +56,7 @@ class AnimatedButton(
 
     private var currentFrame = frames.firstEntry().value
     override fun itemstack(menu: AquaticMenu): ItemStack? {
-        if (viewRequirements.any { !it(menu) }) {
+        if (viewRequirements(menu)) {
             currentComponent = failComponent
             return currentComponent?.itemstack(menu)
         }
