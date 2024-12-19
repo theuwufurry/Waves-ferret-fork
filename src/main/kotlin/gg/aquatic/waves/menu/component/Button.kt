@@ -81,6 +81,8 @@ class Button(
         tick++
     }
 
+    fun modifyButton(menu: AquaticMenu) = ButtonUpdate(menu)
+
     inner class ButtonUpdate(val menu: AquaticMenu) {
         private var priority = this@Button.priority
         private var slots = this@Button.slots
@@ -119,7 +121,7 @@ class Button(
             return this
         }
 
-        fun finish() {
+        fun finish(): Button {
             this@Button.priority = priority
             this@Button.slots = slots
             this@Button.onClick = onClick
@@ -128,6 +130,7 @@ class Button(
             this@Button.failComponent = failComponent
 
             menu.updateComponent(this@Button)
+            return this@Button
         }
     }
 
