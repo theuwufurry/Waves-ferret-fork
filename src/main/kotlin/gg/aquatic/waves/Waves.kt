@@ -35,6 +35,15 @@ class Waves : JavaPlugin() {
         WaveModules.MENUS to MenuHandler
     )
     lateinit var configValues: WavesConfig
+    /**
+     * Indicates whether the `Waves` plugin has been fully initialized.
+     * This variable is set to `true` when the plugin completes the initialization process
+     * during the execution of the `onEnable` method. It is used to prevent certain actions
+     * from being performed before the initialization is complete.
+     *
+     * This property is private to ensure controlled modification and only allows
+     * being updated within the class.
+     */
     var initialized = false
         private set
 
