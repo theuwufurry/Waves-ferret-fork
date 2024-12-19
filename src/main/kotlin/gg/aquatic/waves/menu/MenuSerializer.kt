@@ -25,7 +25,6 @@ object MenuSerializer {
     fun loadPrivateInventory(section: ConfigurationSection): PrivateMenuSettings {
         val type = if (section.contains("size")) {
             val size = section.getInt("size",54)
-            Bukkit.broadcastMessage("Size: $size")
             when(size) {
                 54 -> InventoryType.GENERIC9X6
                 45 -> InventoryType.GENERIC9X5
@@ -36,7 +35,6 @@ object MenuSerializer {
                 else -> InventoryType.GENERIC9X6
             }
         } else InventoryType.valueOf(section.getString("type","GENERIC9X6")!!.uppercase())
-        Bukkit.broadcastMessage("Type: $type")
 
         val title = section.getString("title") ?: ""
         val components = HashMap<String,IButtonSettings>()
@@ -49,7 +47,6 @@ object MenuSerializer {
                 }
             }
         }
-        Bukkit.broadcastMessage("Components: ${components.size}")
         return PrivateMenuSettings(type, MiniMessage.miniMessage().deserialize(title), components)
     }
 

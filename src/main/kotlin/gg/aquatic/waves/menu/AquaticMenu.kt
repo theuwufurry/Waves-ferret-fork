@@ -43,7 +43,6 @@ open class AquaticMenu(
                         continue
                     }
                 }
-                Bukkit.broadcastMessage("Setting item at $slot to ${item.type}")
                 this.setItem(slot,item)
                 continue
             }
@@ -54,7 +53,6 @@ open class AquaticMenu(
                         continue
                     }
                 }
-                Bukkit.broadcastMessage("Setting item at $slot to ${item.type}")
                 this.setItem(slot,item)
             }
         }
