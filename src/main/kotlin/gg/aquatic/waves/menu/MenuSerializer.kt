@@ -13,6 +13,7 @@ import gg.aquatic.waves.registry.serializer.InventorySerializer.loadActionsWithC
 import gg.aquatic.waves.registry.serializer.ItemSerializer
 import gg.aquatic.waves.registry.serializer.RequirementSerializer
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import java.util.ArrayList
@@ -24,15 +25,19 @@ object MenuSerializer {
     fun loadPrivateInventory(section: ConfigurationSection): PrivateMenuSettings {
         val type = if (section.contains("size")) {
             val size = section.getInt("size",54)
+            Bukkit.broadcastMessage("Size: $size")
             when(size) {
                 54 -> InventoryType.GENERIC9X6
                 45 -> InventoryType.GENERIC9X5
                 36 -> InventoryType.GENERIC9X4
                 27 -> InventoryType.GENERIC9X3
+                18 -> InventoryType.GENERIC9X2
                 9 -> InventoryType.GENERIC9X1
                 else -> InventoryType.GENERIC9X6
             }
         } else InventoryType.valueOf(section.getString("type","GENERIC9X6")!!.uppercase())
+        Bukkit.broadcastMessage("Type: $type")
+
         val title = section.getString("title") ?: ""
         val components = HashMap<String,IButtonSettings>()
         val componentsSection = section.getConfigurationSection("buttons")
@@ -44,6 +49,7 @@ object MenuSerializer {
                 }
             }
         }
+        Bukkit.broadcastMessage("Components: ${components.size}")
         return PrivateMenuSettings(type, MiniMessage.miniMessage().deserialize(title), components)
     }
 

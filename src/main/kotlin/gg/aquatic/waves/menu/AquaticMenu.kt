@@ -5,6 +5,8 @@ import gg.aquatic.waves.inventory.InventoryType
 import gg.aquatic.waves.inventory.PacketInventory
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
@@ -23,7 +25,7 @@ open class AquaticMenu(
     }
 
     internal fun updateComponent(component: MenuComponent) {
-        val item = component.itemstack(this)
+        val item = component.itemstack(this) ?: ItemStack(Material.AIR)
         val state = ComponentState(component.slots, item)
 
         val previousComponentState = componentStates[component.id]
@@ -31,7 +33,7 @@ open class AquaticMenu(
         componentStates[component.id] = state
         for (slot in component.slots) {
             val previousComponentId = renderedComponents[slot]
-            val previousComponent = components[previousComponentId]
+            val previousComponent = previousComponentId?.let { components[it] }
 
             val currentItem = this.content[slot]
             if (previousComponent == null || previousComponentState == null) {
@@ -41,16 +43,18 @@ open class AquaticMenu(
                         continue
                     }
                 }
+                Bukkit.broadcastMessage("Setting item at $slot")
                 this.setItem(slot,item)
                 continue
             }
-            if (previousComponent.priority < component.priority) {
+            if (previousComponent.priority <= component.priority) {
                 renderedComponents[slot] = component.id
                 if (currentItem != null) {
                     if (currentItem.isSimilar(item)) {
                         continue
                     }
                 }
+                Bukkit.broadcastMessage("Setting item at $slot")
                 this.setItem(slot,item)
             }
         }
