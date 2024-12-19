@@ -12,14 +12,21 @@ class Button(
     itemstack: ItemStack,
     slots: Collection<Int>,
     priority: Int,
-    textUpdater: (String, AquaticMenu) -> String = { s, _ -> s },
-    viewRequirements: Collection<(AquaticMenu) -> Boolean> = listOf(),
+    val updateEvery: Int,
     failComponent: MenuComponent?,
+    viewRequirements: Collection<(AquaticMenu) -> Boolean> = listOf(),
+    textUpdater: (String, AquaticMenu) -> String = { s, _ -> s },
     onClick: (AsyncPacketInventoryInteractEvent) -> Unit = { _ -> }
 ) : MenuComponent() {
 
     override var priority: Int = priority
         private set
+        get() {
+            if (currentComponent == null) {
+                return field
+            }
+            return currentComponent?.priority ?: field
+        }
     override var slots: Collection<Int> = slots
         private set
         get() {
@@ -46,30 +53,32 @@ class Button(
 
     private var currentComponent: MenuComponent? = null
 
-    override var itemstack: ItemStack? = itemstack
-        private set
+    private var itemstack: ItemStack? = itemstack
 
     override fun itemstack(menu: AquaticMenu): ItemStack? {
-        if (currentComponent == null) {
-            if (viewRequirements.any { !it(menu) }) {
-                currentComponent = failComponent
-                return currentComponent?.itemstack(menu)
-            }
-            itemstack?.modifyFastMeta {
-                this.displayName = this.displayName?.let { comp ->
-                    MiniMessage.miniMessage().deserialize(textUpdater(MiniMessage.miniMessage().serialize(comp), menu))
-                }
-                this.lore = this.lore.map {
-                    MiniMessage.miniMessage().deserialize(textUpdater(MiniMessage.miniMessage().serialize(it), menu))
-                }
-            }
-            return itemstack
+        if (viewRequirements.any { !it(menu) }) {
+            currentComponent = failComponent
+            return currentComponent?.itemstack(menu)
         }
-        return currentComponent?.itemstack(menu)
+        val iS = itemstack?.clone()
+        iS?.modifyFastMeta {
+            this.displayName = this.displayName?.let { comp ->
+                MiniMessage.miniMessage().deserialize(textUpdater(MiniMessage.miniMessage().serialize(comp), menu))
+            }
+            this.lore = this.lore.map {
+                MiniMessage.miniMessage().deserialize(textUpdater(MiniMessage.miniMessage().serialize(it), menu))
+            }
+        }
+        return iS
     }
 
-    override fun tick() {
-
+    private var tick = 0
+    override fun tick(menu: AquaticMenu) {
+        if (tick >= updateEvery) {
+            tick = 0
+            menu.updateComponent(this)
+        }
+        tick++
     }
 
     inner class ButtonUpdate(val menu: AquaticMenu) {

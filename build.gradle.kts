@@ -36,7 +36,6 @@ dependencies {
     implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.44:all")
     implementation("gg.aquatic.aquaticseries.spigot:spigot:1.0.44")
     implementation("gg.aquatic.aquaticseries.paper:paper:1.0.44")
-    implementation("gg.aquatic.packeteventsext:PacketEventsExt:1.0.0")
     implementation("gg.aquatic.aquaticseries:aquaticlib-core:1.0.44:all") {
     }
     implementation("gg.aquatic.aquaticseries.nms:NMS_v1_17_1:$nmsVersion") {
@@ -73,7 +72,7 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktor_version")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-    implementation("com.github.retrooper:packetevents-spigot:2.6.0")
+    implementation("com.github.retrooper:packetevents-spigot:2.7.0")
 
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("gg.aquatic:AEAPI:1.0")

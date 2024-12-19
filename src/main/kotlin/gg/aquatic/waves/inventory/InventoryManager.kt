@@ -12,6 +12,7 @@ import gg.aquatic.aquaticseries.lib.util.call
 import gg.aquatic.aquaticseries.lib.util.event
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
+import gg.aquatic.waves.menu.AquaticMenu
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.packetEvent
@@ -174,9 +175,13 @@ object InventoryManager : WaveModule {
         }
     }
 
-    fun updateItems(inventory: PacketInventory, iS: Map<Int, ItemStack>) {
+    fun updateItems(inventory: PacketInventory, iS: Map<Int, ItemStack?>) {
         for ((slot, item) in iS) {
-            inventory.addItem(slot, item)
+            if (item == null) {
+                inventory.content.remove(slot)
+            } else {
+                inventory.addItem(slot, item)
+            }
             //updateItem(inventory, item, slot)
         }
 

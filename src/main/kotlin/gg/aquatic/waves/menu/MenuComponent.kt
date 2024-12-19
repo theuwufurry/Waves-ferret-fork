@@ -10,9 +10,9 @@ abstract class MenuComponent(
     abstract val priority: Int
     abstract val slots: Collection<Int>
     abstract val onClick: (AsyncPacketInventoryInteractEvent) -> Unit
-    abstract val itemstack: ItemStack?
+    //abstract val itemstack: ItemStack?
 
     abstract fun itemstack(menu: AquaticMenu): ItemStack?
 
-    abstract fun tick()
+    abstract fun tick(menu: AquaticMenu)
 }

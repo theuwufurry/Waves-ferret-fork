@@ -12,6 +12,7 @@ import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.interactable.InteractableHandler
 import gg.aquatic.waves.item.ItemHandler
+import gg.aquatic.waves.menu.MenuHandler
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.ProfilesModule
@@ -30,7 +31,8 @@ class Waves : JavaPlugin() {
         WaveModules.FAKE_OBJECTS to FakeObjectHandler,
         WaveModules.CHUNK_TRACKER to ChunkTracker,
         WaveModules.INTERACTABLES to InteractableHandler,
-        WaveModules.INVENTORIES to gg.aquatic.waves.inventory.InventoryManager
+        WaveModules.INVENTORIES to gg.aquatic.waves.inventory.InventoryManager,
+        WaveModules.MENUS to MenuHandler
     )
     lateinit var configValues: WavesConfig
     var initialized = false

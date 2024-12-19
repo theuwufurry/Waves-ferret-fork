@@ -46,10 +46,10 @@ open class PacketInventory(
         content[slot] = item
     }
 
-    fun setItem(slot: Int, item: ItemStack) {
+    fun setItem(slot: Int, item: ItemStack?) {
         InventoryManager.updateItem(this, item, slot)
     }
-    fun changeItems(items: Map<Int,ItemStack>) {
+    fun changeItems(items: Map<Int,ItemStack?>) {
         InventoryManager.updateItems(this, items)
     }
     fun setItems(items: Map<Int, ItemStack>) {
