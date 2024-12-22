@@ -26,6 +26,7 @@ repositories {
     maven {
         url = uri("https://repo.codemc.io/repository/maven-snapshots/")
     }
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
 val nmsVersion = "1.0.39"
@@ -33,35 +34,6 @@ val nmsVersion = "1.0.39"
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("net.kyori:adventure-text-serializer-gson:4.17.0")
-    implementation("gg.aquatic.aquaticseries:aquaticlib:1.0.44:all")
-    implementation("gg.aquatic.aquaticseries.spigot:spigot:1.0.44")
-    implementation("gg.aquatic.aquaticseries.paper:paper:1.0.44")
-    implementation("gg.aquatic.aquaticseries:aquaticlib-core:1.0.44:all") {
-    }
-    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_17_1:$nmsVersion") {
-        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
-    }
-    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_18_2:$nmsVersion") {
-        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
-    }
-    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_19_4:$nmsVersion") {
-        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
-    }
-    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_20_1:$nmsVersion") {
-        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
-    }
-    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_20_4:$nmsVersion") {
-        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
-    }
-    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_20_6:$nmsVersion") {
-        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
-    }
-    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_21:$nmsVersion") {
-        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
-    }
-    implementation("gg.aquatic.aquaticseries.nms:NMS_v1_21_1:$nmsVersion") {
-        exclude("gg.aquatic.aquaticseries.nms", "AquaticNMS")
-    }
     implementation("gg.aquatic.wavessync:wavessync-api:1.0.1:all")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
@@ -70,6 +42,9 @@ dependencies {
     implementation("io.ktor:ktor-client-okhttp:$ktor_version")
     implementation("io.ktor:ktor-client-okhttp-jvm:2.3.12")
     implementation("io.ktor:ktor-client-auth:$ktor_version")
+
+    compileOnly("com.zaxxer:HikariCP:5.1.0")
+    compileOnly("me.clip:placeholderapi:2.11.2")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("com.github.retrooper:packetevents-spigot:2.7.0")
@@ -83,6 +58,7 @@ dependencies {
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
     implementation("com.github.micartey:webhookly:master-SNAPSHOT")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
+    implementation("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
 }
 
 
@@ -104,6 +80,7 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shad
 
     // Exclude the original (unrelocated) kotlinx-coroutines-core package
     //exclude("kotlin/**")
+    relocate("com.tcoded.folialib", "gg.aquatic.aquaticseries.lib.folialib")
     exclude("com/google/**","com/typesafe/**", "io/netty/**", "org/slf4j/**")
 }
 
@@ -114,6 +91,7 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shad
     from(sourceSets.main.get().output)
     configurations = listOf(project.configurations.runtimeClasspath.get())
 
+    relocate("com.tcoded.folialib", "gg.aquatic.aquaticseries.lib.folialib")
     relocate("kotlinx.coroutines", "gg.aquatic.waves.shadow.kotlinx.coroutines")
     relocate("com.github.retrooper", "gg.aquatic.waves.shadow.com.retrooper")
     relocate("io.github.retrooper", "gg.aquatic.waves.shadow.io.retrooper")

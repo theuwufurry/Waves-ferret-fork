@@ -1,7 +1,7 @@
 package gg.aquatic.waves.chunk
 
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData
-import gg.aquatic.aquaticseries.lib.util.AquaticEvent
+import gg.aquatic.waves.util.event.AquaticEvent
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 

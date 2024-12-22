@@ -1,6 +1,6 @@
 package gg.aquatic.waves.interactable
 
-import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
+import gg.aquatic.waves.util.audience.AquaticAudience
 import org.bukkit.Location
 import org.bukkit.entity.Player
 

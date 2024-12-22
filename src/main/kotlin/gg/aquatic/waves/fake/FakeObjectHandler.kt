@@ -6,15 +6,10 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType.Play
 import com.github.retrooper.packetevents.protocol.player.InteractionHand
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging
-import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
-import gg.aquatic.aquaticseries.lib.util.event
-import gg.aquatic.aquaticseries.lib.util.runAsync
-import gg.aquatic.aquaticseries.lib.util.runAsyncTimer
-import gg.aquatic.aquaticseries.lib.util.runLaterSync
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.chunk.AsyncPlayerChunkLoadEvent
-import gg.aquatic.waves.chunk.PlayerChunkUnloadEvent
+import gg.aquatic.waves.chunk.AsyncPlayerChunkUnloadEvent
+import gg.aquatic.waves.chunk.cache.ChunkCacheHandler
 import gg.aquatic.waves.chunk.chunkId
 import gg.aquatic.waves.fake.block.FakeBlock
 import gg.aquatic.waves.fake.block.FakeBlockInteractEvent
@@ -22,10 +17,9 @@ import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.fake.entity.FakeEntityInteractEvent
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
-import gg.aquatic.waves.util.packetEvent
-import gg.aquatic.waves.util.player
+import gg.aquatic.waves.util.*
+import gg.aquatic.waves.util.event.event
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -75,12 +69,10 @@ object FakeObjectHandler : WaveModule {
                 }
             }
         }
-        event<PlayerChunkUnloadEvent> {
-            runAsync {
-                for (tickableObject in tickableObjects) {
-                    if (tickableObject.location.chunk.chunkId() != it.chunk.chunkId()) continue
-                    handlePlayerRemove(it.player, tickableObject, false)
-                }
+        event<AsyncPlayerChunkUnloadEvent> {
+            for (tickableObject in tickableObjects) {
+                if (tickableObject.location.chunk.chunkId() != it.chunk.chunkId()) continue
+                handlePlayerRemove(it.player, tickableObject, false)
             }
         }
 

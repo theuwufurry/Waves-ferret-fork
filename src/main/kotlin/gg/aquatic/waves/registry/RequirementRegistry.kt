@@ -1,6 +1,6 @@
 package gg.aquatic.waves.registry
 
-import gg.aquatic.aquaticseries.lib.requirement.AbstractRequirement
+import gg.aquatic.waves.util.requirement.AbstractRequirement
 
 inline fun <reified T: Any> WavesRegistry.registerRequirement(id: String, requirement: AbstractRequirement<T>) {
     val map = REQUIREMENT.getOrPut(T::class.java) { HashMap() }

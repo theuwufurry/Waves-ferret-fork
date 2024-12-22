@@ -5,7 +5,6 @@ import gg.aquatic.waves.inventory.InventoryType
 import gg.aquatic.waves.inventory.PacketInventory
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack

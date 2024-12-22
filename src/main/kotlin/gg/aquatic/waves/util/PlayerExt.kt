@@ -4,8 +4,6 @@ import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.protocol.player.InteractionHand
 import com.github.retrooper.packetevents.protocol.player.User
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenBook
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
-import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
 import net.md_5.bungee.chat.ComponentSerializer

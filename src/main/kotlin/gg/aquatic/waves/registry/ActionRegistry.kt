@@ -1,6 +1,6 @@
 package gg.aquatic.waves.registry
 
-import gg.aquatic.aquaticseries.lib.action.AbstractAction
+import gg.aquatic.waves.util.action.AbstractAction
 
 inline fun <reified T: Any> WavesRegistry.registerAction(id: String, action: AbstractAction<T>) {
     val map = ACTION.getOrPut(T::class.java) { HashMap() }

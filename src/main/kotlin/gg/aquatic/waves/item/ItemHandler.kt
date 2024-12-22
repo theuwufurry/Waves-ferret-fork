@@ -1,20 +1,18 @@
 package gg.aquatic.waves.item
 
-import gg.aquatic.aquaticseries.lib.AquaticSeriesLib
-import gg.aquatic.aquaticseries.lib.util.call
-import gg.aquatic.aquaticseries.lib.util.event
-import gg.aquatic.aquaticseries.lib.util.runSync
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.registry.isAquaticItem
 import gg.aquatic.waves.registry.registryId
+import gg.aquatic.waves.util.event.call
+import gg.aquatic.waves.util.event.event
+import gg.aquatic.waves.util.runSync
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.EntityType
 import org.bukkit.event.block.Action
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryInteractEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -24,7 +22,7 @@ import org.bukkit.inventory.ItemStack
 object ItemHandler : WaveModule {
 
     val NAMESPACE_KEY by lazy {
-        NamespacedKey(AquaticSeriesLib.INSTANCE.plugin, "Custom_Item_Registry")
+        NamespacedKey(Waves.INSTANCE, "Custom_Item_Registry")
     }
     val listenInteractions = mutableMapOf<String, (AquaticItemInteractEvent) -> Unit>()
     override val type: WaveModules = WaveModules.ITEMS

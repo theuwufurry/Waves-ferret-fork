@@ -8,11 +8,11 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
-import gg.aquatic.aquaticseries.lib.util.event
-import gg.aquatic.aquaticseries.lib.util.mapPair
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.util.event.event
+import gg.aquatic.waves.util.mapPair
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player
 import gg.aquatic.waves.util.toUser

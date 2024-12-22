@@ -1,13 +1,10 @@
 package gg.aquatic.waves.registry.serializer
 
-import gg.aquatic.aquaticseries.lib.price.ConfiguredPrice
-import gg.aquatic.aquaticseries.lib.util.argument.ArgumentSerializer
+import gg.aquatic.waves.util.price.ConfiguredPrice
+import gg.aquatic.waves.util.argument.ArgumentSerializer
 import gg.aquatic.waves.registry.WavesRegistry
 import gg.aquatic.waves.registry.getPrice
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.entity.Player
 
 object PriceSerializer {
 

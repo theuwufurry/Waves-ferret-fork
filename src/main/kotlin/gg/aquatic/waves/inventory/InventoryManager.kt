@@ -2,25 +2,22 @@ package gg.aquatic.waves.inventory
 
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketReceiveEvent
-import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow.WindowClickType
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
-import gg.aquatic.aquaticseries.lib.util.call
-import gg.aquatic.aquaticseries.lib.util.event
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
-import gg.aquatic.waves.menu.AquaticMenu
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.util.event.call
+import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
@@ -37,6 +34,7 @@ object InventoryManager : WaveModule {
         event<PlayerQuitEvent> {
             onCloseMenu(it.player)
         }
+        /*
         packetEvent<PacketSendEvent> {
             val player = player() ?: return@packetEvent
             if (packetType != PacketType.Play.Server.WINDOW_ITEMS) {
@@ -50,6 +48,7 @@ object InventoryManager : WaveModule {
             isCancelled = true
             updateInventoryContent(menu, viewer)
         }
+         */
         packetEvent<PacketReceiveEvent> {
             val player = player() ?: return@packetEvent
 

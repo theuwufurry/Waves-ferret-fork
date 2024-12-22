@@ -9,8 +9,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
-import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
-import gg.aquatic.aquaticseries.lib.chunkcache.ChunkCacheHandler
+import gg.aquatic.waves.chunk.cache.ChunkCacheHandler
+import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.chunk.chunkId
 import gg.aquatic.waves.chunk.trackedChunks
 import gg.aquatic.waves.fake.FakeObject

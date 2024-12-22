@@ -2,7 +2,7 @@ package gg.aquatic.waves.interactable
 
 import com.ticxo.modelengine.api.events.BaseEntityInteractEvent
 import com.ticxo.modelengine.api.events.BaseEntityInteractEvent.Action
-import gg.aquatic.aquaticseries.lib.util.event
+import gg.aquatic.waves.util.event.event
 import org.bukkit.inventory.EquipmentSlot
 
 class MEGInteractableHandler {

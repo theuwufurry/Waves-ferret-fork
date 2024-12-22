@@ -1,19 +1,19 @@
 package gg.aquatic.waves.menu
 
-import gg.aquatic.aquaticseries.lib.betterinventory2.SlotSelection
-import gg.aquatic.aquaticseries.lib.betterinventory2.action.ConfiguredActionsWithConditions
-import gg.aquatic.aquaticseries.lib.util.getSectionList
 import gg.aquatic.waves.inventory.ButtonType
 import gg.aquatic.waves.inventory.InventoryType
 import gg.aquatic.waves.menu.settings.AnimatedButtonSettings
 import gg.aquatic.waves.menu.settings.ButtonSettings
 import gg.aquatic.waves.menu.settings.IButtonSettings
 import gg.aquatic.waves.menu.settings.PrivateMenuSettings
-import gg.aquatic.waves.registry.serializer.InventorySerializer.loadActionsWithConditions
+import gg.aquatic.waves.registry.serializer.ActionSerializer
 import gg.aquatic.waves.registry.serializer.ItemSerializer
 import gg.aquatic.waves.registry.serializer.RequirementSerializer
+import gg.aquatic.waves.util.generic.ConfiguredExecutableObjectWithConditions
+import gg.aquatic.waves.util.generic.ConfiguredExecutableObjectsWithConditions
+import gg.aquatic.waves.util.getSectionList
+import gg.aquatic.waves.util.requirement.ConfiguredRequirementWithFailActions
 import net.kyori.adventure.text.minimessage.MiniMessage
-import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import java.util.ArrayList
@@ -78,7 +78,7 @@ object MenuSerializer {
     }
 
     fun loadClickSettings(sections: List<ConfigurationSection>): gg.aquatic.waves.menu.settings.ClickSettings {
-        val map = HashMap<ButtonType, MutableList<ConfiguredActionsWithConditions>>()
+        val map = HashMap<ButtonType, MutableList<ConfiguredExecutableObjectsWithConditions<Player,Unit>>>()
         for (section in sections) {
             val actions = loadActionsWithConditions(section) ?: continue
             for (menuClickActionType in section.getStringList("types")
@@ -103,6 +103,47 @@ object MenuSerializer {
             }
         }
         return SlotSelection.of(slots)
+    }
+
+    fun loadActionsWithConditions(section: ConfigurationSection): ConfiguredExecutableObjectsWithConditions<Player,Unit>? {
+        val actions = ArrayList<ConfiguredExecutableObjectWithConditions<Player,Unit>>()
+        val actionSections = section.getSectionList("actions")
+
+        for (actionSection in actionSections) {
+            actions += loadActionWithCondition(actionSection) ?: continue
+        }
+        val conditions = ArrayList<ConfiguredRequirementWithFailActions<Player,Unit>>()
+        for (conditionSection in section.getSectionList("conditions")) {
+            conditions += loadConditionWithFailActions(conditionSection) ?: continue
+        }
+
+        if (actions.isEmpty() && conditions.isEmpty()) return null
+
+        val failActions = if (section.isConfigurationSection("fail") && conditions.isNotEmpty()) {
+            loadActionsWithConditions(section.getConfigurationSection("fail")!!)
+        } else null
+
+        return ConfiguredExecutableObjectsWithConditions(actions, conditions, failActions)
+    }
+
+    fun loadActionWithCondition(section: ConfigurationSection): ConfiguredExecutableObjectWithConditions<Player,Unit>? {
+        val action = ActionSerializer.fromSection<Player>(section) ?: return null
+        val conditions = ArrayList<ConfiguredRequirementWithFailActions<Player,Unit>>()
+        for (configurationSection in section.getSectionList("conditions")) {
+            conditions += loadConditionWithFailActions(configurationSection) ?: continue
+        }
+        val failActions = if (section.isConfigurationSection("fail") && conditions.isNotEmpty()) {
+            loadActionsWithConditions(section.getConfigurationSection("fail")!!)
+        } else null
+        return ConfiguredExecutableObjectWithConditions(action, conditions, failActions)
+    }
+
+    fun loadConditionWithFailActions(section: ConfigurationSection): ConfiguredRequirementWithFailActions<Player,Unit>? {
+        val condition = RequirementSerializer.fromSection<Player>(section) ?: return null
+        val failActions = if (section.isConfigurationSection("fail")) {
+            loadActionsWithConditions(section.getConfigurationSection("fail")!!)
+        } else null
+        return ConfiguredRequirementWithFailActions(condition, failActions)
     }
 
 }

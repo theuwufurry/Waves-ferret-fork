@@ -1,6 +1,6 @@
 package gg.aquatic.waves.economy
 
-import gg.aquatic.aquaticseries.lib.economy.Currency
+import gg.aquatic.waves.util.currency.Currency
 import org.bukkit.entity.Player
 
 class RegisteredCurrency(

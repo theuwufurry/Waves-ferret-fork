@@ -1,10 +1,9 @@
 package gg.aquatic.waves.registry
 
-import gg.aquatic.aquaticseries.lib.economy.Currency
 import gg.aquatic.waves.economy.CustomCurrency
 import gg.aquatic.waves.economy.EconomyHandler
 import gg.aquatic.waves.economy.RegisteredCurrency
-import java.util.concurrent.CompletableFuture
+import gg.aquatic.waves.util.currency.Currency
 
 fun WavesRegistry.registerCurrency(currency: Currency) {
     if (currency is RegisteredCurrency) return

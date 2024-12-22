@@ -1,6 +1,6 @@
 package gg.aquatic.waves.fake
 
-import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
+import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.chunk.trackedByPlayers
 import org.bukkit.Location
 import org.bukkit.entity.Player

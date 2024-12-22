@@ -9,7 +9,7 @@ import io.netty.buffer.PooledByteBufAllocator
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 
-
+/*
 fun Entity.getEntityData(): List<EntityData> {
     val nmsEntity = SpigotReflectionUtil.getNMSEntity(this)
 
@@ -44,6 +44,7 @@ fun readEntityMetadata(buffer: Any): List<EntityData> {
     val data = wrapper.readEntityMetadata()
     return data
 }
+ */
 /*
 fun Entity.setEntityData(data: List<EntityData>) {
     val nmsEntity = SpigotReflectionUtil.getNMSEntity(this)

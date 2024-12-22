@@ -1,12 +1,12 @@
 package gg.aquatic.waves.menu.settings
 
-import gg.aquatic.aquaticseries.lib.requirement.ConfiguredRequirement
-import gg.aquatic.aquaticseries.lib.util.checkRequirements
+import gg.aquatic.waves.util.requirement.ConfiguredRequirement
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.menu.AquaticMenu
 import gg.aquatic.waves.menu.PrivateAquaticMenu
 import gg.aquatic.waves.menu.component.Button
+import gg.aquatic.waves.util.checkRequirements
 import org.bukkit.entity.Player
 
 class ButtonSettings(

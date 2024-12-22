@@ -1,6 +1,6 @@
 package gg.aquatic.waves.registry
 
-import gg.aquatic.aquaticseries.lib.price.AbstractPrice
+import gg.aquatic.waves.util.price.AbstractPrice
 
 inline fun <reified T: Any> WavesRegistry.registerPrice(id: String, price: AbstractPrice<T>) {
     val map = PRICE.getOrPut(T::class.java) { HashMap() }

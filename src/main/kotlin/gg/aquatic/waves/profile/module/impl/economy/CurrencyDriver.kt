@@ -1,6 +1,6 @@
 package gg.aquatic.waves.profile.module.impl.economy
 
-import gg.aquatic.aquaticseries.lib.data.DataDriver
+import gg.aquatic.waves.data.DataDriver
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer

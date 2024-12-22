@@ -1,11 +1,10 @@
 package gg.aquatic.waves.registry.serializer
 
-import gg.aquatic.aquaticseries.lib.requirement.ConfiguredRequirement
-import gg.aquatic.aquaticseries.lib.util.argument.AquaticObjectArgument
+import gg.aquatic.waves.util.requirement.ConfiguredRequirement
+import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.registry.WavesRegistry
 import gg.aquatic.waves.registry.getRequirement
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import gg.aquatic.waves.util.generic.ExecutableObject
 import org.bukkit.configuration.ConfigurationSection
 
 object RequirementSerializer {
@@ -18,8 +17,7 @@ object RequirementSerializer {
             return null
         }
 
-        val arguments = requirement.arguments()
-        val args = AquaticObjectArgument.loadRequirementArguments(section, arguments)
+        val args = AquaticObjectArgument.loadRequirementArguments(section, requirement.arguments)
 
         val configuredRequirement = ConfiguredRequirement(requirement, args)
         return configuredRequirement

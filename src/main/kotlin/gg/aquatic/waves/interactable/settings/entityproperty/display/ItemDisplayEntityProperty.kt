@@ -2,9 +2,9 @@ package gg.aquatic.waves.interactable.settings.entityproperty.display
 
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.item.AquaticItem
-import gg.aquatic.waves.item.loadFromYml
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.ItemDisplayEntityDataBuilder
+import gg.aquatic.waves.util.item.loadFromYml
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.ItemDisplay.ItemDisplayTransform
 

@@ -1,12 +1,12 @@
 package gg.aquatic.waves.interactable.settings
 
-import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
-import gg.aquatic.aquaticseries.lib.block.AquaticBlock
-import gg.aquatic.aquaticseries.lib.util.AquaticBlockSerializer
+import gg.aquatic.waves.util.audience.AquaticAudience
+import gg.aquatic.waves.util.block.AquaticBlock
 import gg.aquatic.waves.fake.block.FakeBlock
 import gg.aquatic.waves.interactable.Interactable
 import gg.aquatic.waves.interactable.InteractableInteractEvent
 import gg.aquatic.waves.interactable.type.BlockInteractable
+import gg.aquatic.waves.util.block.AquaticBlockSerializer
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.util.Vector

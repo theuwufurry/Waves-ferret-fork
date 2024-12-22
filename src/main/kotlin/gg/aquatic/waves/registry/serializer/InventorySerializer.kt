@@ -1,5 +1,5 @@
 package gg.aquatic.waves.registry.serializer
-
+/*
 import gg.aquatic.aquaticseries.lib.betterinventory2.SlotSelection
 import gg.aquatic.aquaticseries.lib.betterinventory2.action.ConfiguredActionWithConditions
 import gg.aquatic.aquaticseries.lib.betterinventory2.action.ConfiguredActionsWithConditions
@@ -181,3 +181,4 @@ object InventorySerializer {
         return ConfiguredConditionWithFailActions(condition, failActions)
     }
 }
+ */

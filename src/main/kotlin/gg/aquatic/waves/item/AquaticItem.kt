@@ -1,8 +1,8 @@
 package gg.aquatic.waves.item
 
-import gg.aquatic.aquaticseries.lib.util.setSpawnerType
-import gg.aquatic.aquaticseries.lib.util.toAquatic
-import gg.aquatic.waves.util.toComponent
+import gg.aquatic.waves.util.item.modifyFastMeta
+import gg.aquatic.waves.util.item.setSpawnerType
+import gg.aquatic.waves.util.toMMComponent
 import net.advancedplugins.ae.api.AEAPI
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
@@ -46,10 +46,10 @@ class AquaticItem(
 
         iS.modifyFastMeta {
             name?.apply {
-                displayName = this.toAquatic().toComponent()
+                displayName = this.toMMComponent()
             }
             description?.apply {
-                lore = this.toAquatic().toComponent().map { it.decoration(TextDecoration.ITALIC, false) }
+                lore = this.map { it.toMMComponent().decoration(TextDecoration.ITALIC, false) }
             }
             if (this@AquaticItem.modelData > 0) {
                 modelData = this@AquaticItem.modelData

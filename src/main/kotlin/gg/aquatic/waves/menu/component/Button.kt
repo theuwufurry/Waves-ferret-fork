@@ -1,9 +1,9 @@
 package gg.aquatic.waves.menu.component
 
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
-import gg.aquatic.waves.item.modifyFastMeta
 import gg.aquatic.waves.menu.AquaticMenu
 import gg.aquatic.waves.menu.MenuComponent
+import gg.aquatic.waves.util.item.modifyFastMeta
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.inventory.ItemStack
 

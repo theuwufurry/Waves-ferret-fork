@@ -1,14 +1,12 @@
 package gg.aquatic.waves.profile.module.impl.economy
 
-import gg.aquatic.aquaticseries.lib.data.MySqlDriver
+import gg.aquatic.waves.data.MySqlDriver
 import gg.aquatic.waves.economy.CustomCurrency
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.profile.module.ProfileModule
 import gg.aquatic.waves.profile.module.ProfileModuleEntry
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.util.*
 import kotlin.collections.HashMap

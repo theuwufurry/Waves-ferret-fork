@@ -4,7 +4,7 @@ import com.ticxo.modelengine.api.ModelEngineAPI
 import com.ticxo.modelengine.api.model.ActiveModel
 import com.ticxo.modelengine.api.model.ModeledEntity
 import com.ticxo.modelengine.api.model.bone.BoneBehaviorTypes
-import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
+import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.interactable.Interactable
 import gg.aquatic.waves.interactable.InteractableHandler
 import gg.aquatic.waves.interactable.InteractableInteractEvent

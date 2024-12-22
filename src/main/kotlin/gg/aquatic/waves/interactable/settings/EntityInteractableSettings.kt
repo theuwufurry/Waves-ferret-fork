@@ -1,9 +1,7 @@
 package gg.aquatic.waves.interactable.settings
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
-import gg.aquatic.aquaticseries.lib.audience.AquaticAudience
-import gg.aquatic.aquaticseries.lib.util.getSectionList
-import gg.aquatic.aquaticseries.lib.util.mapPair
+import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.interactable.Interactable
 import gg.aquatic.waves.interactable.InteractableInteractEvent
@@ -11,6 +9,8 @@ import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.type.EntityInteractable
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.registry.serializer.EntityPropertySerializer
+import gg.aquatic.waves.util.getSectionList
+import gg.aquatic.waves.util.mapPair
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.util.Vector

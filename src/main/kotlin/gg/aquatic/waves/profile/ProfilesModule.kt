@@ -1,17 +1,20 @@
 package gg.aquatic.waves.profile
 
-import gg.aquatic.aquaticseries.lib.data.DataDriver
-import gg.aquatic.aquaticseries.lib.data.MySqlDriver
-import gg.aquatic.aquaticseries.lib.logger.type.InfoLogger
-import gg.aquatic.aquaticseries.lib.util.*
+import gg.aquatic.waves.data.DataDriver
+import gg.aquatic.waves.data.MySqlDriver
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
-import gg.aquatic.waves.profile.event.ProfileLoadEvent
+import gg.aquatic.waves.profile.event.AsyncProfileLoadEvent
 import gg.aquatic.waves.profile.event.ProfileUnloadEvent
 import gg.aquatic.waves.profile.module.ProfileModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncedPlayer
+import gg.aquatic.waves.util.event.call
+import gg.aquatic.waves.util.event.event
+import gg.aquatic.waves.util.logger.type.InfoLogger
+import gg.aquatic.waves.util.runAsync
+import gg.aquatic.waves.util.toBytes
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -20,7 +23,6 @@ import org.bukkit.event.player.PlayerQuitEvent
 import java.sql.Statement
 import java.util.Optional
 import java.util.UUID
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 object ProfilesModule : WaveModule {
@@ -72,9 +74,7 @@ object ProfilesModule : WaveModule {
             fun loadPlayer(): AquaticPlayer {
                 val player = getOrCreate(it.player)
                 Bukkit.getConsoleSender().sendMessage("Profile Loaded!")
-                runSync {
-                    ProfileLoadEvent(player).call()
-                }
+                AsyncProfileLoadEvent(player).call()
                 cache[player.uuid] = player
                 playersLoading -= it.player.uniqueId
                 return player
@@ -83,25 +83,23 @@ object ProfilesModule : WaveModule {
             val syncSettings = Waves.INSTANCE.configValues.syncSettings
             if (syncSettings.enabled) {
                 runAsync {
-                    runBlocking {
-                        val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
-                        if (player != null) {
-                            if (player.server == null) {
-                                loadPlayer()
-                            } else {
-                                playersAwaiting += it.player.uniqueId
-                            }
+                    val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
+                    if (player != null) {
+                        if (player.server == null) {
+                            loadPlayer()
                         } else {
-                            val aquaticPlayer = loadPlayer()
-                            val cachedPlayer =
-                                SyncedPlayer(
-                                    aquaticPlayer.uuid,
-                                    aquaticPlayer.username,
-                                    syncSettings.serverId,
-                                    HashMap()
-                                )
-                            SyncHandler.client.cachePlayer(cachedPlayer)
+                            playersAwaiting += it.player.uniqueId
                         }
+                    } else {
+                        val aquaticPlayer = loadPlayer()
+                        val cachedPlayer =
+                            SyncedPlayer(
+                                aquaticPlayer.uuid,
+                                aquaticPlayer.username,
+                                syncSettings.serverId,
+                                HashMap()
+                            )
+                        SyncHandler.client.cachePlayer(cachedPlayer)
                     }
                 }
 
@@ -127,15 +125,13 @@ object ProfilesModule : WaveModule {
             val syncSettings = Waves.INSTANCE.configValues.syncSettings
             if (syncSettings.enabled) {
                 runAsync {
-                    runBlocking {
-                        savePlayer()
-                        val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
-                        if (player != null) {
-                            if (player.server == null) {
-                                savePlayer()
-                            } else {
-                                playersAwaiting += it.player.uniqueId
-                            }
+                    savePlayer()
+                    val player = SyncHandler.client.getPlayerCache(it.player.uniqueId)
+                    if (player != null) {
+                        if (player.server == null) {
+                            savePlayer()
+                        } else {
+                            playersAwaiting += it.player.uniqueId
                         }
                     }
                 }

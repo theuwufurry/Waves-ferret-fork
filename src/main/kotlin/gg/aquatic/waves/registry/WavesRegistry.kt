@@ -1,15 +1,13 @@
 package gg.aquatic.waves.registry
 
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose
-import gg.aquatic.aquaticseries.lib.action.AbstractAction
-import gg.aquatic.aquaticseries.lib.economy.Currency
+import gg.aquatic.waves.util.action.AbstractAction
 import gg.aquatic.waves.item.factory.HDBFactory
 import gg.aquatic.waves.item.factory.IAFactory
 import gg.aquatic.waves.item.factory.MMFactory
 import gg.aquatic.waves.item.factory.OraxenFactory
-import gg.aquatic.aquaticseries.lib.price.AbstractPrice
-import gg.aquatic.aquaticseries.lib.requirement.AbstractRequirement
-import gg.aquatic.aquaticseries.paper.adapt.PaperString
+import gg.aquatic.waves.util.price.AbstractPrice
+import gg.aquatic.waves.util.requirement.AbstractRequirement
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.interactable.settings.BlockInteractableSettings
 import gg.aquatic.waves.interactable.settings.EntityInteractableSettings
@@ -21,10 +19,13 @@ import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.BaseEntityDataBuilder
 import gg.aquatic.waves.util.action.*
-import gg.aquatic.waves.util.action.discord.DiscordWebhookAction
-import gg.aquatic.waves.util.price.ItemPrice
-import gg.aquatic.waves.util.price.VaultPrice
-import gg.aquatic.waves.util.requirement.ExpressionPlayerRequirement
+import gg.aquatic.waves.util.action.impl.discord.DiscordWebhookAction
+import gg.aquatic.waves.util.action.impl.*
+import gg.aquatic.waves.util.currency.Currency
+import gg.aquatic.waves.util.price.impl.ItemPrice
+import gg.aquatic.waves.util.price.impl.VaultPrice
+import gg.aquatic.waves.util.requirement.impl.ExpressionPlayerRequirement
+import gg.aquatic.waves.util.toMMComponent
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
@@ -93,7 +94,7 @@ object WavesRegistry {
             (builder as BaseEntityDataBuilder).isFlying(s.getBoolean(str))
         },
         createProperty("custom-name") { s, str, builder ->
-            (builder as BaseEntityDataBuilder).setCustomName(PaperString(s.getString(str) ?: "").convert())
+            (builder as BaseEntityDataBuilder).setCustomName((s.getString(str) ?: "").toMMComponent())
         },
         createProperty("custom-name-visible") { s, str, builder ->
             (builder as BaseEntityDataBuilder).isCustomNameVisible(s.getBoolean(str))

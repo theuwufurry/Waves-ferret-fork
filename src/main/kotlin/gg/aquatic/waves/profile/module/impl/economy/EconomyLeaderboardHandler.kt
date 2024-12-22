@@ -1,13 +1,13 @@
 package gg.aquatic.waves.profile.module.impl.economy
 
-import gg.aquatic.aquaticseries.lib.util.mapPair
-import gg.aquatic.aquaticseries.lib.util.toUUID
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.registry.WavesRegistry
+import gg.aquatic.waves.util.mapPair
+import gg.aquatic.waves.util.toUUID
 
 fun EconomyProfileModule.refreshLeaderboard() {
     for (value in WavesRegistry.INDEX_TO_CURRENCY.values) {
