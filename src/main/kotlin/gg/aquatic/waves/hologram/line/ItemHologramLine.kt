@@ -18,7 +18,6 @@ import org.bukkit.entity.ItemDisplay.ItemDisplayTransform
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
-import java.util.function.Function
 
 class ItemHologramLine(
     val item: ItemStack,
@@ -26,7 +25,7 @@ class ItemHologramLine(
     val scale: Float = 1.0f,
     val billboard: Billboard = Billboard.CENTER,
     val itemDisplayTransform: ItemDisplayTransform,
-    override val filter: Function<Player, Boolean>,
+    override val filter: (Player) -> Boolean,
     override val failLine: HologramLine,
 ) : HologramLine() {
     override fun spawn(
