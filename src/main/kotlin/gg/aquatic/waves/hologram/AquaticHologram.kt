@@ -6,12 +6,15 @@ import org.bukkit.entity.Player
 import java.util.concurrent.ConcurrentHashMap
 
 class AquaticHologram(
-    val location: Location,
+    location: Location,
     val filter: (Player) -> Boolean,
     val textUpdater: (Player, String) -> String,
     val viewDistance: Int,
     lines: Set<HologramLine>
 ) {
+
+    var location = location
+        private set
 
     init {
         HologramHandler.spawnedHolograms += this
@@ -109,6 +112,13 @@ class AquaticHologram(
         lines.clear()
 
         HologramHandler.spawnedHolograms -= this
+    }
+
+    fun teleport(location: Location) {
+        this.location = location
+        viewers.forEach { (player, _) ->
+            showOrUpdate(player)
+        }
     }
 
 }
