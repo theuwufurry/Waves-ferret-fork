@@ -1,11 +1,14 @@
 package gg.aquatic.waves.fake
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent
+import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.protocol.packettype.PacketType.Play
 import com.github.retrooper.packetevents.protocol.player.InteractionHand
+import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.chunk.AsyncPlayerChunkLoadEvent
 import gg.aquatic.waves.chunk.AsyncPlayerChunkUnloadEvent
@@ -116,6 +119,27 @@ object FakeObjectHandler : WaveModule {
             }
         }
          */
+        packetEvent<PacketSendEvent> {
+            val player = player() ?: return@packetEvent
+            if (packetType == PacketType.Play.Server.BLOCK_CHANGE) {
+                val packet = WrapperPlayServerBlockChange(this)
+                val blocks = locationToBlocks[player.world.getBlockAt(
+                    packet.blockPosition.x,
+                    packet.blockPosition.y,
+                    packet.blockPosition.z
+                ).location] ?: return@packetEvent
+
+                for (block in blocks) {
+                    if (block.viewers.contains(player)) {
+                        if (!block.destroyed) {
+                            packet.blockState = SpigotConversionUtil.fromBukkitBlockData(block.block.blockData)
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        /*
         packetEvent<PacketReceiveEvent> {
             /*
             if (packetType == PacketType.Play.Client.PLAYER_DIGGING) {
@@ -172,6 +196,7 @@ object FakeObjectHandler : WaveModule {
                             player,
                             false
                         )
+                        packet.cursorPosition
                         block.onInteract(event)
                         if (!block.destroyed) {
                             this.isCancelled = true
@@ -181,6 +206,7 @@ object FakeObjectHandler : WaveModule {
                 }
             }
         }
+         */
         event<PlayerInteractEvent> {
             val blocks = locationToBlocks[it.clickedBlock?.location ?: return@event] ?: return@event
             for (block in blocks) {
