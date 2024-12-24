@@ -7,6 +7,7 @@ import gg.aquatic.waves.data.SQLiteDriver
 import gg.aquatic.waves.chunk.ChunkTracker
 import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
+import gg.aquatic.waves.hologram.HologramHandler
 import gg.aquatic.waves.interactable.InteractableHandler
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.menu.MenuHandler
@@ -31,7 +32,8 @@ class Waves : JavaPlugin() {
         WaveModules.CHUNK_TRACKER to ChunkTracker,
         WaveModules.INTERACTABLES to InteractableHandler,
         WaveModules.INVENTORIES to gg.aquatic.waves.inventory.InventoryManager,
-        WaveModules.MENUS to MenuHandler
+        WaveModules.MENUS to MenuHandler,
+        WaveModules.HOLOGRAMS to HologramHandler
     )
     lateinit var configValues: WavesConfig
     /**

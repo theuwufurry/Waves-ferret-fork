@@ -93,4 +93,14 @@ class AquaticHologram(
         }
     }
 
+    fun destroy() {
+        viewers.forEach { (_, spawnedHologramLines) ->
+            spawnedHologramLines.forEach { it.destroy() }
+        }
+        viewers.clear()
+        lines.clear()
+
+        HologramHandler.spawnedHolograms -= this
+    }
+
 }

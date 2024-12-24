@@ -8,5 +8,6 @@ enum class WaveModules {
     CHUNK_TRACKER,
     INTERACTABLES,
     INVENTORIES,
-    MENUS
+    MENUS,
+    HOLOGRAMS
 }
