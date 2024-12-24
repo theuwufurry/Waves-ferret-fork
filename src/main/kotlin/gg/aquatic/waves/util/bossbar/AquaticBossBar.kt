@@ -112,6 +112,7 @@ class AquaticBossBar(
 
         val packet = WrapperPlayServerBossBar(uuid,WrapperPlayServerBossBar.Action.REMOVE)
         packet.uuid = uuid
+        player.toUser().sendPacket(packet)
     }
 
 }

@@ -14,7 +14,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 
 class MEGInteractable(
-    val modelId: String, audience: AquaticAudience, override val onInteract: (InteractableInteractEvent) -> Unit,
+    override val location: Location, val modelId: String, audience: AquaticAudience, override val onInteract: (InteractableInteractEvent) -> Unit,
 ) : Interactable() {
 
     override val viewers: MutableSet<Player> = mutableSetOf()
@@ -71,10 +71,6 @@ class MEGInteractable(
         modeledEntity.addModel(activeModel, true)
     }
 
-    override val location: Location
-        get() {
-            return dummy.location
-        }
 
     override fun addViewer(player: Player) {
         viewers.add(player)
