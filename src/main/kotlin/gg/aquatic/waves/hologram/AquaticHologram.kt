@@ -12,6 +12,10 @@ class AquaticHologram(
     val viewDistance: Int
 ) {
 
+    init {
+        HologramHandler.spawnedHolograms += this
+    }
+
     val lines = ConcurrentHashMap.newKeySet<HologramLine>()
     val viewers = ConcurrentHashMap<Player, MutableSet<SpawnedHologramLine>>()
 
