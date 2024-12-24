@@ -9,14 +9,15 @@ class AquaticHologram(
     val location: Location,
     val filter: (Player) -> Boolean,
     val textUpdater: (Player, String) -> String,
-    val viewDistance: Int
+    val viewDistance: Int,
+    lines: Set<HologramLine>
 ) {
 
     init {
         HologramHandler.spawnedHolograms += this
     }
 
-    val lines = ConcurrentHashMap.newKeySet<HologramLine>()
+    val lines = ConcurrentHashMap.newKeySet<HologramLine>().apply { addAll(lines) }
     val viewers = ConcurrentHashMap<Player, MutableSet<SpawnedHologramLine>>()
 
     fun tick() {
