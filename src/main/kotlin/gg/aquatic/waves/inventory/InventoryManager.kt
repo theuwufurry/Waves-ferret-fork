@@ -9,6 +9,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
 import gg.aquatic.waves.Waves
+import gg.aquatic.waves.inventory.event.AsyncPacketInventoryCloseEvent
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
@@ -16,6 +17,7 @@ import gg.aquatic.waves.util.event.call
 import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player
+import gg.aquatic.waves.util.runLaterSync
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import org.bukkit.entity.Player
@@ -124,6 +126,12 @@ object InventoryManager : WaveModule {
     fun onCloseMenu(player: Player) {
         val removed = openedInventories.remove(player)
         removed?.viewers?.remove(player.uniqueId)
+
+        runLaterSync(2) {
+            if (openedInventories.containsKey(player)) return@runLaterSync
+            player.updateInventory()
+        }
+        AsyncPacketInventoryCloseEvent(player,removed ?: return).call()
     }
 
     fun handleClickInventory(player: Player, packet: WrapperPlayClientClickWindow, clickType: ClickType) {
