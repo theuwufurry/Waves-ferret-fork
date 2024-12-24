@@ -29,6 +29,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.inventory.EquipmentSlot
 import java.util.concurrent.ConcurrentHashMap
 
 object FakeObjectHandler : WaveModule {
@@ -208,6 +209,7 @@ object FakeObjectHandler : WaveModule {
         }
          */
         event<PlayerInteractEvent> {
+            if (it.hand == EquipmentSlot.OFF_HAND) return@event
             val blocks = locationToBlocks[it.clickedBlock?.location ?: return@event] ?: return@event
             for (block in blocks) {
                 if (block.viewers.contains(it.player)) {
