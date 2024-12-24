@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class AquaticHologram(
     val location: Location,
+    val filter: (Player) -> Boolean,
     val textUpdater: (Player, String) -> String,
     val viewDistance: Int
 ) {
@@ -66,6 +67,7 @@ class AquaticHologram(
         }
     }
 
+    @Volatile
     private var rangeTick = 0
     private fun tickRange() {
         rangeTick++
@@ -75,6 +77,7 @@ class AquaticHologram(
         rangeTick = 0
         val remaining = viewers.toMutableMap()
         for (trackedByPlayer in location.chunk.trackedByPlayers()) {
+            if (filter(trackedByPlayer)) continue
             if (viewers.containsKey(trackedByPlayer)) {
                 if (trackedByPlayer.location.distanceSquared(location) <= viewDistance * viewDistance) {
                     remaining.remove(trackedByPlayer)
