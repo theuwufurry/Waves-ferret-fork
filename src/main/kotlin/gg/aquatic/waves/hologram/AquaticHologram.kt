@@ -32,7 +32,7 @@ class AquaticHologram(
         }
     }
 
-    private fun showOrUpdate(player: Player) {
+    fun showOrUpdate(player: Player) {
         val lines = viewers.getOrPut(player) { ConcurrentHashMap.newKeySet() }
 
         fun getVisibleLine(player: Player, hologramLine: HologramLine): HologramLine? {
