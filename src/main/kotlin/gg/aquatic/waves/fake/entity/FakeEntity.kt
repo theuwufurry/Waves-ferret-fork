@@ -50,7 +50,7 @@ open class FakeEntity(
         }
 
     override fun destroy() {
-        for (player in isViewing) {
+        for (player in isViewing.toSet()) {
             hide(player)
         }
         FakeObjectHandler.tickableObjects -= this

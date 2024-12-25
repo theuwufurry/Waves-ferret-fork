@@ -11,6 +11,7 @@ import gg.aquatic.waves.util.requirement.AbstractRequirement
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.interactable.settings.BlockInteractableSettings
 import gg.aquatic.waves.interactable.settings.EntityInteractableSettings
+import gg.aquatic.waves.interactable.settings.MEGInteractableSettings
 import gg.aquatic.waves.interactable.settings.OraxenEntityInteractableSettings
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.settings.entityproperty.display.DisplayEntityProperty
@@ -68,7 +69,8 @@ object WavesRegistry {
     val INTERACTABLE_FACTORIES = hashMapOf(
         "ORAXEN_FURNITURE" to OraxenEntityInteractableSettings.Companion,
         "ENTITY" to EntityInteractableSettings.Companion,
-        "BLOCK" to BlockInteractableSettings.Companion
+        "BLOCK" to BlockInteractableSettings.Companion,
+        "MODELENGINE" to MEGInteractableSettings.Companion
     )
 
     val ENTITY_PROPERTY_FACTORIES = hashMapOf(
