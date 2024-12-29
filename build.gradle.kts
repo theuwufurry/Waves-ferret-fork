@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "gg.aquatic.waves"
-version = "1.1.3"
+version = "1.1.4"
 
 val ktor_version: String by project
 
@@ -27,9 +27,8 @@ repositories {
         url = uri("https://repo.codemc.io/repository/maven-snapshots/")
     }
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    maven("https://repo.auxilor.io/repository/maven-public/")
 }
-
-val nmsVersion = "1.0.39"
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
@@ -59,6 +58,7 @@ dependencies {
     implementation("com.github.micartey:webhookly:master-SNAPSHOT")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
+    compileOnly("com.willfp:eco:6.74.5")
 }
 
 

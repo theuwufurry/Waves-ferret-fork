@@ -2,10 +2,6 @@ package gg.aquatic.waves.registry
 
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose
 import gg.aquatic.waves.util.action.AbstractAction
-import gg.aquatic.waves.item.factory.HDBFactory
-import gg.aquatic.waves.item.factory.IAFactory
-import gg.aquatic.waves.item.factory.MMFactory
-import gg.aquatic.waves.item.factory.OraxenFactory
 import gg.aquatic.waves.util.price.AbstractPrice
 import gg.aquatic.waves.util.requirement.AbstractRequirement
 import gg.aquatic.waves.economy.RegisteredCurrency
@@ -17,6 +13,7 @@ import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.settings.entityproperty.display.DisplayEntityProperty
 import gg.aquatic.waves.interactable.settings.entityproperty.display.ItemDisplayEntityProperty
 import gg.aquatic.waves.item.AquaticItem
+import gg.aquatic.waves.item.factory.*
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.BaseEntityDataBuilder
 import gg.aquatic.waves.util.action.*
@@ -63,7 +60,8 @@ object WavesRegistry {
         "MYTHICITEM" to MMFactory,
         "ORAXEN" to OraxenFactory,
         "HDB" to HDBFactory,
-        "ITEMSADDER" to IAFactory
+        "ITEMSADDER" to IAFactory,
+        "ECO" to EcoFactory
     )
 
     val INTERACTABLE_FACTORIES = hashMapOf(
