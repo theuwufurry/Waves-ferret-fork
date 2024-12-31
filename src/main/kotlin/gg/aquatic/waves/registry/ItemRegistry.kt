@@ -54,7 +54,7 @@ fun AquaticItem.removeInteractionHandler(): Boolean {
     return true
 }
 
-private fun AquaticItem.unregister(): Boolean {
+fun AquaticItem.unregister(): Boolean {
     val registryId = registryId() ?: return false
     val item = getUnmodifiedItem()
     val meta = item.itemMeta ?: return false
