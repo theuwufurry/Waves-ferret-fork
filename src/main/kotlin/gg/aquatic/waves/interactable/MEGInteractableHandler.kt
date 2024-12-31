@@ -13,6 +13,7 @@ class MEGInteractableHandler {
             if (base !is MEGInteractableDummy) return@event
             val interactable = base.interactable
             if (it.slot == EquipmentSlot.OFF_HAND) return@event
+            if (it.action == Action.INTERACT_ON) return@event
             val event = InteractableInteractEvent(
                 interactable,
                 it.player,

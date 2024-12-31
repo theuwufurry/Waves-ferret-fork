@@ -9,7 +9,6 @@ import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.type.EntityInteractable
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.registry.serializer.EntityPropertySerializer
-import gg.aquatic.waves.util.getSectionList
 import gg.aquatic.waves.util.mapPair
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
@@ -39,7 +38,8 @@ class EntityInteractableSettings(
 
     companion object : InteractableSettingsFactory {
         override fun load(section: ConfigurationSection): InteractableSettings {
-            val props = EntityPropertySerializer.fromSections(section.getSectionList("properties")).toHashSet()
+            val props = section.getConfigurationSection("properties")
+                ?.let { EntityPropertySerializer.fromSection(it).toHashSet() } ?: hashSetOf()
             val offsetStrs = section.getString("offset", "0;0;0")!!.split(";")
             val offset = Vector(
                 offsetStrs.getOrElse(0) { "0" }.toDouble(),
