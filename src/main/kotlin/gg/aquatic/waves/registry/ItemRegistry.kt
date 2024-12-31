@@ -30,7 +30,7 @@ private fun AquaticItem.register(
 ): Boolean {
     val registryId = registryId()
     val item = getUnmodifiedItem()
-    if (registryId != null) return false
+    if (registryId != null && registryId != "$namespace:$id") return false
     val meta = item.itemMeta ?: return false
     meta.persistentDataContainer.set(ItemHandler.NAMESPACE_KEY, PersistentDataType.STRING, "$namespace:$id")
     item.itemMeta = meta
