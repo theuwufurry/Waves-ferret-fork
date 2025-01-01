@@ -46,7 +46,7 @@ class AquaticItem(
 
         iS.modifyFastMeta {
             name?.apply {
-                displayName = this.toMMComponent()
+                displayName = this.toMMComponent().decoration(TextDecoration.ITALIC, false)
             }
             description?.apply {
                 lore = this.map { it.toMMComponent().decoration(TextDecoration.ITALIC, false) }

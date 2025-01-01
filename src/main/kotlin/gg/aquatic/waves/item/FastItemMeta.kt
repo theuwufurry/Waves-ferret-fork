@@ -18,11 +18,11 @@ class FastItemMeta(
 
     var displayName: Component?
         get() {
-            return nms.getComponent(ComponentTypes.ITEM_NAME).getOrNull()
+            return nms.getComponent(ComponentTypes.CUSTOM_NAME).getOrNull()
         }
         set(value) {
-            nms.setComponent(ComponentTypes.ITEM_NAME, value)
-            itemStack.itemMeta = SpigotConversionUtil.toBukkitItemStack(nms).itemMeta
+            nms.setComponent(ComponentTypes.CUSTOM_NAME, value)
+            //itemStack.itemMeta = SpigotConversionUtil.toBukkitItemStack(nms).itemMeta
         }
 
     var lore: List<Component>
