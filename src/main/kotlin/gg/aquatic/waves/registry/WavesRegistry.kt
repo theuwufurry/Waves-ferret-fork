@@ -72,40 +72,42 @@ object WavesRegistry {
     )
 
     val ENTITY_PROPERTY_FACTORIES = hashMapOf(
-        createProperty("is-on-fire") { s, str, builder ->
+        createProperty("is-on-fire") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).isOnFire(s.getBoolean(str))
         },
-        createProperty("is-sneaking") { s, str, builder ->
+        createProperty("is-sneaking") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).isSneaking(s.getBoolean(str))
         },
-        createProperty("is-sprinting") { s, str, builder ->
+        createProperty("is-sprinting") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).isSprinting(s.getBoolean(str))
         },
-        createProperty("is-swimming") { s, str, builder ->
+        createProperty("is-swimming") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).isSwimming(s.getBoolean(str))
         },
-        createProperty("invisible") { s, str, builder ->
+        createProperty("invisible") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).isInvisible(s.getBoolean(str))
         },
-        createProperty("glowing") { s, str, builder ->
+        createProperty("glowing") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).isGlowing(s.getBoolean(str))
         },
-        createProperty("is-flying") { s, str, builder ->
+        createProperty("is-flying") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).isFlying(s.getBoolean(str))
         },
-        createProperty("custom-name") { s, str, builder ->
-            (builder as BaseEntityDataBuilder).setCustomName((s.getString(str) ?: "").toMMComponent())
+        createProperty("custom-name") { s, str, builder, player, updater ->
+            var name = s.getString(str) ?: ""
+            if (player != null) name = updater(player, name)
+            (builder as BaseEntityDataBuilder).setCustomName(name.toMMComponent())
         },
-        createProperty("custom-name-visible") { s, str, builder ->
+        createProperty("custom-name-visible") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).isCustomNameVisible(s.getBoolean(str))
         },
-        createProperty("is-silent") { s, str, builder ->
+        createProperty("is-silent") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).isSilent(s.getBoolean(str))
         },
-        createProperty("no-gravity") { s, str, builder ->
+        createProperty("no-gravity") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).hasNoGravity(s.getBoolean(str))
         },
-        createProperty("pose") { s, str, builder ->
+        createProperty("pose") { s, str, builder, _, _ ->
             (builder as BaseEntityDataBuilder).setPose(EntityPose.valueOf(s.getString(str, "STANDING")!!.uppercase()))
         },
         "item" to ItemDisplayEntityProperty.Item.Companion,
@@ -120,13 +122,13 @@ object WavesRegistry {
 
     private fun createProperty(
         path: String,
-        factory: (ConfigurationSection, String, EntityDataBuilder) -> Unit
+        factory: (ConfigurationSection, String, EntityDataBuilder, Player?, (Player, String) -> String) -> Unit
     ): Pair<String, EntityProperty.Serializer> {
         return path to object : EntityProperty.Serializer {
             override fun serialize(section: ConfigurationSection): EntityProperty {
                 return object : EntityProperty {
-                    override fun apply(builder: EntityDataBuilder) {
-                        factory(section, path, builder)
+                    override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
+                        factory(section, path, builder, player, updater)
                     }
                 }
             }

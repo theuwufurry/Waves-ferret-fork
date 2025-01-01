@@ -7,6 +7,7 @@ import gg.aquatic.waves.packetevents.type.ItemDisplayEntityDataBuilder
 import gg.aquatic.waves.util.item.loadFromYml
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.ItemDisplay.ItemDisplayTransform
+import org.bukkit.entity.Player
 
 interface ItemDisplayEntityProperty : EntityProperty {
 
@@ -20,7 +21,7 @@ interface ItemDisplayEntityProperty : EntityProperty {
 
         }
 
-        override fun apply(builder: EntityDataBuilder) {
+        override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
             if (builder is ItemDisplayEntityDataBuilder) {
                 builder.setItem(item.getItem())
             }
@@ -36,7 +37,7 @@ interface ItemDisplayEntityProperty : EntityProperty {
             }
         }
 
-        override fun apply(builder: EntityDataBuilder) {
+        override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
             if (builder is ItemDisplayEntityDataBuilder) {
                 builder.setItemTransformation(transform)
             }

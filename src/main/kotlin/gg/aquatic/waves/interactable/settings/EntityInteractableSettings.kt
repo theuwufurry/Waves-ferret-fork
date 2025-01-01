@@ -26,7 +26,7 @@ class EntityInteractableSettings(
         val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location.clone().add(offset), 50, audience, consumer = {
             val builder = EntityDataBuilder.ANY
             for (prop in props) {
-                prop.apply(builder)
+                prop.apply(builder, null) { _, str -> str }
             }
             entityData += builder.build().mapPair { it.index to it }
         })
@@ -46,7 +46,7 @@ class EntityInteractableSettings(
                 offsetStrs.getOrElse(1) { "0" }.toDouble(),
                 offsetStrs.getOrElse(2) { "0" }.toDouble()
             )
-            return EntityInteractableSettings(props,offset)
+            return EntityInteractableSettings(props, offset)
         }
 
     }

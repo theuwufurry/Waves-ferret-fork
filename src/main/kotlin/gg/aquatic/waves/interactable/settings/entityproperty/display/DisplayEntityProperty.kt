@@ -5,6 +5,7 @@ import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.DisplayEntityDataBuilder
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Display
+import org.bukkit.entity.Player
 import org.bukkit.util.Transformation
 import org.joml.AxisAngle4f
 import org.joml.Quaternionf
@@ -13,7 +14,7 @@ import org.joml.Vector3f
 interface DisplayEntityProperty : EntityProperty {
 
     class Billboard(private val billboard: Display.Billboard) : DisplayEntityProperty {
-        override fun apply(builder: EntityDataBuilder) {
+        override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
             if (builder is DisplayEntityDataBuilder) {
                 builder.setBillboard(billboard)
             }
@@ -30,7 +31,7 @@ interface DisplayEntityProperty : EntityProperty {
     }
 
     class InterpolationDelay(private val delay: Int) : DisplayEntityProperty {
-        override fun apply(builder: EntityDataBuilder) {
+        override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
             if (builder is DisplayEntityDataBuilder) {
                 builder.setInterpolationDelay(delay)
             }
@@ -43,7 +44,7 @@ interface DisplayEntityProperty : EntityProperty {
         }
     }
     class InterpolationDuration(private val duration: Int) : DisplayEntityProperty {
-        override fun apply(builder: EntityDataBuilder) {
+        override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
             if (builder is DisplayEntityDataBuilder) {
                 builder.setTransformationInterpolationDuration(duration)
             }
@@ -56,7 +57,7 @@ interface DisplayEntityProperty : EntityProperty {
         }
     }
     class TeleportInterpolationDuration(private val duration: Int) : DisplayEntityProperty {
-        override fun apply(builder: EntityDataBuilder) {
+        override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
             if (builder is DisplayEntityDataBuilder) {
                 builder.setPosRotInterpolationDuration(duration)
             }
@@ -108,7 +109,7 @@ interface DisplayEntityProperty : EntityProperty {
             }
         }
 
-        override fun apply(builder: EntityDataBuilder) {
+        override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
             if (builder is DisplayEntityDataBuilder) {
                 builder.setTransformation(transformation)
             }
