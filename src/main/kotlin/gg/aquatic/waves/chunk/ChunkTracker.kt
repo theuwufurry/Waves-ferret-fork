@@ -15,6 +15,7 @@ import org.bukkit.Bukkit
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 object ChunkTracker : WaveModule {
@@ -61,16 +62,14 @@ object ChunkTracker : WaveModule {
         }
         event<PlayerQuitEvent> {
             val playerPair = playerToChunks.remove(it.player.uniqueId) ?: return@event
-            runAsync {
-                for (chunkId in playerPair.second) {
-                    val chunkList = chunks[playerPair.first]?.get(chunkId) ?: continue
-                    chunkList -= it.player.uniqueId
-                    if (chunkList.isNotEmpty()) continue
-                    chunks[playerPair.first]?.remove(chunkId)
-                    AsyncPlayerChunkUnloadEvent(it.player,chunkId.toChunk(it.player.world)).call()
-                }
-                playerToChunks.remove(it.player.uniqueId)
+            for (chunkId in playerPair.second) {
+                val chunkList = chunks[playerPair.first]?.get(chunkId) ?: continue
+                chunkList -= it.player.uniqueId
+                if (chunkList.isNotEmpty()) continue
+                chunks[playerPair.first]?.remove(chunkId)
+                AsyncPlayerChunkUnloadEvent(it.player,chunkId.toChunk(it.player.world)).call()
             }
+            playerToChunks.remove(it.player.uniqueId)
         }
         event<ChunkUnloadEvent> {
             chunks[it.chunk.world.name]?.remove(ChunkId(it.chunk.x, it.chunk.z))

@@ -13,12 +13,9 @@ import gg.aquatic.waves.inventory.event.AsyncPacketInventoryCloseEvent
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.util.*
 import gg.aquatic.waves.util.event.call
 import gg.aquatic.waves.util.event.event
-import gg.aquatic.waves.util.packetEvent
-import gg.aquatic.waves.util.player
-import gg.aquatic.waves.util.runLaterSync
-import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
@@ -34,7 +31,9 @@ object InventoryManager : WaveModule {
 
     override fun initialize(waves: Waves) {
         event<PlayerQuitEvent> {
-            onCloseMenu(it.player)
+            runAsync {
+                onCloseMenu(it.player)
+            }
         }
         /*
         packetEvent<PacketSendEvent> {

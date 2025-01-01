@@ -1,5 +1,7 @@
 package gg.aquatic.waves.fake.block
 
+import com.github.retrooper.packetevents.util.Vector3i
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange
 import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.util.block.AquaticBlock
 import gg.aquatic.waves.chunk.cache.ChunkCacheHandler
@@ -9,6 +11,8 @@ import gg.aquatic.waves.fake.FakeObject
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.fake.FakeObjectChunkBundle
 import gg.aquatic.waves.util.blockLocation
+import gg.aquatic.waves.util.toUser
+import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -132,7 +136,11 @@ open class FakeBlock(
 
     override fun hide(player: Player) {
         isViewing.remove(player)
-        player.sendBlockChange(location, location.block.blockData)
+        val packet = WrapperPlayServerBlockChange(
+            Vector3i(location.blockX,location.blockY,location.blockZ),
+            SpigotConversionUtil.fromBukkitBlockData(location.block.blockData).globalId
+        )
+        player.toUser().sendPacket(packet)
     }
 
     override fun tick() {
