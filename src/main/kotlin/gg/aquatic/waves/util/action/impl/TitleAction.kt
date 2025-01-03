@@ -1,5 +1,8 @@
 package gg.aquatic.waves.util.action.impl
 
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleSubtitle
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleText
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleTimes
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTitle
 import gg.aquatic.waves.util.action.AbstractAction
 import gg.aquatic.waves.util.argument.AquaticObjectArgument
@@ -14,20 +17,26 @@ class TitleAction : AbstractAction<Player>() {
     override fun execute(binder: Player, args: Map<String, Any?>, textUpdater: (Player, String) -> String) {
         val title = (args["title"] as String).updatePAPIPlaceholders(binder)
         val subtitle = (args["subtitle"] as String).updatePAPIPlaceholders(binder)
-        val fadeIn = args["fadeIn"] as Int
+        val fadeIn = args["fade-in"] as Int
         val stay = args["stay"] as Int
-        val fadeOut = args["fadeOut"] as Int
+        val fadeOut = args["fade-out"] as Int
 
-        binder.toUser().sendPacket(
-            WrapperPlayServerTitle(WrapperPlayServerTitle.TitleAction.SET_TIMES_AND_DISPLAY, title.toMMComponent(), subtitle.toMMComponent(), null, fadeIn, stay, fadeOut)
+        val packets = listOf(
+            WrapperPlayServerSetTitleText(title.toMMComponent()),
+            WrapperPlayServerSetTitleTimes(fadeIn, stay, fadeOut),
+            WrapperPlayServerSetTitleSubtitle(subtitle.toMMComponent())
         )
+
+        binder.toUser().let {
+            packets.forEach { packet -> it.sendPacket(packet) }
+        }
     }
 
     override val arguments: List<AquaticObjectArgument<*>> = listOf(
         PrimitiveObjectArgument("title", "", true),
         PrimitiveObjectArgument("subtitle", "", true),
-        PrimitiveObjectArgument("fadeIn", 0, true),
+        PrimitiveObjectArgument("fade-in", 0, true),
         PrimitiveObjectArgument("stay", 60, true),
-        PrimitiveObjectArgument("fadeOut", 0, true)
+        PrimitiveObjectArgument("fade-out", 0, true)
     )
 }

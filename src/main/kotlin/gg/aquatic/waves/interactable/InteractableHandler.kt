@@ -7,6 +7,7 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.event.event
 import org.bukkit.Bukkit
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 
 object InteractableHandler: WaveModule {
 
@@ -26,6 +27,11 @@ object InteractableHandler: WaveModule {
                 if (tickableObject.audience.canBeApplied(it.player)) {
                     tickableObject.addViewer(it.player)
                 }
+            }
+        }
+        event<PlayerQuitEvent> {
+            for (tickableObject in megInteractables) {
+                tickableObject.removeViewer(it.player)
             }
         }
     }
