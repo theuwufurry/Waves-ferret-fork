@@ -61,7 +61,8 @@ object WavesRegistry {
         "ORAXEN" to OraxenFactory,
         "HDB" to HDBFactory,
         "ITEMSADDER" to IAFactory,
-        "ECO" to EcoFactory
+        "ECO" to EcoFactory,
+        "BASE64" to Base64Factory
     )
 
     val INTERACTABLE_FACTORIES = hashMapOf(
