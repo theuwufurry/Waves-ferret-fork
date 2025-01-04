@@ -5,6 +5,9 @@ import com.tcoded.folialib.FoliaLib
 import gg.aquatic.waves.data.MySqlDriver
 import gg.aquatic.waves.data.SQLiteDriver
 import gg.aquatic.waves.chunk.ChunkTracker
+import gg.aquatic.waves.command.AquaticBaseCommand
+import gg.aquatic.waves.command.impl.ItemConvertCommand
+import gg.aquatic.waves.command.register
 import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.hologram.HologramHandler
@@ -117,6 +120,10 @@ class Waves : JavaPlugin() {
             entity.onUpdate(player)
         }
          */
+        AquaticBaseCommand("waves", "Waves base command", mutableListOf(),
+            mutableMapOf(
+                "itemconvert" to ItemConvertCommand
+            ), listOf()).register("waves")
     }
 
     override fun onDisable() {
