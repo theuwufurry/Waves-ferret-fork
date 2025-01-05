@@ -5,6 +5,8 @@ import gg.aquatic.waves.util.action.AbstractAction
 import gg.aquatic.waves.util.price.AbstractPrice
 import gg.aquatic.waves.util.requirement.AbstractRequirement
 import gg.aquatic.waves.economy.RegisteredCurrency
+import gg.aquatic.waves.hologram.line.ItemHologramLine
+import gg.aquatic.waves.hologram.line.TextHologramLine
 import gg.aquatic.waves.interactable.settings.BlockInteractableSettings
 import gg.aquatic.waves.interactable.settings.EntityInteractableSettings
 import gg.aquatic.waves.interactable.settings.MEGInteractableSettings
@@ -70,6 +72,11 @@ object WavesRegistry {
         "ENTITY" to EntityInteractableSettings.Companion,
         "BLOCK" to BlockInteractableSettings.Companion,
         "MODELENGINE" to MEGInteractableSettings.Companion
+    )
+
+    val HOLOGRAM_LINE_FACTORIES = hashMapOf(
+        "item" to ItemHologramLine.Companion,
+        "text" to TextHologramLine.Companion,
     )
 
     val ENTITY_PROPERTY_FACTORIES = hashMapOf(

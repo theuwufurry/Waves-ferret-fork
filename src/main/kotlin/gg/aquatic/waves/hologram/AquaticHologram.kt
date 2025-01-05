@@ -1,6 +1,8 @@
 package gg.aquatic.waves.hologram
 
 import gg.aquatic.waves.chunk.trackedByPlayers
+import gg.aquatic.waves.util.checkRequirements
+import gg.aquatic.waves.util.requirement.ConfiguredRequirement
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.concurrent.ConcurrentHashMap
@@ -119,6 +121,23 @@ class AquaticHologram(
         viewers.forEach { (player, _) ->
             showOrUpdate(player)
         }
+    }
+
+    class Settings(
+        val lines: Set<LineSettings>,
+        val conditions: List<ConfiguredRequirement<Player>>,
+        val viewDistance: Int
+    ) {
+
+        fun create(location: Location, textUpdater: (Player, String) -> String): AquaticHologram = AquaticHologram(
+            location,
+            { p ->
+                conditions.checkRequirements(p)
+            },
+            textUpdater,
+            viewDistance,
+            lines.map { it.create() }.toSet()
+        )
     }
 
 }

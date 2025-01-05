@@ -6,14 +6,18 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
-import gg.aquatic.waves.hologram.HologramLine
-import gg.aquatic.waves.hologram.SpawnedHologramLine
+import gg.aquatic.waves.hologram.*
 import gg.aquatic.waves.packetevents.EntityDataBuilder
+import gg.aquatic.waves.registry.serializer.RequirementSerializer
+import gg.aquatic.waves.util.checkRequirements
+import gg.aquatic.waves.util.getSectionList
+import gg.aquatic.waves.util.requirement.ConfiguredRequirement
 import gg.aquatic.waves.util.toMMComponent
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil
 import org.bukkit.Location
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Display.Billboard
 import org.bukkit.entity.Player
 import java.util.*
@@ -95,5 +99,52 @@ class TextHologramLine(
                 false
             )
         )
+    }
+
+    class Settings(
+        val height: Double,
+        val text: String,
+        val lineWidth: Int,
+        val scale: Float = 1.0f,
+        val billboard: Billboard = Billboard.CENTER,
+        val conditions: List<ConfiguredRequirement<Player>>,
+        val failLine: LineSettings?,
+    ): LineSettings {
+        override fun create(): HologramLine {
+            return TextHologramLine(
+                height,
+                { p ->
+                    conditions.checkRequirements(p)
+                },
+                failLine?.create(),
+                text,
+                lineWidth,
+                scale,
+                billboard,
+            )
+        }
+    }
+
+    companion object: LineFactory {
+        override fun load(section: ConfigurationSection): LineSettings? {
+            val text = section.getString("text") ?: return null
+            val height = section.getDouble("height", 0.3)
+            val lineWidth = section.getInt("line-width", 16)
+            val scale = section.getDouble("scale", 1.0).toFloat()
+            val billboard = Billboard.valueOf(section.getString("billboard", "CENTER")!!.uppercase())
+            val conditions = RequirementSerializer.fromSections<Player>(section.getSectionList("view-conditions"))
+            val failLine = section.getConfigurationSection("fail-line")?.let {
+                HologramSerializer.loadLine(it)
+            }
+            return Settings(
+                height,
+                text,
+                lineWidth,
+                scale,
+                billboard,
+                conditions,
+                failLine,
+            )
+        }
     }
 }
