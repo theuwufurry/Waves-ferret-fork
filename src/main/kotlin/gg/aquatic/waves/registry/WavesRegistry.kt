@@ -7,10 +7,7 @@ import gg.aquatic.waves.util.requirement.AbstractRequirement
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.hologram.line.ItemHologramLine
 import gg.aquatic.waves.hologram.line.TextHologramLine
-import gg.aquatic.waves.interactable.settings.BlockInteractableSettings
-import gg.aquatic.waves.interactable.settings.EntityInteractableSettings
-import gg.aquatic.waves.interactable.settings.MEGInteractableSettings
-import gg.aquatic.waves.interactable.settings.OraxenEntityInteractableSettings
+import gg.aquatic.waves.interactable.settings.*
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.settings.entityproperty.display.DisplayEntityProperty
 import gg.aquatic.waves.interactable.settings.entityproperty.display.ItemDisplayEntityProperty
@@ -71,7 +68,8 @@ object WavesRegistry {
         "ORAXEN_FURNITURE" to OraxenEntityInteractableSettings.Companion,
         "ENTITY" to EntityInteractableSettings.Companion,
         "BLOCK" to BlockInteractableSettings.Companion,
-        "MODELENGINE" to MEGInteractableSettings.Companion
+        "MODELENGINE" to MEGInteractableSettings.Companion,
+        "ITEM_MODEL" to ItemDisplayInteractableSettings.Companion
     )
 
     val HOLOGRAM_LINE_FACTORIES = hashMapOf(
