@@ -21,7 +21,7 @@ interface ItemDisplayEntityProperty : EntityProperty {
 
         }
 
-        override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
+        override fun apply(builder: EntityDataBuilder, updater: (String) -> String) {
             if (builder is ItemDisplayEntityDataBuilder) {
                 builder.setItem(item.getItem())
             }
@@ -37,7 +37,7 @@ interface ItemDisplayEntityProperty : EntityProperty {
             }
         }
 
-        override fun apply(builder: EntityDataBuilder, player: Player?, updater: (Player, String) -> String) {
+        override fun apply(builder: EntityDataBuilder, updater: (String) -> String) {
             if (builder is ItemDisplayEntityDataBuilder) {
                 builder.setItemTransformation(transform)
             }
