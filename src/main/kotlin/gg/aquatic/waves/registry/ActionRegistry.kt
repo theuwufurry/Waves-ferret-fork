@@ -9,7 +9,10 @@ inline fun <reified T: Any> WavesRegistry.registerAction(id: String, action: Abs
 
 inline fun <reified T: Any> WavesRegistry.getAction(id: String): AbstractAction<T>? {
     val map = ACTION[T::class.java] ?: return null
-    return map[id] as AbstractAction<T>
+
+    val value = map[id] ?: return null
+
+    return value as? AbstractAction<T>?
 }
 
 inline fun <reified T: Any> AbstractAction<T>.register(id: String) {
