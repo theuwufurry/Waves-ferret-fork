@@ -3,6 +3,7 @@ package gg.aquatic.waves.inventory
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow
 import gg.aquatic.waves.util.toUser
 import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -55,6 +56,17 @@ open class PacketInventory(
     fun setItems(items: Map<Int, ItemStack>) {
         this.content.clear()
         this.content.putAll(items)
+        for ((_, viewer) in viewers) {
+            InventoryManager.updateInventoryContent(this, viewer)
+        }
+    }
+
+    fun updateItems(player: Player) {
+        val viewer = viewers[player.uniqueId] ?: return
+        InventoryManager.updateInventoryContent(this, viewer)
+    }
+
+    fun updateItems() {
         for ((_, viewer) in viewers) {
             InventoryManager.updateInventoryContent(this, viewer)
         }
