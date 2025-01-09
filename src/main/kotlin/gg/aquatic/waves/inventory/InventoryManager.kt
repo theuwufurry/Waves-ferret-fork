@@ -69,7 +69,11 @@ object InventoryManager : WaveModule {
                 accumulateDrag(player, packet, clickData.second)
                 return@packetEvent
             }
-
+            if (packet.slot == -999) {
+                inventory.updateItems(player)
+                isCancelled = true
+                return@packetEvent
+            }
             val menuClickData = isMenuClick(packet, Pair(clickData.first, clickData.second), player)
             if (menuClickData) {
                 handleClickMenu(WindowClick(player, clickData.second, packet.slot))
