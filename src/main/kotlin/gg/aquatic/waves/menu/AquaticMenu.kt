@@ -23,7 +23,38 @@ open class AquaticMenu(
         InventoryManager.openMenu(player, this)
     }
 
+    fun addComponent(component: MenuComponent) {
+        components[component.id] = component
+        updateComponent(component)
+    }
+
+    fun removeComponent(component: MenuComponent) {
+        components.remove(component.id) ?: return
+        updateComponents()
+    }
+
+    fun updateComponents() {
+        val renderedToRemove = mutableListOf<Int>()
+        for ((slot, component) in renderedComponents) {
+            if (!components.containsKey(component)) {
+                renderedToRemove.add(slot)
+                continue
+            }
+        }
+        for (slot in renderedToRemove) {
+            renderedComponents.remove(slot)
+            this.setItem(slot,null)
+        }
+        for ((_, component) in components) {
+            updateComponent(component)
+        }
+    }
+
     fun updateComponent(component: MenuComponent) {
+        if (!components.containsKey(component.id)) {
+            updateComponents()
+            return
+        }
         val item = component.itemstack(this) ?: ItemStack(Material.AIR)
         val state = ComponentState(component.slots, item)
 
