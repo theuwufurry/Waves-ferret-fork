@@ -12,11 +12,7 @@ object ActionSerializer {
         section: ConfigurationSection
     ): ConfiguredExecutableObject<T,Unit>? {
         val type = section.getString("type") ?: return null
-        val action = WavesRegistry.getAction<T>(type)
-        if (action == null) {
-            println("[AquaticSeriesLib] Action type $type does not exist!")
-            return null
-        }
+        val action = WavesRegistry.getAction<T>(type) ?: return null
 
         val args = AquaticObjectArgument.loadRequirementArguments(section, action.arguments)
 
