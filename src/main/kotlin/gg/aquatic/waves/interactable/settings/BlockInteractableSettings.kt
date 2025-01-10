@@ -7,6 +7,7 @@ import gg.aquatic.waves.interactable.Interactable
 import gg.aquatic.waves.interactable.InteractableInteractEvent
 import gg.aquatic.waves.interactable.type.BlockInteractable
 import gg.aquatic.waves.util.block.AquaticBlockSerializer
+import gg.aquatic.waves.util.blockLocation
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.util.Vector
@@ -20,7 +21,7 @@ class BlockInteractableSettings(
         audience: AquaticAudience,
         onInteract: (InteractableInteractEvent) -> Unit
     ): Interactable {
-        val fb = FakeBlock(block, location.clone().add(offset), 50, audience)
+        val fb = FakeBlock(block, location.clone().add(offset).blockLocation(), 50, audience)
         fb.register()
         return BlockInteractable(fb, onInteract)
     }

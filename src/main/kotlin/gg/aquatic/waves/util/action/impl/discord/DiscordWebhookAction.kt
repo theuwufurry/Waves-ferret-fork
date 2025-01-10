@@ -15,7 +15,7 @@ class DiscordWebhookAction : AbstractAction<Player>() {
         val url = args["url"] as String
         val content = args["content"] as String
         val username = args["username"] as String
-        val avatarUrl = args["avatar_url"] as String
+        val avatarUrl = args["avatar-url"] as String
         val tts = args["tts"] as Boolean
         val embeds = args["embeds"] as ArrayList<EmbedObject>
 
@@ -35,7 +35,7 @@ class DiscordWebhookAction : AbstractAction<Player>() {
         PrimitiveObjectArgument("url", "", true),
         PrimitiveObjectArgument("content", null, false),
         PrimitiveObjectArgument("username", "AquaticCrates", false),
-        PrimitiveObjectArgument("avatar_url", "", false),
+        PrimitiveObjectArgument("avatar-url", "", false),
         PrimitiveObjectArgument("tts", false, required = false),
         DiscordEmbedArgument("embeds", ArrayList(), false)
     )
