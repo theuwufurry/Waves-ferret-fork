@@ -46,6 +46,19 @@ class FastItemMeta(
             nms.setComponent(ComponentTypes.ENCHANTMENTS, ItemEnchantments(value, true))
         }
 
+    var customModelData: ItemCustomModelData?
+        get() {
+            return nms.getComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS).getOrNull()
+        }
+        set(value) {
+            if (value == null) {
+                nms.unsetComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS)
+                return
+            }
+            nms.setComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS, value)
+        }
+
+    @Deprecated("Use customModelData instead")
     var modelData: Int?
         get() {
             return nms.getComponent(ComponentTypes.CUSTOM_MODEL_DATA).getOrNull()
