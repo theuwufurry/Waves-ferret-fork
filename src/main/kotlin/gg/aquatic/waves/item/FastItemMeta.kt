@@ -1,6 +1,9 @@
 package gg.aquatic.waves.item
 
+import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.manager.server.ServerVersion
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemCustomModelData
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnchantments
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType
@@ -48,7 +51,19 @@ class FastItemMeta(
             return nms.getComponent(ComponentTypes.CUSTOM_MODEL_DATA).getOrNull()
         }
         set(value) {
-            nms.setComponent(ComponentTypes.CUSTOM_MODEL_DATA, value)
+            if (value == null) {
+                if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+                    nms.unsetComponent(ComponentTypes.CUSTOM_MODEL_DATA)
+                } else {
+                    nms.unsetComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS)
+                }
+            } else {
+                if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+                    nms.setComponent(ComponentTypes.CUSTOM_MODEL_DATA, value)
+                } else {
+                    nms.setComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS, ItemCustomModelData(value))
+                }
+            }
         }
 
     fun enchantments(enchantments: Map<EnchantmentType, Int>, showInTooltip: Boolean = true) {
