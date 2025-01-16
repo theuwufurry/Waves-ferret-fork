@@ -35,25 +35,25 @@ object ChunkTracker : WaveModule {
             val chunkId = ChunkId(packet.column.x, packet.column.z)
             chunks.getOrPut(player.world.name) { hashMapOf() }.getOrPut(chunkId) { ConcurrentHashMap.newKeySet() }.add(player.uniqueId)
 
-            runSync {
-                val chunk = chunkId.toChunk(player.world)
-                var playerPair = playerToChunks.getOrPut(player.uniqueId) { player.world.name to ConcurrentHashMap.newKeySet() }
-                if (playerPair.first != player.location.world!!.name) {
-                    for (chunkId1 in playerPair.second) {
-                        val chunkList = chunks[playerPair.first]?.get(chunkId1) ?: continue
-                        chunkList -= player.uniqueId
-                        runAsync {
-                            AsyncPlayerChunkUnloadEvent(player,chunk).call()
-                        }
-                        if (chunkList.isEmpty()) {
-                            chunks[playerPair.first]?.remove(chunkId1)
-                        }
+            val chunk = chunkId.toChunk(player.world)
+            var (worldName, worldChunks) = playerToChunks.getOrPut(player.uniqueId) { player.world.name to ConcurrentHashMap.newKeySet() }
+            if (worldName != player.location.world!!.name) {
+                for (chunkId1 in worldChunks) {
+                    val chunkList = chunks[worldName]?.get(chunkId1) ?: continue
+                    chunkList -= player.uniqueId
+                    runAsync {
+                        AsyncPlayerChunkUnloadEvent(player,chunk).call()
                     }
-                    playerPair = player.world.name to ConcurrentHashMap.newKeySet()
-                    playerToChunks[player.uniqueId] = playerPair
+                    if (chunkList.isEmpty()) {
+                        chunks[worldName]?.remove(chunkId1)
+                    }
                 }
+                worldName = player.world.name
+                worldChunks = ConcurrentHashMap.newKeySet()
+                playerToChunks[player.uniqueId] = worldName to worldChunks
+            } else {
                 val toRemove = mutableSetOf<ChunkId>()
-                for (chunkId1 in playerPair.second) {
+                for (chunkId1 in worldChunks) {
                     val viewDistance = player.clientViewDistance.coerceAtMost(Bukkit.getViewDistance()) + 1
                     val currentChunk = player.location.chunk
                     if (chunkId1.x > currentChunk.x + viewDistance || chunkId1.x < currentChunk.x - viewDistance || chunkId1.z > currentChunk.z + viewDistance || chunkId1.z < currentChunk.z - viewDistance) {
@@ -64,12 +64,10 @@ object ChunkTracker : WaveModule {
                         }
                     }
                 }
-                playerPair.second -= toRemove
-                playerPair.second += chunkId
-                runAsync {
-                    AsyncPlayerChunkLoadEvent(player,chunk,packet).call()
-                }
+                worldChunks -= toRemove
             }
+            worldChunks += chunkId
+            AsyncPlayerChunkLoadEvent(player,chunk,packet).call()
 
         }
         event<PlayerQuitEvent> {

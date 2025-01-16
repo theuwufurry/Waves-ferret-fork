@@ -26,6 +26,7 @@ class MEGInteractableHandler {
         }
         event<PlayerChangedWorldEvent> {
             for (tickableObject in InteractableHandler.megInteractables) {
+                if (tickableObject.location.world != it.player.world) continue
                 tickableObject.removeViewer(it.player)
                 runLaterSync(6) {
                     if (tickableObject.audience.canBeApplied(it.player)) {
@@ -34,5 +35,4 @@ class MEGInteractableHandler {
                 }
             }}
     }
-
 }

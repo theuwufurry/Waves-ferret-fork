@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "gg.aquatic.waves"
-version = "1.1.15"
+version = "1.1.16"
 
 val ktor_version: String by project
 
@@ -33,6 +33,7 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("net.kyori:adventure-text-serializer-gson:4.17.0")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.18.0")
     implementation("gg.aquatic.wavessync:wavessync-api:1.0.1:all")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")

@@ -42,13 +42,13 @@ open class FakeBlock(
         }
 
     override fun destroy() {
+        destroyed = true
         for (player in isViewing) {
             hide(player)
         }
         FakeObjectHandler.tickableObjects -= this
         unregister()
         FakeObjectHandler.locationToBlocks[location]?.remove(this)
-        destroyed = true
     }
 
     var block = block

@@ -134,7 +134,7 @@ object InventoryManager : WaveModule {
             if (openedInventories.containsKey(player)) return@runLaterSync
             player.updateInventory()
         }
-        AsyncPacketInventoryCloseEvent(player,removed ?: return).call()
+        AsyncPacketInventoryCloseEvent(player, removed ?: return).call()
     }
 
     fun handleClickInventory(player: Player, packet: WrapperPlayClientClickWindow, clickType: ClickType) {
@@ -160,8 +160,16 @@ object InventoryManager : WaveModule {
                 items += contentItem?.let { SpigotConversionUtil.fromBukkitItemStack(it) }
             }
         }
+
+        // Offhand item
+        val offHandItem = inventory.content[inventory.type.size + 36] ?: viewer.player.inventory.itemInOffHand
+
         val packet = WrapperPlayServerWindowItems(126, 0, items, viewer.carriedItem)
-        viewer.player.toUser().sendPacketSilently(packet)
+        val offHandPacket = WrapperPlayServerSetSlot(0, 0, 45, SpigotConversionUtil.fromBukkitItemStack(offHandItem))
+        viewer.player.toUser().let {
+            it.sendPacketSilently(packet)
+            it.sendPacketSilently(offHandPacket)
+        }
     }
 
     fun handleClickMenu(click: WindowClick) {

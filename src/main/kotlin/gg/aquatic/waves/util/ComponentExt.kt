@@ -17,3 +17,7 @@ fun Component.toMMString(): String {
 fun Component.toJson(): String {
     return net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serialize(this)
 }
+
+fun Component.toPlain(): String {
+    return net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(this)
+}

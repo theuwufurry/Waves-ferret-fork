@@ -12,6 +12,7 @@ abstract class FakeObject {
     abstract val location: Location
     protected var registered: Boolean = false
     abstract val viewRange: Int
+    @Volatile
     var destroyed: Boolean = false
     abstract var audience: AquaticAudience
 

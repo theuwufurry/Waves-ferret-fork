@@ -23,6 +23,7 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.*
 import gg.aquatic.waves.util.event.event
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -133,7 +134,8 @@ object FakeObjectHandler : WaveModule {
                 for (block in blocks) {
                     if (block.viewers.contains(player)) {
                         if (!block.destroyed) {
-                            packet.blockState = SpigotConversionUtil.fromBukkitBlockData(block.block.blockData)
+                            val newState = SpigotConversionUtil.fromBukkitBlockData(block.block.blockData)
+                            packet.blockState = newState
                             break
                         }
                     }
@@ -222,11 +224,14 @@ object FakeObjectHandler : WaveModule {
                     block.onInteract(event)
                     if (!block.destroyed) {
                         if (it.action == Action.RIGHT_CLICK_AIR || it.action == Action.RIGHT_CLICK_BLOCK) {
+                            /*
                             runLaterSync(1) {
                                 block.show(it.player)
                             }
+                             */
+                        } else {
+                            block.show(it.player)
                         }
-                        block.show(it.player)
                     }
                     break
                 }

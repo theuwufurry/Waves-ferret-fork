@@ -1,5 +1,6 @@
 package gg.aquatic.waves.chunk.cache
 
+import org.bukkit.Bukkit
 import org.bukkit.Chunk
 
 object ChunkCacheHandler {
@@ -11,7 +12,8 @@ object ChunkCacheHandler {
         val world = chunk.world.name
         val chunkMap = cache[world] ?: return HashMap()
         val chunkId = "${chunk.x},${chunk.z}"
-        return chunkMap[chunkId] ?: return HashMap()
+        val map = chunkMap[chunkId] ?: return HashMap()
+        return map
     }
 
     fun getObject(chunk: Chunk, clazz: Class<out ChunkObject>): ChunkObject? {

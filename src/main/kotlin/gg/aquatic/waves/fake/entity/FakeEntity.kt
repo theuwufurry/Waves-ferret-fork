@@ -50,13 +50,13 @@ open class FakeEntity(
         }
 
     override fun destroy() {
+        destroyed = true
         for (player in isViewing.toSet()) {
             hide(player)
         }
         FakeObjectHandler.tickableObjects -= this
         unregister()
         FakeObjectHandler.idToEntity -= entityId
-        destroyed = true
     }
 
     val entityId = SpigotReflectionUtil.generateEntityId()
