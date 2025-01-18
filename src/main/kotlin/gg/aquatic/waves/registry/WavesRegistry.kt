@@ -64,6 +64,11 @@ object WavesRegistry {
         "BASE64" to Base64Factory
     )
 
+    val BLOCK_FACTORIES = hashMapOf(
+        "ITEMSADDER" to gg.aquatic.waves.util.block.factory.IAFactory,
+        "ORAXEN" to gg.aquatic.waves.util.block.factory.OraxenFactory,
+    )
+
     val INTERACTABLE_FACTORIES = hashMapOf(
         "ORAXEN_FURNITURE" to OraxenEntityInteractableSettings.Companion,
         "ENTITY" to EntityInteractableSettings.Companion,

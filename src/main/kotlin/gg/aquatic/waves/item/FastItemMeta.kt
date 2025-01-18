@@ -21,9 +21,16 @@ class FastItemMeta(
 
     var displayName: Component?
         get() {
+            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+                return nms.getComponent(ComponentTypes.ITEM_NAME).getOrNull()
+            }
             return nms.getComponent(ComponentTypes.CUSTOM_NAME).getOrNull()
         }
         set(value) {
+            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+                nms.setComponent(ComponentTypes.ITEM_NAME, value)
+                return
+            }
             nms.setComponent(ComponentTypes.CUSTOM_NAME, value)
             //itemStack.itemMeta = SpigotConversionUtil.toBukkitItemStack(nms).itemMeta
         }
