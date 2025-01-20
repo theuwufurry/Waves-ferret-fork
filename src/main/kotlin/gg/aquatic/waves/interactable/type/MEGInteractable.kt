@@ -12,6 +12,7 @@ import gg.aquatic.waves.interactable.MEGInteractableDummy
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import kotlin.jvm.optionals.getOrNull
 
 class MEGInteractable(
     override val location: Location, val modelId: String, audience: AquaticAudience, override val onInteract: (InteractableInteractEvent) -> Unit,
@@ -45,7 +46,7 @@ class MEGInteractable(
     }
 
     fun setSkin(player: Player) {
-        activeModel.apply {
+        activeModel?.apply {
             for (value in bones.values) {
                 value.getBoneBehavior(BoneBehaviorTypes.PLAYER_LIMB).ifPresent {
                     setSkin(player)
@@ -54,13 +55,13 @@ class MEGInteractable(
         }
     }
 
-    val modeledEntity: ModeledEntity
+    val modeledEntity: ModeledEntity?
         get() {
             return ModelEngineAPI.getModeledEntity(dummy.uuid)
         }
-    val activeModel: ActiveModel
+    val activeModel: ActiveModel?
         get() {
-            return modeledEntity.getModel(modelId).get()
+            return modeledEntity?.getModel(modelId)?.getOrNull()
         }
 
     init {
@@ -84,8 +85,8 @@ class MEGInteractable(
 
 
     override fun destroy() {
-        this.activeModel.destroy()
-        this.activeModel.isRemoved = true
+        this.activeModel?.destroy()
+        this.activeModel?.isRemoved = true
         dummy.isRemoved = true
         InteractableHandler.megInteractables -= this
         viewers.clear()
