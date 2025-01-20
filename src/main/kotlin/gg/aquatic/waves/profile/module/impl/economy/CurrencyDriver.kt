@@ -34,7 +34,7 @@ object CurrencyDriver {
 
     fun save(connection: Connection, entry: EconomyEntry) {
 
-        val newValues = entry.balance.mapValues { (currency, pair) ->
+        val newValues = entry.balance.mapValues { (_, pair) ->
             (pair.first to pair.first)
         }
         connection.prepareStatement("replace into aquaticcurrency values (?, ?, ?)").use { preparedStatement ->
