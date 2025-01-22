@@ -5,11 +5,12 @@ import gg.aquatic.waves.util.argument.impl.PrimitiveObjectArgument
 import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.statistic.StatisticAddEvent
 import gg.aquatic.waves.util.statistic.StatisticType
+import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 
-object BlockBreakStatistic: StatisticType() {
+object BlockBreakStatistic: StatisticType<Player>() {
     override val arguments: Collection<AquaticObjectArgument<*>> = listOf(
         PrimitiveObjectArgument("types", ArrayList<String>(), true)
     )

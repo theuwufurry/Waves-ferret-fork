@@ -133,8 +133,9 @@ object WavesRegistry {
     )
     val ITEM = HashMap<String, AquaticItem>()
 
-    val STATISTIC_TYPES = HashMap<String, StatisticType>().apply {
-        put("BLOCK_BREAK", BlockBreakStatistic)
+    val STATISTIC_TYPES = HashMap<Class<*>, MutableMap<String, StatisticType<*>>>().apply {
+        val p = getOrPut(Player::class.java) { HashMap() }
+        p["BLOCK_BREAK"] = BlockBreakStatistic
     }
 
     private fun createProperty(

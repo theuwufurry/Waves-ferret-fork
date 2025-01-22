@@ -1,25 +1,24 @@
 package gg.aquatic.waves.util.statistic
 
 import gg.aquatic.waves.util.argument.AquaticObjectArgument
-import org.bukkit.entity.Player
 
-abstract class StatisticType {
+abstract class StatisticType<T> {
 
     abstract val arguments: Collection<AquaticObjectArgument<*>>
 
-    val handles = mutableListOf<StatisticHandle>()
+    val handles = mutableListOf<StatisticHandle<T>>()
 
     abstract fun initialize()
     abstract fun terminate()
 
-    fun registerHandle(handle: StatisticHandle) {
+    fun registerHandle(handle: StatisticHandle<T>) {
         if (handles.isEmpty()) {
             initialize()
         }
         handles.add(handle)
     }
 
-    fun unregisterHandle(handle: StatisticHandle) {
+    fun unregisterHandle(handle: StatisticHandle<T>) {
         handles.remove(handle)
         if (handles.isEmpty()) {
             terminate()
@@ -27,10 +26,10 @@ abstract class StatisticType {
     }
 }
 
-class StatisticHandle(
-    val statistic: StatisticType,
+class StatisticHandle<T>(
+    val statistic: StatisticType<T>,
     val args: Map<String, Any?>,
-    val consumer: (StatisticAddEvent) -> Unit
+    val consumer: (StatisticAddEvent<T>) -> Unit
 ) {
 
     fun unregister() {
@@ -43,4 +42,4 @@ class StatisticHandle(
 
 }
 
-class StatisticAddEvent(val statistic: StatisticType, val increasedAmount: Number, val player: Player)
+class StatisticAddEvent<T>(val statistic: StatisticType<T>, val increasedAmount: Number, val binder: T)
