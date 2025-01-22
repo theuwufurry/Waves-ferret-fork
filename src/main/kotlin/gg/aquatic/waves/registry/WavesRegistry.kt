@@ -22,6 +22,8 @@ import gg.aquatic.waves.util.currency.Currency
 import gg.aquatic.waves.util.price.impl.ItemPrice
 import gg.aquatic.waves.util.price.impl.VaultPrice
 import gg.aquatic.waves.util.requirement.impl.ExpressionPlayerRequirement
+import gg.aquatic.waves.util.statistic.StatisticType
+import gg.aquatic.waves.util.statistic.impl.BlockBreakStatistic
 import gg.aquatic.waves.util.toMMComponent
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
@@ -130,6 +132,10 @@ object WavesRegistry {
         "transformation" to DisplayEntityProperty.Transformation.Companion,
     )
     val ITEM = HashMap<String, AquaticItem>()
+
+    val STATISTIC_TYPES = HashMap<String, StatisticType>().apply {
+        put("BLOCK_BREAK", BlockBreakStatistic)
+    }
 
     private fun createProperty(
         path: String,
