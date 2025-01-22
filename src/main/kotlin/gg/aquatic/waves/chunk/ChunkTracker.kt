@@ -38,7 +38,8 @@ object ChunkTracker : WaveModule {
             var (previousWorldName, worldChunks) = playerToChunks.getOrPut(player.uniqueId) { player.world.name to ConcurrentHashMap.newKeySet() }
             if (previousWorldName != player.world.name) {
                 for (chunkId1 in worldChunks) {
-                    val chunkList = chunks[previousWorldName]?.get(chunkId1) ?: continue
+                    val chunkListMap = chunks[previousWorldName] ?: break
+                    val chunkList = chunkListMap[chunkId1] ?: continue
                     chunkList -= player.uniqueId
                     AsyncPlayerChunkUnloadEvent(player, chunk).call()
                     if (chunkList.isEmpty()) {
@@ -70,12 +71,13 @@ object ChunkTracker : WaveModule {
             for (chunkId in playerPair.second) {
                 val chunkList = chunks[playerPair.first]?.get(chunkId) ?: continue
                 chunkList -= it.player.uniqueId
-                if (chunkList.isNotEmpty()) continue
-                chunks[playerPair.first]?.remove(chunkId)
                 val chunk = chunkId.toChunk(it.player.world)
                 runAsync {
                     AsyncPlayerChunkUnloadEvent(it.player, chunk).call()
                 }
+                if (chunkList.isNotEmpty()) continue
+                chunks[playerPair.first]?.remove(chunkId)
+
             }
             playerToChunks.remove(it.player.uniqueId)
         }
