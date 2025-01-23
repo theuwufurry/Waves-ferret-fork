@@ -44,7 +44,7 @@ class ItemDisplayInteractableSettings(
 
     companion object: InteractableSettingsFactory {
         override fun load(section: ConfigurationSection): InteractableSettings? {
-            val offsetStr = section.getString("vector","0;0;0")!!.split(";")
+            val offsetStr = section.getString("offset","0;0;0")!!.split(";")
             val offset = Vector(
                 offsetStr[0].toDouble(),
                 offsetStr[1].toDouble(),
@@ -52,7 +52,7 @@ class ItemDisplayInteractableSettings(
             )
             val item = AquaticItem.loadFromYml(section.getConfigurationSection("item")) ?: return null
             val itemTransform = ItemDisplayTransform.valueOf(section.getString("item-transform") ?: "NONE")
-            val scaleStr = section.getString("scale","0;0;0")!!.split(";")
+            val scaleStr = section.getString("scale","1;1;1")!!.split(";")
             val scale = Vector(
                 scaleStr[0].toDouble(),
                 scaleStr[1].toDouble(),
