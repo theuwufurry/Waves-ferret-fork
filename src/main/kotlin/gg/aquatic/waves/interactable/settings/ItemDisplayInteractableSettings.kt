@@ -58,7 +58,7 @@ class ItemDisplayInteractableSettings(
                 scaleStr[1].toDouble(),
                 scaleStr[2].toDouble()
             )
-            val billboard = Billboard.valueOf(section.getString("billboard") ?: "NONE")
+            val billboard = Billboard.valueOf(section.getString("billboard") ?: "FIXED")
             return ItemDisplayInteractableSettings(offset, item, itemTransform, scale, billboard)
         }
 

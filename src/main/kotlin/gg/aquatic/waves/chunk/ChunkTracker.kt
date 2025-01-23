@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
 object ChunkTracker : WaveModule {
 
     // WorldName, Chunk ID, List of players
-    val chunks = ConcurrentHashMap<String, HashMap<ChunkId, MutableSet<UUID>>>()
+    val chunks = ConcurrentHashMap<String, ConcurrentHashMap<ChunkId, MutableSet<UUID>>>()
     val playerToChunks = ConcurrentHashMap<UUID, Pair<String, MutableSet<ChunkId>>>()
 
     override val type: WaveModules = WaveModules.CHUNK_TRACKER
@@ -31,7 +31,7 @@ object ChunkTracker : WaveModule {
             val packet = WrapperPlayServerChunkData(this)
             val player = this.player() ?: return@packetEvent
             val chunkId = ChunkId(packet.column.x, packet.column.z)
-            chunks.getOrPut(player.world.name) { hashMapOf() }.getOrPut(chunkId) { ConcurrentHashMap.newKeySet() }
+            chunks.getOrPut(player.world.name) { ConcurrentHashMap() }.getOrPut(chunkId) { ConcurrentHashMap.newKeySet() }
                 .add(player.uniqueId)
 
             val chunk = chunkId.toChunk(player.world)
