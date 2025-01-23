@@ -17,9 +17,6 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-/*
-newly loaded chunk is out of range, but can never be put back into range
- */
 object ChunkTracker : WaveModule {
 
     // WorldName, Chunk ID, List of players
