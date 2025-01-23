@@ -17,6 +17,9 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
+/*
+newly loaded chunk is out of range, but can never be put back into range
+ */
 object ChunkTracker : WaveModule {
 
     // WorldName, Chunk ID, List of players
@@ -52,11 +55,12 @@ object ChunkTracker : WaveModule {
             } else {
                 val toRemove = mutableSetOf<ChunkId>()
                 for (chunkId1 in worldChunks) {
-                    val viewDistance = player.clientViewDistance.coerceAtMost(Bukkit.getViewDistance()) + 1
+                    val viewDistance = player.clientViewDistance.coerceAtMost(Bukkit.getViewDistance()) + 2
                     val currentChunk = player.location.chunk
                     if (chunkId1.x > currentChunk.x + viewDistance || chunkId1.x < currentChunk.x - viewDistance || chunkId1.z > currentChunk.z + viewDistance || chunkId1.z < currentChunk.z - viewDistance) {
                         toRemove += chunkId1
                         chunks[player.world.name]?.get(chunkId1)?.remove(player.uniqueId)
+
                         AsyncPlayerChunkUnloadEvent(player, chunk).call()
                     }
                 }
