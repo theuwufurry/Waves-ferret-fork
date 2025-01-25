@@ -37,5 +37,9 @@ abstract class EntityDataBuilder {
             get() {
                 return InteractionEntityDataBuilder()
             }
+        val ITEM: ItemEntityDataBuilder
+            get() {
+                return ItemEntityDataBuilder()
+            }
     }
 }
