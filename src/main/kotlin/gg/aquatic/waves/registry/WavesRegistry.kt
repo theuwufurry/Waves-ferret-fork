@@ -15,10 +15,12 @@ import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.item.factory.*
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.BaseEntityDataBuilder
+import gg.aquatic.waves.packetevents.type.ItemEntityDataBuilder
 import gg.aquatic.waves.util.action.*
 import gg.aquatic.waves.util.action.impl.discord.DiscordWebhookAction
 import gg.aquatic.waves.util.action.impl.*
 import gg.aquatic.waves.util.currency.Currency
+import gg.aquatic.waves.util.item.loadFromYml
 import gg.aquatic.waves.util.price.impl.ItemPrice
 import gg.aquatic.waves.util.price.impl.VaultPrice
 import gg.aquatic.waves.util.requirement.impl.ExpressionPlayerRequirement
@@ -122,6 +124,9 @@ object WavesRegistry {
         },
         createProperty("pose") { s, str, builder, _ ->
             (builder as BaseEntityDataBuilder).setPose(EntityPose.valueOf(s.getString(str, "STANDING")!!.uppercase()))
+        },
+        createProperty("entity-item") { s, str, builder, _ ->
+            (builder as ItemEntityDataBuilder).setItem(AquaticItem.loadFromYml(s)?.getItem() ?: return@createProperty)
         },
         "item" to ItemDisplayEntityProperty.Item.Companion,
         "item-transform" to ItemDisplayEntityProperty.ItemTransformation.Companion,
