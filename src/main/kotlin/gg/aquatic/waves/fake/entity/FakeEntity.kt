@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
 import gg.aquatic.waves.chunk.cache.ChunkCacheHandler
 import gg.aquatic.waves.util.audience.AquaticAudience
@@ -25,6 +26,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 open class FakeEntity(
     val type: EntityType, override var location: Location,
@@ -63,6 +65,7 @@ open class FakeEntity(
     val entityUUID = UUID.randomUUID()
     val entityData = HashMap<Int, EntityData>()
     val equipment = HashMap<EquipmentSlot, ItemStack>()
+    val passengers = HashSet<Int>()
 
     init {
         consumer(this)
@@ -111,13 +114,14 @@ open class FakeEntity(
             val packet = WrapperPlayServerEntityMetadata(entityId, entityData.values.toMutableList())
             user.sendPacket(packet)
         }
-
         if (equipment.isNotEmpty()) {
             val packet = WrapperPlayServerEntityEquipment(
                 entityId,
                 equipment.map { Equipment(it.key, SpigotConversionUtil.fromBukkitItemStack(it.value)) })
             user.sendPacket(packet)
         }
+        val passengersPacket = WrapperPlayServerSetPassengers(entityId, passengers.toIntArray())
+        user.sendPacket(passengersPacket)
         onUpdate(player)
     }
 
