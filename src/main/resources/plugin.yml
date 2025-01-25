@@ -1,6 +1,6 @@
 name: Waves
 main: gg.aquatic.waves.Waves
-version: '1.0.0'
+version: '${project.version}'
 authors: [ AquaticCreations ]
 api-version: 1.19
 folia-supported: true
