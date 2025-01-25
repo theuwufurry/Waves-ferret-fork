@@ -8,8 +8,12 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnc
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound
+import com.github.retrooper.packetevents.protocol.nbt.NBTString
+import gg.aquatic.waves.util.toJson
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
 import org.bukkit.inventory.ItemStack
 import kotlin.jvm.optionals.getOrNull
 
@@ -22,16 +26,25 @@ class FastItemMeta(
     var displayName: Component?
         get() {
             if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
-                return nms.getComponent(ComponentTypes.ITEM_NAME).getOrNull()
+                val json = nms.orCreateTag?.getCompoundTagOrNull("display")?.getStringTagValueOrNull("Name") ?: return null
+                return JSONComponentSerializer.json().deserialize(json)
             }
             return nms.getComponent(ComponentTypes.CUSTOM_NAME).getOrNull()
         }
         set(value) {
             if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
-                nms.setComponent(ComponentTypes.ITEM_NAME, value)
+                var displayTag = nms.orCreateTag.getCompoundTagOrNull("display")
+                if (displayTag == null) {
+                    displayTag = NBTCompound()
+                    nms.orCreateTag.setTag("display", displayTag)
+                }
+                displayTag.removeTag("Name")
+                value ?: return
+                displayTag.setTag("Name", NBTString(value.toJson()))
                 return
             }
             nms.setComponent(ComponentTypes.CUSTOM_NAME, value)
+            //nms.setComponent(ComponentTypes.CUSTOM_NAME, value)
             //itemStack.itemMeta = SpigotConversionUtil.toBukkitItemStack(nms).itemMeta
         }
 
