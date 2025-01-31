@@ -17,4 +17,6 @@ abstract class Interactable {
 
     abstract fun destroy()
 
+    abstract fun updateViewers()
+
 }

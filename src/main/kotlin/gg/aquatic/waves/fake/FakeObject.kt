@@ -37,12 +37,14 @@ abstract class FakeObject {
         tickRange()
     }
 
-    private fun tickRange() {
-        rangeTick++
-        if (rangeTick % 4 == 0) {
-            rangeTick = 0
-        } else {
-            return
+    internal fun tickRange(forced: Boolean = false) {
+        if (!forced) {
+            rangeTick++
+            if (rangeTick % 4 == 0) {
+                rangeTick = 0
+            } else {
+                return
+            }
         }
 
         val loadedChunkViewers = location.chunk.trackedByPlayers().filter { viewers.contains(it) }

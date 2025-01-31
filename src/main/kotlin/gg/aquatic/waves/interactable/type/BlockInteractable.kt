@@ -52,4 +52,8 @@ class BlockInteractable(
         this.block.destroy()
     }
 
+    override fun updateViewers() {
+        block.tickRange(true)
+    }
+
 }

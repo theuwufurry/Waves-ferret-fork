@@ -49,4 +49,8 @@ class EntityInteractable(val entity: FakeEntity, override val onInteract: (Inter
     override fun destroy() {
         this.entity.destroy()
     }
+
+    override fun updateViewers() {
+        entity.tickRange(true)
+    }
 }

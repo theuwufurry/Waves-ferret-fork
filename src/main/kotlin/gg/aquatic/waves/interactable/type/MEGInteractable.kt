@@ -91,4 +91,12 @@ class MEGInteractable(
         InteractableHandler.megInteractables -= this
         viewers.clear()
     }
+
+    override fun updateViewers() {
+        location.world?.players?.forEach { player ->
+            if (audience.canBeApplied(player)) {
+                addViewer(player)
+            }
+        }
+    }
 }
