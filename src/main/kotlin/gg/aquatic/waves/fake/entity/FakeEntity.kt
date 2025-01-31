@@ -25,6 +25,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
@@ -63,9 +64,9 @@ open class FakeEntity(
 
     val entityId = SpigotReflectionUtil.generateEntityId()
     val entityUUID = UUID.randomUUID()
-    val entityData = HashMap<Int, EntityData>()
-    val equipment = HashMap<EquipmentSlot, ItemStack>()
-    val passengers = HashSet<Int>()
+    val entityData = ConcurrentHashMap<Int, EntityData>()
+    val equipment = ConcurrentHashMap<EquipmentSlot, ItemStack>()
+    val passengers = ConcurrentHashMap.newKeySet<Int>()
 
     init {
         consumer(this)
