@@ -14,7 +14,6 @@ import gg.aquatic.waves.interactable.settings.entityproperty.display.ItemDisplay
 import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.item.factory.*
 import gg.aquatic.waves.packetevents.EntityDataBuilder
-import gg.aquatic.waves.packetevents.type.BaseEntityDataBuilder
 import gg.aquatic.waves.packetevents.type.ItemEntityDataBuilder
 import gg.aquatic.waves.util.action.*
 import gg.aquatic.waves.util.action.impl.discord.DiscordWebhookAction
@@ -88,42 +87,42 @@ object WavesRegistry {
 
     val ENTITY_PROPERTY_FACTORIES = hashMapOf(
         createProperty("is-on-fire") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).isOnFire(s.getBoolean(str))
+            builder.isOnFire(s.getBoolean(str))
         },
         createProperty("is-sneaking") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).isSneaking(s.getBoolean(str))
+            builder.isSneaking(s.getBoolean(str))
         },
         createProperty("is-sprinting") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).isSprinting(s.getBoolean(str))
+            builder.isSprinting(s.getBoolean(str))
         },
         createProperty("is-swimming") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).isSwimming(s.getBoolean(str))
+            builder.isSwimming(s.getBoolean(str))
         },
         createProperty("invisible") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).isInvisible(s.getBoolean(str))
+            builder.isInvisible(s.getBoolean(str))
         },
         createProperty("glowing") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).isGlowing(s.getBoolean(str))
+            builder.isGlowing(s.getBoolean(str))
         },
         createProperty("is-flying") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).isFlying(s.getBoolean(str))
+            builder.isFlying(s.getBoolean(str))
         },
         createProperty("custom-name") { s, str, builder, updater ->
             var name = s.getString(str) ?: ""
             name = updater(name)
-            (builder as BaseEntityDataBuilder).setCustomName(name.toMMComponent())
+            builder.setCustomName(name.toMMComponent())
         },
         createProperty("custom-name-visible") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).isCustomNameVisible(s.getBoolean(str))
+            builder.isCustomNameVisible(s.getBoolean(str))
         },
         createProperty("is-silent") { s, str, builder,  _ ->
-            (builder as BaseEntityDataBuilder).isSilent(s.getBoolean(str))
+            builder.isSilent(s.getBoolean(str))
         },
         createProperty("no-gravity") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).hasNoGravity(s.getBoolean(str))
+            builder.hasNoGravity(s.getBoolean(str))
         },
         createProperty("pose") { s, str, builder, _ ->
-            (builder as BaseEntityDataBuilder).setPose(EntityPose.valueOf(s.getString(str, "STANDING")!!.uppercase()))
+            builder.setPose(EntityPose.valueOf(s.getString(str, "STANDING")!!.uppercase()))
         },
         createProperty("entity-item") { s, str, builder, _ ->
             (builder as ItemEntityDataBuilder).setItem(AquaticItem.loadFromYml(s)?.getItem() ?: return@createProperty)

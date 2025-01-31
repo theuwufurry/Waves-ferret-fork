@@ -54,7 +54,7 @@ class TextHologramLine(
             0,
             null
         )
-        val builder = EntityDataBuilder.TEXT_DISPLAY
+        val builder = EntityDataBuilder.TEXT_DISPLAY()
         builder.setText(text.toMMComponent())
         builder.setLineWidth(lineWidth)
         val entityData = builder
@@ -79,7 +79,7 @@ class TextHologramLine(
 
     override fun update(spawnedHologramLine: SpawnedHologramLine) {
         val text = spawnedHologramLine.textUpdater(spawnedHologramLine.player, this.text)
-        val builder = EntityDataBuilder.TEXT_DISPLAY
+        val builder = EntityDataBuilder.TEXT_DISPLAY()
         builder.setText(text.toMMComponent())
         builder.setLineWidth(lineWidth)
         val entityData = builder

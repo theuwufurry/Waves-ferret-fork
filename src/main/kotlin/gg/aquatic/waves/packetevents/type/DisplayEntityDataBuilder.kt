@@ -9,7 +9,7 @@ import org.bukkit.entity.Display.Billboard
 import org.bukkit.util.Transformation
 import org.joml.*
 
-abstract class DisplayEntityDataBuilder : EntityDataBuilder() {
+open class DisplayEntityDataBuilder : EntityDataBuilder() {
 
     fun setInterpolationDelay(delay: Int): DisplayEntityDataBuilder {
         addData(8, EntityDataTypes.INT, delay)

@@ -59,7 +59,7 @@ class ItemHologramLine(
             0,
             null
         )
-        val entityData = EntityDataBuilder.ITEM_DISPLAY
+        val entityData = EntityDataBuilder.ITEM_DISPLAY()
             .setItem(item)
             .setItemTransformation(itemDisplayTransform)
             .setScale(Vector3f(scale, scale, scale))

@@ -29,7 +29,7 @@ class ItemDisplayInteractableSettings(
         onInteract: (InteractableInteractEvent) -> Unit
     ): Interactable {
         val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location.clone().add(offset), 50, audience, consumer =  {
-            entityData += EntityDataBuilder.ITEM_DISPLAY
+            entityData += EntityDataBuilder.ITEM_DISPLAY()
                 .setItem(item.getItem())
                 .setItemTransformation(itemTransform)
                 .setScale(scale.x, scale.y, scale.z)

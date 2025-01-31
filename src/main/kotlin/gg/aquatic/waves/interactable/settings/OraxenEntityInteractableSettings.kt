@@ -23,7 +23,7 @@ class OraxenEntityInteractableSettings(
         val item = OraxenItems.getItemById(furniture.itemID).build()
         val displaySettings = furniture.displayEntityProperties
         val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location.clone().add(offset), 50, audience, consumer =  {
-            entityData += EntityDataBuilder.ITEM_DISPLAY
+            entityData += EntityDataBuilder.ITEM_DISPLAY()
                 .setItem(item)
                 .setItemTransformation(displaySettings.displayTransform)
                 .setScale(displaySettings.scale.x, displaySettings.scale.y, displaySettings.scale.z)
