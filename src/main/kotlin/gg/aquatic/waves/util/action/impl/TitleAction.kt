@@ -3,16 +3,16 @@ package gg.aquatic.waves.util.action.impl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleSubtitle
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleText
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetTitleTimes
-import gg.aquatic.waves.util.action.AbstractAction
 import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.util.argument.ObjectArguments
 import gg.aquatic.waves.util.argument.impl.PrimitiveObjectArgument
+import gg.aquatic.waves.util.generic.Action
 import gg.aquatic.waves.util.toMMComponent
 import gg.aquatic.waves.util.toUser
 import gg.aquatic.waves.util.updatePAPIPlaceholders
 import org.bukkit.entity.Player
 
-class TitleAction : AbstractAction<Player>() {
+class TitleAction : Action<Player> {
 
     override fun execute(binder: Player, args: ObjectArguments, textUpdater: (Player, String) -> String) {
         val title = (args.string("title") { str -> textUpdater(binder, str)} ?: return).updatePAPIPlaceholders(binder)

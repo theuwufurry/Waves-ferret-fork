@@ -1,20 +1,20 @@
 package gg.aquatic.waves.registry
 
-import gg.aquatic.waves.util.action.AbstractAction
+import gg.aquatic.waves.util.generic.Action
 
-inline fun <reified T: Any> WavesRegistry.registerAction(id: String, action: AbstractAction<T>) {
+inline fun <reified T: Any> WavesRegistry.registerAction(id: String, action: Action<T>) {
     val map = ACTION.getOrPut(T::class.java) { HashMap() }
     map += id to action
 }
 
-inline fun <reified T: Any> WavesRegistry.getAction(id: String): AbstractAction<T>? {
+inline fun <reified T: Any> WavesRegistry.getAction(id: String): Action<T>? {
     val map = ACTION[T::class.java] ?: return null
 
     val value = map[id] ?: return null
 
-    return value as? AbstractAction<T>?
+    return value as? Action<T>?
 }
 
-inline fun <reified T: Any> AbstractAction<T>.register(id: String) {
+inline fun <reified T: Any> Action<T>.register(id: String) {
     WavesRegistry.registerAction(id, this)
 }

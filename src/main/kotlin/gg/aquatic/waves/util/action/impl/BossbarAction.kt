@@ -1,11 +1,11 @@
 package gg.aquatic.waves.util.action.impl
 
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBossBar
-import gg.aquatic.waves.util.action.AbstractAction
 import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.util.argument.ObjectArguments
 import gg.aquatic.waves.util.argument.impl.PrimitiveObjectArgument
 import gg.aquatic.waves.util.bossbar.AquaticBossBar
+import gg.aquatic.waves.util.generic.Action
 import gg.aquatic.waves.util.runLaterSync
 import gg.aquatic.waves.util.toMMComponent
 import gg.aquatic.waves.util.updatePAPIPlaceholders
@@ -13,7 +13,7 @@ import net.kyori.adventure.bossbar.BossBar
 import org.bukkit.entity.Player
 import java.util.*
 
-class BossbarAction : AbstractAction<Player>() {
+class BossbarAction : Action<Player> {
 
     override fun execute(binder: Player, args: ObjectArguments, textUpdater: (Player, String) -> String) {
         val message = (args.string("message") { str -> textUpdater(binder, str)}!!).updatePAPIPlaceholders(binder)

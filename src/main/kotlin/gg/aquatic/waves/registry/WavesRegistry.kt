@@ -1,9 +1,7 @@
 package gg.aquatic.waves.registry
 
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose
-import gg.aquatic.waves.util.action.AbstractAction
 import gg.aquatic.waves.util.price.AbstractPrice
-import gg.aquatic.waves.util.requirement.AbstractRequirement
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.hologram.line.ItemHologramLine
 import gg.aquatic.waves.hologram.line.TextHologramLine
@@ -19,6 +17,8 @@ import gg.aquatic.waves.util.action.*
 import gg.aquatic.waves.util.action.impl.discord.DiscordWebhookAction
 import gg.aquatic.waves.util.action.impl.*
 import gg.aquatic.waves.util.currency.Currency
+import gg.aquatic.waves.util.generic.Action
+import gg.aquatic.waves.util.generic.Condition
 import gg.aquatic.waves.util.item.loadFromYml
 import gg.aquatic.waves.util.price.impl.ItemPrice
 import gg.aquatic.waves.util.price.impl.VaultPrice
@@ -33,7 +33,7 @@ object WavesRegistry {
 
     val INDEX_TO_CURRENCY = HashMap<Int, RegisteredCurrency>()
     val ECONOMY = HashMap<String, Currency>()
-    val ACTION = HashMap<Class<*>, MutableMap<String, AbstractAction<*>>>().apply {
+    val ACTION = HashMap<Class<*>, MutableMap<String, Action<*>>>().apply {
         val p = getOrPut(Player::class.java) { HashMap() }
         p["actionbar"] = ActionbarAction()
         p["bossbar"] = BossbarAction()
@@ -45,7 +45,7 @@ object WavesRegistry {
         p["sound"] = SoundAction()
         p["discord-webhook"] = DiscordWebhookAction()
     }
-    val REQUIREMENT = HashMap<Class<*>, MutableMap<String, AbstractRequirement<*>>>().apply {
+    val REQUIREMENT = HashMap<Class<*>, MutableMap<String, Condition<*>>>().apply {
         //val p = getOrPut(Player::class.java) { HashMap() }
         //p += "expression" to ExpressionPlayerRequirement()
     }

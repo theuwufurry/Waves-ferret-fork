@@ -9,3 +9,6 @@ interface ExecutableObject<A, B> {
     val arguments: List<AquaticObjectArgument<*>>
 
 }
+
+typealias Action<A> = ExecutableObject<A, Unit>
+typealias Condition<A> = ExecutableObject<A, Boolean>
