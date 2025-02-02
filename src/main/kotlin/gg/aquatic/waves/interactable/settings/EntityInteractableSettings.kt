@@ -9,7 +9,7 @@ import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.type.EntityInteractable
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.registry.serializer.EntityPropertySerializer
-import gg.aquatic.waves.util.mapPair
+import gg.aquatic.waves.util.collection.mapPair
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.util.Vector

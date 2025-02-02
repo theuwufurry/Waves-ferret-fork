@@ -2,6 +2,7 @@ package gg.aquatic.waves.fake.entity
 
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
 import com.github.retrooper.packetevents.protocol.player.Equipment
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
@@ -17,17 +18,19 @@ import gg.aquatic.waves.chunk.trackedChunks
 import gg.aquatic.waves.fake.FakeObject
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.fake.FakeObjectChunkBundle
+import gg.aquatic.waves.packetevents.EntityDataBuilder
+import gg.aquatic.waves.util.audience.FilterAudience
+import gg.aquatic.waves.util.collection.mapPair
 import gg.aquatic.waves.util.toUser
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil
-import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
+import java.util.concurrent.atomic.AtomicInteger
 
 open class FakeEntity(
     val type: EntityType, override var location: Location,
@@ -38,7 +41,8 @@ open class FakeEntity(
     var onUpdate: (Player) -> Unit = {},
 ) : FakeObject() {
 
-    override var audience = audience
+    @Volatile
+    override var audience: AquaticAudience = FilterAudience { false }
         set(value) {
             field = value
             for (viewer in viewers.toMutableList()) {
@@ -46,7 +50,7 @@ open class FakeEntity(
                 removeViewer(viewer)
             }
             for (player in
-            Bukkit.getOnlinePlayers().filter { !viewers.contains(it) }) {
+            location.world!!.players.filter { !viewers.contains(it) }) {
                 if (!field.canBeApplied(player)) continue
                 addViewer(player)
             }
@@ -62,13 +66,17 @@ open class FakeEntity(
         FakeObjectHandler.idToEntity -= entityId
     }
 
-    val entityId = SpigotReflectionUtil.generateEntityId()
+    val atomicEntityId = AtomicInteger(SpigotReflectionUtil.generateEntityId())
+    val entityId: Int get() = atomicEntityId.get()
     val entityUUID = UUID.randomUUID()
     val entityData = ConcurrentHashMap<Int, EntityData>()
     val equipment = ConcurrentHashMap<EquipmentSlot, ItemStack>()
     val passengers = ConcurrentHashMap.newKeySet<Int>()
 
     init {
+        if (type == EntityTypes.ITEM) {
+            entityData += EntityDataBuilder.ITEM().setItem(ItemStack(Material.STONE)).build().mapPair { it.index to it }
+        }
         consumer(this)
         this.audience = audience
         FakeObjectHandler.tickableObjects += this
@@ -112,7 +120,7 @@ open class FakeEntity(
     private fun sendUpdate(player: Player) {
         val user = player.toUser()
         if (entityData.isNotEmpty()) {
-            val packet = WrapperPlayServerEntityMetadata(entityId, entityData.values.toMutableList())
+            val packet = WrapperPlayServerEntityMetadata(entityId, entityData.values.toList())
             user.sendPacket(packet)
         }
         if (equipment.isNotEmpty()) {
@@ -123,6 +131,7 @@ open class FakeEntity(
         }
         val passengersPacket = WrapperPlayServerSetPassengers(entityId, passengers.toIntArray())
         user.sendPacket(passengersPacket)
+
         onUpdate(player)
     }
 
@@ -148,6 +157,7 @@ open class FakeEntity(
     }
 
     override fun show(player: Player) {
+        if (isViewing.contains(player)) return
         isViewing.add(player)
         val spawnPacket = WrapperPlayServerSpawnEntity(
             entityId,

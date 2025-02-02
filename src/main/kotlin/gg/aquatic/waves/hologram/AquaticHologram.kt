@@ -1,7 +1,7 @@
 package gg.aquatic.waves.hologram
 
 import gg.aquatic.waves.chunk.trackedByPlayers
-import gg.aquatic.waves.util.checkRequirements
+import gg.aquatic.waves.util.collection.checkRequirements
 import gg.aquatic.waves.util.requirement.ConfiguredRequirement
 import org.bukkit.Location
 import org.bukkit.entity.Player

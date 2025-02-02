@@ -1,4 +1,4 @@
-package gg.aquatic.waves.util
+package gg.aquatic.waves.util.collection
 
 import gg.aquatic.waves.util.generic.ConfiguredExecutableObject
 import gg.aquatic.waves.util.requirement.ConfiguredRequirement

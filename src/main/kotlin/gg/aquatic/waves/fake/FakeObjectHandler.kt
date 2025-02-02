@@ -4,10 +4,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.protocol.packettype.PacketType.Play
-import com.github.retrooper.packetevents.protocol.player.InteractionHand
-import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.chunk.AsyncPlayerChunkLoadEvent
@@ -23,7 +20,6 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.*
 import gg.aquatic.waves.util.event.event
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -62,7 +58,7 @@ object FakeObjectHandler : WaveModule {
             tickableObjects += obj.entities
             for (block in obj.blocks) {
                 if (block.viewers.contains(it.player)) {
-                    val index = (block.location.y.toInt()+64) / 16
+                    val index = (block.location.y.toInt() + 64) / 16
                     val chunk = it.wrappedPacket.column.chunks[index]
                     chunk.set(
                         block.location.x.toInt() and 0xf,
@@ -91,36 +87,6 @@ object FakeObjectHandler : WaveModule {
                 }
             }
         }
-        /*
-        event<ChunkUnloadEvent> {
-            val obj = ChunkCacheHandler.getObject(it.chunk, FakeObjectChunkBundle::class.java) as? FakeObjectChunkBundle
-                ?: return@event
-
-            for ((_, locMap) in obj.cache) {
-                for ((_, inst) in locMap) {
-                    if (inst !is FakeObject) {
-                        continue
-                    }
-                    inst.viewers.clear()
-                    inst.isViewing.clear()
-                    objectRemovalQueue += inst
-                }
-            }
-        }
-        event<ChunkLoadEvent> {
-            val obj = ChunkCacheHandler.getObject(it.chunk, LocationChunkObject::class.java) as? LocationChunkObject
-                ?: return@event
-            for ((_, locMap) in obj.cache) {
-                for ((_, inst) in locMap) {
-                    if (inst !is FakeObject) {
-                        continue
-                    }
-                    inst.audience = inst.audience
-                    tickableObjects += inst
-                }
-            }
-        }
-         */
         packetEvent<PacketSendEvent> {
             val player = player() ?: return@packetEvent
             if (packetType == PacketType.Play.Server.BLOCK_CHANGE) {
@@ -142,74 +108,7 @@ object FakeObjectHandler : WaveModule {
                 }
             }
         }
-        /*
-        packetEvent<PacketReceiveEvent> {
-            /*
-            if (packetType == PacketType.Play.Client.PLAYER_DIGGING) {
-                val packet = WrapperPlayClientPlayerDigging(this)
-                Bukkit.broadcastMessage("Packet Interacted - LEFT")
 
-                val player = player()
-
-                val blocks = locationToBlocks[player.world.getBlockAt(
-                    packet.blockPosition.x,
-                    packet.blockPosition.y,
-                    packet.blockPosition.z
-                ).location] ?: return@packetEvent
-
-                for (block in blocks) {
-                    if (block.viewers.contains(player)) {
-                        val event = FakeBlockInteractEvent(
-                            block,
-                            player,
-                            true
-                        )
-                        block.onInteract(event)
-                        if (!block.destroyed) {
-                            this.isCancelled = true
-                            runLaterSync(40) {
-                                Bukkit.broadcastMessage("Showing the block")
-                                block.show(player)
-                            }
-                        }
-                        break
-                    }
-                }
-            } else */
-            if (packetType == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
-                val packet = WrapperPlayClientPlayerBlockPlacement(this)
-                val isOffhand = (packet.hand == InteractionHand.OFF_HAND)
-
-                val player = player() ?: return@packetEvent
-
-                val blocks = locationToBlocks[player.world.getBlockAt(
-                    packet.blockPosition.x,
-                    packet.blockPosition.y,
-                    packet.blockPosition.z
-                ).location] ?: return@packetEvent
-
-                for (block in blocks) {
-                    if (block.viewers.contains(player)) {
-                        if (isOffhand) {
-                            this.isCancelled = true
-                            break
-                        }
-                        val event = FakeBlockInteractEvent(
-                            block,
-                            player,
-                            false
-                        )
-                        packet.cursorPosition
-                        block.onInteract(event)
-                        if (!block.destroyed) {
-                            this.isCancelled = true
-                        }
-                        break
-                    }
-                }
-            }
-        }
-         */
         event<PlayerInteractEvent> {
             if (it.hand == EquipmentSlot.OFF_HAND) return@event
             val blocks = locationToBlocks[it.clickedBlock?.location ?: return@event] ?: return@event

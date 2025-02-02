@@ -12,7 +12,7 @@ import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.event.event
-import gg.aquatic.waves.util.mapPair
+import gg.aquatic.waves.util.collection.mapPair
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player
 import gg.aquatic.waves.util.toUser

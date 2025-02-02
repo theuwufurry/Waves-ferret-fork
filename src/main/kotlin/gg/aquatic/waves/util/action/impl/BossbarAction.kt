@@ -3,6 +3,7 @@ package gg.aquatic.waves.util.action.impl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBossBar
 import gg.aquatic.waves.util.action.AbstractAction
 import gg.aquatic.waves.util.argument.AquaticObjectArgument
+import gg.aquatic.waves.util.argument.ObjectArguments
 import gg.aquatic.waves.util.argument.impl.PrimitiveObjectArgument
 import gg.aquatic.waves.util.bossbar.AquaticBossBar
 import gg.aquatic.waves.util.runLaterSync
@@ -14,17 +15,15 @@ import java.util.*
 
 class BossbarAction : AbstractAction<Player>() {
 
-    override fun execute(binder: Player, args: Map<String, Any?>, textUpdater: (Player, String) -> String) {
-        val message = (args["message"] as String).updatePAPIPlaceholders(binder)
-        val progress = args["progress"].toString().toFloat()
-        val color = BossBar.Color.valueOf((args["color"] as String).uppercase())
-        val style = BossBar.Overlay.valueOf((args["style"] as String).uppercase())
-
+    override fun execute(binder: Player, args: ObjectArguments, textUpdater: (Player, String) -> String) {
+        val message = (args.string("message") { str -> textUpdater(binder, str)}!!).updatePAPIPlaceholders(binder)
+        val progress = args.float("progress") { str -> textUpdater(binder, str)} ?: 0.0f
+        val color = BossBar.Color.valueOf((args.string("color") { str -> textUpdater(binder, str)} ?: "BLUE").uppercase())
+        val style = BossBar.Overlay.valueOf((args.string("style") { str -> textUpdater(binder, str)} ?: "SOLID").uppercase())
 
         val bossBar =
             AquaticBossBar(textUpdater(binder, message).toMMComponent(), color, style, mutableSetOf(), progress)
-
-        val duration = args["duration"] as Int
+        val duration = args.int("duration") { str -> textUpdater(binder, str)} ?: 60
 
         WrapperPlayServerBossBar(UUID.randomUUID(), WrapperPlayServerBossBar.Action.ADD).color
 

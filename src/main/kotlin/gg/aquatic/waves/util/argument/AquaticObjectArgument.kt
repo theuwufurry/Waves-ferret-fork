@@ -14,7 +14,7 @@ abstract class AquaticObjectArgument<T>(
         fun loadRequirementArguments(
             section: ConfigurationSection,
             arguments: List<AquaticObjectArgument<*>>
-        ): Map<String, Any?> {
+        ): ObjectArguments {
             val args: MutableMap<String, Any?> = java.util.HashMap()
 
             for (argument in arguments) {
@@ -25,7 +25,7 @@ abstract class AquaticObjectArgument<T>(
                 }
                 args += argument.id to loaded
             }
-            return args
+            return ObjectArguments(args)
         }
     }
 

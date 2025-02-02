@@ -6,7 +6,7 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.AquaticPlayer
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.registry.WavesRegistry
-import gg.aquatic.waves.util.mapPair
+import gg.aquatic.waves.util.collection.mapPair
 import gg.aquatic.waves.util.toUUID
 
 fun EconomyProfileModule.refreshLeaderboard() {

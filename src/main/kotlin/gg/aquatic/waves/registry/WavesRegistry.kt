@@ -22,7 +22,6 @@ import gg.aquatic.waves.util.currency.Currency
 import gg.aquatic.waves.util.item.loadFromYml
 import gg.aquatic.waves.util.price.impl.ItemPrice
 import gg.aquatic.waves.util.price.impl.VaultPrice
-import gg.aquatic.waves.util.requirement.impl.ExpressionPlayerRequirement
 import gg.aquatic.waves.util.statistic.StatisticType
 import gg.aquatic.waves.util.statistic.impl.BlockBreakStatistic
 import gg.aquatic.waves.util.toMMComponent
@@ -47,8 +46,8 @@ object WavesRegistry {
         p["discord-webhook"] = DiscordWebhookAction()
     }
     val REQUIREMENT = HashMap<Class<*>, MutableMap<String, AbstractRequirement<*>>>().apply {
-        val p = getOrPut(Player::class.java) { HashMap() }
-        p += "expression" to ExpressionPlayerRequirement()
+        //val p = getOrPut(Player::class.java) { HashMap() }
+        //p += "expression" to ExpressionPlayerRequirement()
     }
     val PRICE by lazy {
         HashMap<Class<*>, MutableMap<String, AbstractPrice<*>>>().apply {

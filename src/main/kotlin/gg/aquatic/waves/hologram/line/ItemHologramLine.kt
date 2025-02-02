@@ -9,10 +9,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import gg.aquatic.waves.hologram.*
 import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.packetevents.EntityDataBuilder
-import gg.aquatic.waves.registry.serializer.ItemSerializer
 import gg.aquatic.waves.registry.serializer.RequirementSerializer
-import gg.aquatic.waves.util.checkRequirements
-import gg.aquatic.waves.util.generic.ConfiguredExecutableObject
+import gg.aquatic.waves.util.collection.checkRequirements
 import gg.aquatic.waves.util.getSectionList
 import gg.aquatic.waves.util.item.loadFromYml
 import gg.aquatic.waves.util.requirement.ConfiguredRequirement

@@ -6,7 +6,7 @@ import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.menu.AquaticMenu
 import gg.aquatic.waves.menu.PrivateAquaticMenu
 import gg.aquatic.waves.menu.component.Button
-import gg.aquatic.waves.util.checkRequirements
+import gg.aquatic.waves.util.collection.checkRequirements
 import org.bukkit.entity.Player
 
 class ButtonSettings(

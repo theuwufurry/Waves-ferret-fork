@@ -9,7 +9,7 @@ import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.util.item.loadFromYml
-import gg.aquatic.waves.util.mapPair
+import gg.aquatic.waves.util.collection.mapPair
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Display.Billboard
