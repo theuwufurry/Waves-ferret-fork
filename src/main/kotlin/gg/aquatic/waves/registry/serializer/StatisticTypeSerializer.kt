@@ -2,6 +2,7 @@ package gg.aquatic.waves.registry.serializer
 
 import gg.aquatic.waves.registry.WavesRegistry
 import gg.aquatic.waves.util.argument.ArgumentSerializer
+import gg.aquatic.waves.util.argument.ObjectArguments
 import gg.aquatic.waves.util.statistic.StatisticAddEvent
 import gg.aquatic.waves.util.statistic.StatisticHandle
 import gg.aquatic.waves.util.statistic.StatisticType
@@ -16,7 +17,7 @@ object StatisticTypeSerializer {
         val typeId = configurationSection.getString("type") ?: return null
         val registry = WavesRegistry.STATISTIC_TYPES[T::class.java] ?: return null
         val type = registry[typeId] as? StatisticType<T> ?: return null
-        val args = ArgumentSerializer.load(configurationSection, type.arguments)
+        val args = ObjectArguments(ArgumentSerializer.load(configurationSection, type.arguments))
         return StatisticHandle(type, args, consumer)
     }
 

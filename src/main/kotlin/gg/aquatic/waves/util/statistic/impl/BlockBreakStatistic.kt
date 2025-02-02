@@ -24,7 +24,7 @@ object BlockBreakStatistic: StatisticType<Player>() {
 
             for (statisticHandle in handles) {
                 val args = statisticHandle.args
-                val types = args["types"] as? List<String> ?: ArrayList()
+                val types = args.stringCollection("types") ?: listOf()
 
                 if ("ALL" !in types && it.block.type.name.uppercase() !in types) {
                     continue

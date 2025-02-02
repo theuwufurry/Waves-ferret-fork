@@ -1,6 +1,7 @@
 package gg.aquatic.waves.util.statistic
 
 import gg.aquatic.waves.util.argument.AquaticObjectArgument
+import gg.aquatic.waves.util.argument.ObjectArguments
 
 abstract class StatisticType<T> {
 
@@ -28,7 +29,7 @@ abstract class StatisticType<T> {
 
 class StatisticHandle<T>(
     val statistic: StatisticType<T>,
-    val args: Map<String, Any?>,
+    val args: ObjectArguments,
     val consumer: (StatisticAddEvent<T>) -> Unit
 ) {
 
