@@ -26,7 +26,7 @@ repositories {
     maven {
         url = uri("https://repo.codemc.io/repository/maven-snapshots/")
     }
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    maven("https://repo.extendedclip.com/releases/")
     maven("https://repo.auxilor.io/repository/maven-public/")
 }
 
@@ -44,7 +44,7 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktor_version")
 
     compileOnly("com.zaxxer:HikariCP:5.1.0")
-    compileOnly("me.clip:placeholderapi:2.11.2")
+    compileOnly("me.clip:placeholderapi:2.11.6")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("com.github.retrooper:packetevents-spigot:2.7.0")
