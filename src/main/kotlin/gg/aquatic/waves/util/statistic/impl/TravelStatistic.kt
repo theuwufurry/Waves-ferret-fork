@@ -12,10 +12,10 @@ import org.bukkit.event.player.PlayerMoveEvent
 
 object TravelStatistic: StatisticType<Player>() {
     override val arguments: Collection<AquaticObjectArgument<*>> = listOf(
-        PrimitiveObjectArgument("count-swimming", Boolean, true),
-        PrimitiveObjectArgument("count-flying", Boolean, true),
-        PrimitiveObjectArgument("count-gliding",Boolean, true),
-        PrimitiveObjectArgument("count-driving",Boolean, true)
+        PrimitiveObjectArgument("count-swimming", true, required = true),
+        PrimitiveObjectArgument("count-flying", true, required = true),
+        PrimitiveObjectArgument("count-gliding", defaultValue = true, required = true),
+        PrimitiveObjectArgument("count-driving", defaultValue = true, required = true)
     )
     private var listener: Listener? = null
 

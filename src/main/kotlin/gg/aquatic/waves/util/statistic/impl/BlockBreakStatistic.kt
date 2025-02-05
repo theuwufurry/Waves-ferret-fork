@@ -21,7 +21,6 @@ object BlockBreakStatistic: StatisticType<Player>() {
         BlockBreakEvent.getHandlerList()
         listener = event<BlockBreakEvent>(ignoredCancelled = true) {
             val player = it.player
-
             for (statisticHandle in handles) {
                 val args = statisticHandle.args
                 val types = args.stringCollection("types") ?: listOf()

@@ -16,11 +16,9 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.inventory.CraftItemEvent
 
-object KillStatistic: StatisticType<Player>() {
+object KillStatistic : StatisticType<Player>() {
     override val arguments: Collection<AquaticObjectArgument<*>> = listOf(
-        PrimitiveObjectArgument("mobs", Boolean, true),
-        PrimitiveObjectArgument("animals", Boolean, true),
-        PrimitiveObjectArgument("players", Boolean, true)
+        PrimitiveObjectArgument("types", ArrayList<String>(), true)
     )
 
     private var listener: Listener? = null
@@ -32,13 +30,9 @@ object KillStatistic: StatisticType<Player>() {
 
             for (statisticHandle in handles) {
                 val args = statisticHandle.args
-                val mobs = args.boolean("mobs") ?: true
-                val animals = args.boolean("animals") ?: true
-                val players = args.boolean("players") ?: true
+                val types = args.stringCollection("types") ?: listOf()
 
-                if ((it.entity is Player && !players) ||
-                    (it.entity is Animals && !animals) ||
-                    (it.entity is Monster && !mobs)) {
+                if ("ALL" !in types && it.entity.type.name.uppercase() !in types) {
                     continue
                 }
 

@@ -28,6 +28,7 @@ repositories {
     }
     maven("https://repo.extendedclip.com/releases/")
     maven("https://repo.auxilor.io/repository/maven-public/")
+    maven("https://nexus.phoenixdevt.fr/repository/maven-public/")
 }
 
 dependencies {
@@ -55,6 +56,8 @@ dependencies {
     compileOnly("com.github.LoneDev6:API-ItemsAdder:3.6.2-beta-r3-b")
     compileOnly ("com.ticxo.modelengine:ModelEngine:R4.0.8")
     compileOnly("io.lumine:Mythic-Dist:5.6.1")
+    compileOnly("io.lumine:MythicLib-dist:1.6.2-SNAPSHOT")
+    compileOnly("net.Indyuce:MMOItems-API:6.9.5-SNAPSHOT")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
     implementation("com.github.micartey:webhookly:master-SNAPSHOT")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")

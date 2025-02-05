@@ -13,7 +13,9 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 
 object DamageDealtStatistic: StatisticType<Player>() {
-    override val arguments: Collection<AquaticObjectArgument<*>> = listOf()
+    override val arguments: Collection<AquaticObjectArgument<*>> = listOf(
+        PrimitiveObjectArgument("types", ArrayList<String>(), true)
+    )
 
     private var listener: Listener? = null
 
@@ -23,6 +25,12 @@ object DamageDealtStatistic: StatisticType<Player>() {
             val player = it.damager as? Player ?: return@event
 
             for (statisticHandle in handles) {
+                val args = statisticHandle.args
+                val types = args.stringCollection("types") ?: listOf()
+
+                if ("ALL" !in types && it.entity.type.name.uppercase() !in types) {
+                    continue
+                }
                 val event = StatisticAddEvent(this, it.damage, player)
                 statisticHandle.consumer(event)
             }
