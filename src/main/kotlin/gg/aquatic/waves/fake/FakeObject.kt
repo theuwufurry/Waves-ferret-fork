@@ -2,6 +2,7 @@ package gg.aquatic.waves.fake
 
 import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.chunk.trackedByPlayers
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.UUID
@@ -10,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap
 abstract class FakeObject {
 
     abstract val location: Location
+    @Volatile
     protected var registered: Boolean = false
     abstract val viewRange: Int
     @Volatile
@@ -47,7 +49,8 @@ abstract class FakeObject {
             }
         }
 
-        val loadedChunkViewers = location.chunk.trackedByPlayers().filter { viewers.contains(it) }
+        val trackedPlayers = location.chunk.trackedByPlayers()
+        val loadedChunkViewers = trackedPlayers.filter { viewers.contains(it) }
         for (loadedChunkViewer in loadedChunkViewers.toSet()) {
             if (!loadedChunkViewer.isOnline) {
                 FakeObjectHandler.handlePlayerRemove(loadedChunkViewer, this, true)
@@ -66,7 +69,6 @@ abstract class FakeObject {
             } else {
                 if (distance <= viewRange * viewRange) {
                     show(loadedChunkViewer)
-                    isViewing.add(loadedChunkViewer)
                 }
             }
         }

@@ -20,6 +20,7 @@ import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.*
 import gg.aquatic.waves.util.event.event
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -41,7 +42,7 @@ object FakeObjectHandler : WaveModule {
         runAsyncTimer(
             100, 1
         ) {
-            if (tickableObjects.isNotEmpty()) {
+            if (objectRemovalQueue.isNotEmpty()) {
                 tickableObjects -= objectRemovalQueue
                 objectRemovalQueue.clear()
             }

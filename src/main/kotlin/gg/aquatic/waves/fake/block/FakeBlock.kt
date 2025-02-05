@@ -48,7 +48,7 @@ open class FakeBlock(
         }
         FakeObjectHandler.tickableObjects -= this
         unregister()
-        FakeObjectHandler.locationToBlocks[location]?.remove(this)
+        FakeObjectHandler.locationToBlocks[location.blockLocation()]?.remove(this)
     }
 
     var block = block
@@ -57,14 +57,7 @@ open class FakeBlock(
 
     init {
         this.audience = audience
-        val set = if (FakeObjectHandler.locationToBlocks.contains(location)) {
-            FakeObjectHandler.locationToBlocks[location]!!
-        } else {
-            val set = ConcurrentHashMap.newKeySet<FakeBlock>()
-            FakeObjectHandler.locationToBlocks[location] = set
-            set
-        }
-        set += this
+        FakeObjectHandler.locationToBlocks.getOrPut(location.blockLocation()) { ConcurrentHashMap.newKeySet() } += this
         FakeObjectHandler.tickableObjects += this
 
         for (viewer in viewers) {
@@ -119,7 +112,10 @@ open class FakeBlock(
     }
 
     override fun removeViewer(player: Player) {
-        hide(player)
+        if (isViewing.contains(player)) {
+            hide(player)
+        }
+        viewers.remove(player)
     }
 
     override fun show(player: Player) {
@@ -137,7 +133,7 @@ open class FakeBlock(
     override fun hide(player: Player) {
         isViewing.remove(player)
         val packet = WrapperPlayServerBlockChange(
-            Vector3i(location.blockX,location.blockY,location.blockZ),
+            Vector3i(location.blockX, location.blockY, location.blockZ),
             SpigotConversionUtil.fromBukkitBlockData(location.block.blockData).globalId
         )
         player.toUser().sendPacket(packet)
