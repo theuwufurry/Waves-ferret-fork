@@ -64,7 +64,7 @@ dependencies {
     implementation("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
     compileOnly("com.willfp:eco:6.74.5")
 
-    implementation("net.wesjd:anvilgui:1.10.4-SNAPSHOT")
+    //implementation("net.wesjd:anvilgui:1.10.4-SNAPSHOT")
 }
 
 
