@@ -136,7 +136,7 @@ open class FakeBlock(
             Vector3i(location.blockX, location.blockY, location.blockZ),
             SpigotConversionUtil.fromBukkitBlockData(location.block.blockData).globalId
         )
-        player.toUser().sendPacket(packet)
+        player.toUser()?.sendPacket(packet)
     }
 
     override fun tick() {

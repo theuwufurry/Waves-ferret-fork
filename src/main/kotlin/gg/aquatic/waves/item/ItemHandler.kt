@@ -1,7 +1,7 @@
 package gg.aquatic.waves.item
 
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.module.WaveModule
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.registry.isAquaticItem
 import gg.aquatic.waves.registry.registryId
@@ -19,7 +19,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
-object ItemHandler : WaveModule {
+object ItemHandler : WavesModule {
 
     val NAMESPACE_KEY by lazy {
         NamespacedKey(Waves.INSTANCE, "Custom_Item_Registry")

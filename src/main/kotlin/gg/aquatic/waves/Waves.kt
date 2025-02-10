@@ -11,10 +11,11 @@ import gg.aquatic.waves.command.register
 import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.hologram.HologramHandler
+import gg.aquatic.waves.input.InputModule
 import gg.aquatic.waves.interactable.InteractableHandler
 import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.menu.MenuHandler
-import gg.aquatic.waves.module.WaveModule
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
@@ -36,7 +37,8 @@ class Waves : JavaPlugin() {
         WaveModules.INTERACTABLES to InteractableHandler,
         WaveModules.INVENTORIES to gg.aquatic.waves.inventory.InventoryManager,
         WaveModules.MENUS to MenuHandler,
-        WaveModules.HOLOGRAMS to HologramHandler
+        WaveModules.HOLOGRAMS to HologramHandler,
+        WaveModules.INPUT to InputModule
     )
     lateinit var configValues: WavesConfig
     /**
@@ -55,7 +57,7 @@ class Waves : JavaPlugin() {
         lateinit var INSTANCE: Waves
             private set
 
-        fun getModule(type: WaveModules): WaveModule? {
+        fun getModule(type: WaveModules): WavesModule? {
             return INSTANCE.modules[type]
         }
     }
@@ -127,6 +129,7 @@ class Waves : JavaPlugin() {
     }
 
     override fun onDisable() {
+        ProfilesModule.save(*ProfilesModule.cache.values.toTypedArray())
         PacketEvents.getAPI().terminate()
     }
 

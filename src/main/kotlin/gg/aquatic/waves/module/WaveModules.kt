@@ -9,5 +9,6 @@ enum class WaveModules {
     INTERACTABLES,
     INVENTORIES,
     MENUS,
-    HOLOGRAMS
+    HOLOGRAMS,
+    INPUT
 }

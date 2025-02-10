@@ -15,12 +15,13 @@ import gg.aquatic.waves.fake.block.FakeBlock
 import gg.aquatic.waves.fake.block.FakeBlockInteractEvent
 import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.fake.entity.FakeEntityInteractEvent
-import gg.aquatic.waves.module.WaveModule
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
-import gg.aquatic.waves.util.*
 import gg.aquatic.waves.util.event.event
+import gg.aquatic.waves.util.packetEvent
+import gg.aquatic.waves.util.player
+import gg.aquatic.waves.util.runAsyncTimer
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -30,7 +31,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.EquipmentSlot
 import java.util.concurrent.ConcurrentHashMap
 
-object FakeObjectHandler : WaveModule {
+object FakeObjectHandler : WavesModule {
     override val type: WaveModules = WaveModules.FAKE_OBJECTS
 
     internal val tickableObjects = ConcurrentHashMap.newKeySet<FakeObject>()

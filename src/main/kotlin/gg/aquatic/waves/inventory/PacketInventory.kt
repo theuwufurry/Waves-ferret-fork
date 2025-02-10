@@ -29,7 +29,7 @@ open class PacketInventory(
         val packet = WrapperPlayServerOpenWindow(126, type.id(), title)
 
         for ((_, viewer) in viewers) {
-            viewer.player.toUser().sendPacket(packet)
+            viewer.player.toUser()?.sendPacket(packet)
             InventoryManager.updateInventoryContent(this, viewer)
         }
 

@@ -3,7 +3,7 @@ package gg.aquatic.waves.profile
 import gg.aquatic.waves.data.DataDriver
 import gg.aquatic.waves.data.MySqlDriver
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.module.WaveModule
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.event.AsyncProfileLoadEvent
 import gg.aquatic.waves.profile.event.ProfileUnloadEvent
@@ -15,7 +15,6 @@ import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.logger.type.InfoLogger
 import gg.aquatic.waves.util.runAsync
 import gg.aquatic.waves.util.toBytes
-import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
@@ -25,7 +24,7 @@ import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-object ProfilesModule : WaveModule {
+object ProfilesModule : WavesModule {
     override val type: WaveModules = WaveModules.PROFILES
 
     val driver: DataDriver

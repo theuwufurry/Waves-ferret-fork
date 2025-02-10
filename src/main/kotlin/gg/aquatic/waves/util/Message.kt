@@ -24,7 +24,7 @@ class Message(var messages: Collection<String>) {
         if (messages.size == 1 && messages.first().isEmpty()) {
             return
         }
-        val user = player.toUser()
+        val user = player.toUser() ?: return
         messages.forEach(Consumer { v: String ->
             user.sendMessage(v.toMMComponent())
         })
@@ -50,7 +50,7 @@ class Message(var messages: Collection<String>) {
         for (onlinePlayer in Bukkit.getOnlinePlayers()) {
             val user = onlinePlayer.toUser()
             messages.forEach(Consumer { v: String ->
-                user.sendMessage(v.toMMComponent())
+                user?.sendMessage(v.toMMComponent())
             })
         }
 

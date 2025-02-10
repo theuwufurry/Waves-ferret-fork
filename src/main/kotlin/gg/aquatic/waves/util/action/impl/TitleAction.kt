@@ -27,7 +27,7 @@ class TitleAction : Action<Player> {
             WrapperPlayServerSetTitleSubtitle(subtitle.toMMComponent())
         )
 
-        binder.toUser().let {
+        binder.toUser()?.let {
             packets.forEach { packet -> it.sendPacket(packet) }
         }
     }

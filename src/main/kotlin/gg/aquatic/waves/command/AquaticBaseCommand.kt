@@ -17,7 +17,8 @@ class AquaticBaseCommand(
     override fun execute(sender: CommandSender, commandLabel: String, args: Array<out String>): Boolean {
         if (args.isEmpty()) {
             if (sender is Player) {
-                helpMessage.forEach { sender.toUser().sendMessage(it) }
+                val user = sender.toUser() ?: return true
+                helpMessage.forEach { user.sendMessage(it) }
             }
             return true
         }
@@ -25,7 +26,8 @@ class AquaticBaseCommand(
         val cmd = subCommands[args[0]]
         if (cmd == null) {
             if (sender is Player) {
-                helpMessage.forEach { sender.toUser().sendMessage(it) }
+                val user = sender.toUser() ?: return true
+                helpMessage.forEach { user.sendMessage(it) }
             }
             return true
         }

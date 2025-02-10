@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "gg.aquatic.waves"
-version = "1.1.31"
+version = "1.1.32"
 
 val ktor_version: String by project
 
@@ -63,6 +63,8 @@ dependencies {
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
     compileOnly("com.willfp:eco:6.74.5")
+
+    implementation("net.wesjd:anvilgui:1.10.4-SNAPSHOT")
 }
 
 
@@ -84,7 +86,9 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shad
 
     // Exclude the original (unrelocated) kotlinx-coroutines-core package
     //exclude("kotlin/**")
-    relocate("com.tcoded.folialib", "gg.aquatic.aquaticseries.lib.folialib")
+    relocate("com.tcoded.folialib", "gg.aquatic.waves.shadow.lib.folialib")
+    relocate("net.wesjd.anvilgui", "gg.aquatic.waves.shadow.net.wesjd.anvilgui")
+
     exclude("com/google/**","com/typesafe/**", "io/netty/**", "org/slf4j/**")
 }
 
@@ -95,10 +99,11 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shad
     from(sourceSets.main.get().output)
     configurations = listOf(project.configurations.runtimeClasspath.get())
 
-    relocate("com.tcoded.folialib", "gg.aquatic.aquaticseries.lib.folialib")
+    relocate("com.tcoded.folialib", "gg.aquatic.waves.shadow.lib.folialib")
     relocate("kotlinx.coroutines", "gg.aquatic.waves.shadow.kotlinx.coroutines")
     relocate("com.github.retrooper", "gg.aquatic.waves.shadow.com.retrooper")
     relocate("io.github.retrooper", "gg.aquatic.waves.shadow.io.retrooper")
+    relocate("net.wesjd.anvilgui", "gg.aquatic.waves.shadow.net.wesjd.anvilgui")
 
     // Exclude the original (unrelocated) kotlinx-coroutines-core package
     exclude("kotlin/**")

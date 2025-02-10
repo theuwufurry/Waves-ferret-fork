@@ -118,7 +118,7 @@ open class FakeEntity(
     }
 
     private fun sendUpdate(player: Player) {
-        val user = player.toUser()
+        val user = player.toUser() ?: return
         if (entityData.isNotEmpty()) {
             val packet = WrapperPlayServerEntityMetadata(entityId, entityData.values.toList())
             user.sendPacket(packet)
@@ -168,14 +168,14 @@ open class FakeEntity(
             0,
             null
         )
-        player.toUser().sendPacket(spawnPacket)
+        player.toUser()?.sendPacket(spawnPacket)
         sendUpdate(player)
     }
 
     override fun hide(player: Player) {
         isViewing.remove(player)
         val destroyPacket = WrapperPlayServerDestroyEntities(entityId)
-        player.toUser().sendPacket(destroyPacket)
+        player.toUser()?.sendPacket(destroyPacket)
     }
 
     override fun tick() {
@@ -192,7 +192,7 @@ open class FakeEntity(
             entityId, SpigotConversionUtil.fromBukkitLocation(location), false
         )
         for (player in isViewing) {
-            player.toUser().sendPacket(packet)
+            player.toUser()?.sendPacket(packet)
         }
     }
 }

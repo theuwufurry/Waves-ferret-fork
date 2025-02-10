@@ -4,7 +4,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType.Play
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.module.WaveModule
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.event.call
 import gg.aquatic.waves.util.event.event
@@ -17,7 +17,7 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-object ChunkTracker : WaveModule {
+object ChunkTracker : WavesModule {
 
     // WorldName, Chunk ID, List of players
     val chunks = ConcurrentHashMap<String, ConcurrentHashMap<ChunkId, MutableSet<UUID>>>()

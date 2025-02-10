@@ -13,8 +13,9 @@ class MessageAction : Action<Player> {
 
     override fun execute(binder: Player, args: ObjectArguments, textUpdater: (Player, String) -> String) {
         val messages = args.stringOrCollection("message") ?: return
+        val user = binder.toUser() ?: return
         for (msg in messages) {
-            binder.toUser().sendMessage(textUpdater(binder,msg.updatePAPIPlaceholders(binder)).toMMComponent())
+            user.sendMessage(textUpdater(binder,msg.updatePAPIPlaceholders(binder)).toMMComponent())
         }
     }
 

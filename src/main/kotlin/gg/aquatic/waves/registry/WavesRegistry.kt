@@ -5,6 +5,9 @@ import gg.aquatic.waves.util.price.AbstractPrice
 import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.hologram.line.ItemHologramLine
 import gg.aquatic.waves.hologram.line.TextHologramLine
+import gg.aquatic.waves.input.Input
+import gg.aquatic.waves.input.impl.ChatInput
+import gg.aquatic.waves.input.impl.VanillaMenuInput
 import gg.aquatic.waves.interactable.settings.*
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.settings.entityproperty.display.DisplayEntityProperty
@@ -141,6 +144,11 @@ object WavesRegistry {
         val p = getOrPut(Player::class.java) { HashMap() }
         p["BLOCK_BREAK"] = BlockBreakStatistic
     }
+
+    val INPUT_TYPES = mutableMapOf(
+        "chat" to ChatInput,
+        "vanilla-menu" to VanillaMenuInput
+    )
 
     private fun createProperty(
         path: String,

@@ -1,12 +1,12 @@
 package gg.aquatic.waves.hologram
 
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.module.WaveModule
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.runAsyncTimer
 import java.util.concurrent.ConcurrentHashMap
 
-object HologramHandler: WaveModule {
+object HologramHandler: WavesModule {
     override val type: WaveModules = WaveModules.HOLOGRAMS
 
     val spawnedHolograms = ConcurrentHashMap.newKeySet<AquaticHologram>()

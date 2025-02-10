@@ -1,10 +1,9 @@
 package gg.aquatic.waves.registry.serializer
 
-import gg.aquatic.waves.util.requirement.ConfiguredRequirement
-import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.registry.WavesRegistry
 import gg.aquatic.waves.registry.getRequirement
-import gg.aquatic.waves.util.generic.ExecutableObject
+import gg.aquatic.waves.util.argument.AquaticObjectArgument
+import gg.aquatic.waves.util.requirement.ConfiguredRequirement
 import org.bukkit.configuration.ConfigurationSection
 
 object RequirementSerializer {
@@ -13,7 +12,7 @@ object RequirementSerializer {
         val type = section.getString("type") ?: return null
         val requirement = WavesRegistry.getRequirement<T>(type)
         if (requirement == null) {
-            println("[AquaticSeriesLib] Action type $type does not exist!")
+            println("[Waves] Action type $type does not exist!")
             return null
         }
 

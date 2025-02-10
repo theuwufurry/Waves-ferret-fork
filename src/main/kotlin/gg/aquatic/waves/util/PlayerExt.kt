@@ -12,12 +12,12 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.BookMeta
 
-fun Player.toUser(): User {
+fun Player.toUser(): User? {
     return PacketEvents.getAPI().playerManager.getUser(this)
 }
 
 fun Player.sendMessage(vararg components: Component) {
-    val user = toUser()
+    val user = toUser() ?: return
     for (component in components) {
         user.sendMessage(component)
     }
@@ -36,7 +36,7 @@ fun Player.openBook(pages: List<Component>) {
     this.inventory.setItemInMainHand(bookItem)
     //sendItemChange(this.inventory.heldItemSlot, bookItem)
     val packet = WrapperPlayServerOpenBook(InteractionHand.MAIN_HAND)
-    toUser().sendPacket(packet)
+    toUser()?.sendPacket(packet)
     this.inventory.setItemInMainHand(previousItem)
     //sendItemChange(this.inventory.heldItemSlot, previousItem)
 }

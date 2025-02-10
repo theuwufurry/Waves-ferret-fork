@@ -11,7 +11,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWi
 import gg.aquatic.waves.Waves
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryCloseEvent
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
-import gg.aquatic.waves.module.WaveModule
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.*
 import gg.aquatic.waves.util.event.call
@@ -24,7 +24,7 @@ import java.util.Optional
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.optionals.getOrNull
 
-object InventoryManager : WaveModule {
+object InventoryManager : WavesModule {
 
     val openedInventories = ConcurrentHashMap<Player, PacketInventory>()
     override val type: WaveModules = WaveModules.INVENTORIES
@@ -107,7 +107,7 @@ object InventoryManager : WaveModule {
         val viewer = InventoryViewer(player)
         inventory.viewers[player.uniqueId] = viewer
 
-        player.toUser().let { user ->
+        player.toUser()?.let { user ->
             user.sendPacket(inventory.inventoryOpenPacket)
             updateInventoryContent(inventory, viewer)
         }
@@ -166,7 +166,7 @@ object InventoryManager : WaveModule {
 
         val packet = WrapperPlayServerWindowItems(126, 0, items, viewer.carriedItem)
         val offHandPacket = WrapperPlayServerSetSlot(0, 0, 45, SpigotConversionUtil.fromBukkitItemStack(offHandItem))
-        viewer.player.toUser().let {
+        viewer.player.toUser()?.let {
             it.sendPacketSilently(packet)
             it.sendPacketSilently(offHandPacket)
         }
@@ -203,7 +203,7 @@ object InventoryManager : WaveModule {
             } ?: com.github.retrooper.packetevents.protocol.item.ItemStack.EMPTY
         )
         for ((_, viewer) in inventory.viewers) {
-            viewer.player.toUser().sendPacket(packet)
+            viewer.player.toUser()?.sendPacket(packet)
         }
     }
 
@@ -279,7 +279,7 @@ object InventoryManager : WaveModule {
     fun reRenderCarriedItem(player: Player) {
         val menu = openedInventories[player] ?: error("Menu under player key not found.")
         val carriedItem = menu.viewers[player.uniqueId]?.carriedItem ?: return
-        player.toUser().sendPacket(WrapperPlayServerSetSlot(-1, 0, -1, carriedItem))
+        player.toUser()?.sendPacket(WrapperPlayServerSetSlot(-1, 0, -1, carriedItem))
     }
 
     private fun updateCarriedItem(

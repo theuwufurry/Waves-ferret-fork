@@ -26,7 +26,7 @@ class AquaticBossBar(
             packet.title = value
 
             for (viewer in viewers) {
-                viewer.toUser().sendPacket(packet)
+                viewer.toUser()?.sendPacket(packet)
             }
         }
     var color: net.kyori.adventure.bossbar.BossBar.Color = color
@@ -38,7 +38,7 @@ class AquaticBossBar(
             packet.overlay = overlay
 
             for (viewer in viewers) {
-                viewer.toUser().sendPacket(packet)
+                viewer.toUser()?.sendPacket(packet)
             }
         }
 
@@ -49,7 +49,7 @@ class AquaticBossBar(
             packet.overlay = value
             packet.color = color
             for (viewer in viewers) {
-                viewer.toUser().sendPacket(packet)
+                viewer.toUser()?.sendPacket(packet)
             }
         }
 
@@ -61,7 +61,7 @@ class AquaticBossBar(
         val packet = WrapperPlayServerBossBar(uuid,WrapperPlayServerBossBar.Action.UPDATE_FLAGS)
         packet.flags = flags
         for (viewer in viewers) {
-            viewer.toUser().sendPacket(packet)
+            viewer.toUser()?.sendPacket(packet)
         }
     }
     fun removeFlag(flag: net.kyori.adventure.bossbar.BossBar.Flag) {
@@ -70,7 +70,7 @@ class AquaticBossBar(
         val packet = WrapperPlayServerBossBar(uuid,WrapperPlayServerBossBar.Action.UPDATE_FLAGS)
         packet.flags = flags
         for (viewer in viewers) {
-            viewer.toUser().sendPacket(packet)
+            viewer.toUser()?.sendPacket(packet)
         }
     }
 
@@ -80,7 +80,7 @@ class AquaticBossBar(
         val packet = WrapperPlayServerBossBar(uuid,WrapperPlayServerBossBar.Action.UPDATE_FLAGS)
         packet.flags = this.flags
         for (viewer in viewers) {
-            viewer.toUser().sendPacket(packet)
+            viewer.toUser()?.sendPacket(packet)
         }
     }
 
@@ -90,7 +90,7 @@ class AquaticBossBar(
             val packet = WrapperPlayServerBossBar(uuid,WrapperPlayServerBossBar.Action.UPDATE_HEALTH)
             packet.health = value
             for (viewer in viewers) {
-                viewer.toUser().sendPacket(packet)
+                viewer.toUser()?.sendPacket(packet)
             }
         }
 
@@ -104,7 +104,7 @@ class AquaticBossBar(
         packet.color = color
         packet.overlay = overlay
         packet.flags = flags
-        player.toUser().sendPacket(packet)
+        player.toUser()?.sendPacket(packet)
     }
 
     fun removeViewer(player: Player) {
@@ -112,7 +112,7 @@ class AquaticBossBar(
 
         val packet = WrapperPlayServerBossBar(uuid,WrapperPlayServerBossBar.Action.REMOVE)
         packet.uuid = uuid
-        player.toUser().sendPacket(packet)
+        player.toUser()?.sendPacket(packet)
     }
 
 }

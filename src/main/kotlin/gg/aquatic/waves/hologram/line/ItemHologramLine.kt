@@ -66,7 +66,7 @@ class ItemHologramLine(
 
         val metadataPacket = WrapperPlayServerEntityMetadata(id, entityData)
 
-        val user = player.toUser()
+        val user = player.toUser() ?: return spawned
         user.sendPacket(spawnPacket)
         user.sendPacket(metadataPacket)
 
@@ -74,7 +74,7 @@ class ItemHologramLine(
     }
 
     override fun destroy(spawnedHologramLine: SpawnedHologramLine) {
-        spawnedHologramLine.player.toUser().sendPacket(
+        spawnedHologramLine.player.toUser()?.sendPacket(
             WrapperPlayServerDestroyEntities(spawnedHologramLine.entityId)
         )
     }
@@ -84,7 +84,7 @@ class ItemHologramLine(
     }
 
     override fun move(spawnedHologramLine: SpawnedHologramLine) {
-        spawnedHologramLine.player.toUser().sendPacket(
+        spawnedHologramLine.player.toUser()?.sendPacket(
             WrapperPlayServerEntityTeleport(
                 spawnedHologramLine.entityId,
                 SpigotConversionUtil.fromBukkitLocation(spawnedHologramLine.currentLocation),

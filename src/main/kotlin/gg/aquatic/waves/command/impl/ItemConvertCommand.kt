@@ -20,9 +20,9 @@ object ItemConvertCommand : ICommand {
             return
         }
         val base64 = ItemEncoder.encode(item)
-        sender.toUser()
-            .sendMessage("Item has been converted! (<u><click:COPY_TO_CLIPBOARD:'$base64'>Click to copy</click></u>)".toMMComponent()
-            )
+        sender.toUser()?.sendMessage(
+            "Item has been converted! (<u><click:COPY_TO_CLIPBOARD:'$base64'>Click to copy</click></u>)".toMMComponent()
+        )
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<out String>): List<String> {
