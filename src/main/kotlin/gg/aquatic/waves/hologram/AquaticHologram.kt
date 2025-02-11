@@ -18,6 +18,9 @@ class AquaticHologram(
     var location = location
         private set
 
+    @Volatile
+    private var rangeTick = 0
+
     init {
         HologramHandler.spawnedHolograms += this
     }
@@ -77,8 +80,6 @@ class AquaticHologram(
         }
     }
 
-    @Volatile
-    private var rangeTick = 0
     private fun tickRange() {
         rangeTick++
         if (rangeTick < 5) {
