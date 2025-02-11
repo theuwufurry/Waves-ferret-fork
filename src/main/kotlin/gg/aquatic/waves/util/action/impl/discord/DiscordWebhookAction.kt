@@ -18,7 +18,7 @@ class DiscordWebhookAction : Action<Player> {
         val username = args.string("username") { str -> textUpdater(binder, str) } ?: return
         val avatarUrl = args.string("avatar-url") { str -> textUpdater(binder, str) } ?: return
         val tts = args.boolean("tts") { str -> textUpdater(binder, str) } ?: return
-        val embeds = args.typed<ArrayList<EmbedObject>>("embeds") { str -> textUpdater(binder, str) } ?: return
+        val embeds = args.typed<Collection<DiscordEmbedArgument.WavesEmbedObject>>("embeds") { str -> textUpdater(binder, str) } ?: return
 
         runAsync {
             val webhook = DiscordWebhook(url)
@@ -26,7 +26,7 @@ class DiscordWebhookAction : Action<Player> {
             webhook.setAvatarUrl(avatarUrl)
             webhook.setUsername(username)
             webhook.setTts(tts)
-            webhook.embeds += embeds
+            webhook.embeds += embeds.map { embed -> embed.convert { textUpdater(binder, it) } }
 
             webhook.execute()
         }
@@ -34,7 +34,7 @@ class DiscordWebhookAction : Action<Player> {
 
     override val arguments: List<AquaticObjectArgument<*>> = listOf(
         PrimitiveObjectArgument("url", "", true),
-        PrimitiveObjectArgument("content", null, false),
+        PrimitiveObjectArgument("content", "", false),
         PrimitiveObjectArgument("username", "AquaticCrates", false),
         PrimitiveObjectArgument("avatar-url", "", false),
         PrimitiveObjectArgument("tts", false, required = false),

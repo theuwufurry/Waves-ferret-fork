@@ -6,21 +6,22 @@ import gg.aquatic.waves.util.getSectionList
 import me.micartey.webhookly.embeds.*
 import org.bukkit.configuration.ConfigurationSection
 import java.awt.Color
+import java.time.OffsetDateTime
 
-class DiscordEmbedArgument(id: String, defaultValue: List<EmbedObject>?, required: Boolean) :
-    AquaticObjectArgument<List<EmbedObject>>(
+class DiscordEmbedArgument(id: String, defaultValue: List<WavesEmbedObject>?, required: Boolean) :
+    AquaticObjectArgument<List<DiscordEmbedArgument.WavesEmbedObject>>(
         id,
         defaultValue, required
     ) {
-    override val serializer: AbstractObjectArgumentSerializer<List<EmbedObject>?> = Companion
+    override val serializer: AbstractObjectArgumentSerializer<List<WavesEmbedObject>?> = Companion
 
-    override fun load(section: ConfigurationSection): List<EmbedObject>? {
+    override fun load(section: ConfigurationSection): List<WavesEmbedObject>? {
         return serializer.load(section, id) ?: return defaultValue
     }
 
-    companion object : AbstractObjectArgumentSerializer<List<EmbedObject>?>() {
-        override fun load(section: ConfigurationSection, id: String): List<EmbedObject> {
-            val list = mutableListOf<EmbedObject>()
+    companion object : AbstractObjectArgumentSerializer<List<WavesEmbedObject>?>() {
+        override fun load(section: ConfigurationSection, id: String): List<WavesEmbedObject> {
+            val list = mutableListOf<WavesEmbedObject>()
 
             for (embedSection in section.getSectionList(id)) {
                 val embed = EmbedObject()
@@ -66,9 +67,48 @@ class DiscordEmbedArgument(id: String, defaultValue: List<EmbedObject>?, require
                     val thumbnailUrl = embedSection.getString("thumbnail")
                     embed.thumbnail = Thumbnail(thumbnailUrl)
                 }
-                list += embed
+                list += WavesEmbedObject(embed)
             }
             return list
+        }
+    }
+
+    class WavesEmbedObject(
+        val embedObject: EmbedObject
+    ) {
+
+        fun convert(updater: (String) -> String): EmbedObject {
+            val new = EmbedObject()
+
+            embedObject.title?.apply {
+                new.title = updater(this)
+            }
+            embedObject.description?.apply {
+                new.description = updater(this)
+            }
+            embedObject.url?.apply {
+                new.url = updater(this)
+            }
+            embedObject.color?.apply {
+                new.color = this
+            }
+            embedObject.timestamp?.apply {
+                new.timestamp = this
+            }
+            embedObject.footer?.apply {
+                new.footer = Footer(updater(this.text), this.iconUrl)
+            }
+            embedObject.thumbnail?.apply {
+                new.thumbnail = Thumbnail(updater(this.url))
+            }
+            embedObject.image?.apply {
+                new.image = Image(updater(this.url))
+            }
+            embedObject.author?.apply {
+                new.author = Author(updater(this.name), this.url, this.iconUrl)
+            }
+            new.fields += embedObject.fields
+            return new
         }
     }
 }
