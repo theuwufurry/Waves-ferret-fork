@@ -87,7 +87,7 @@ class AquaticHologram(
         rangeTick = 0
         val remaining = viewers.toMutableMap()
         for (trackedByPlayer in location.chunk.trackedByPlayers()) {
-            if (filter(trackedByPlayer)) continue
+            if (!filter(trackedByPlayer)) continue
             if (trackedByPlayer.location.distanceSquared(location) <= viewDistance * viewDistance) {
                 remaining.remove(trackedByPlayer)
                 if (viewers.containsKey(trackedByPlayer)) {

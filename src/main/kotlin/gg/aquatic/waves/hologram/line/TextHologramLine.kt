@@ -128,8 +128,8 @@ class TextHologramLine(
     companion object: LineFactory {
         override fun load(section: ConfigurationSection): LineSettings? {
             val text = section.getString("text") ?: return null
-            val height = section.getDouble("height", 0.3)
-            val lineWidth = section.getInt("line-width", 16)
+            val height = section.getDouble("height", 0.5)
+            val lineWidth = section.getInt("line-width", 100)
             val scale = section.getDouble("scale", 1.0).toFloat()
             val billboard = Billboard.valueOf(section.getString("billboard", "CENTER")!!.uppercase())
             val conditions = RequirementSerializer.fromSections<Player>(section.getSectionList("view-conditions"))
