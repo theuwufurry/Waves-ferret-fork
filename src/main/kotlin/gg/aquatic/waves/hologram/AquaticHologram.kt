@@ -89,6 +89,7 @@ class AquaticHologram(
         val remaining = viewers.toMutableMap()
         for (trackedByPlayer in location.chunk.trackedByPlayers()) {
             if (!filter(trackedByPlayer)) continue
+            if (trackedByPlayer.world != location.world) continue
             if (trackedByPlayer.location.distanceSquared(location) <= viewDistance * viewDistance) {
                 remaining.remove(trackedByPlayer)
                 if (viewers.containsKey(trackedByPlayer)) {
@@ -104,13 +105,13 @@ class AquaticHologram(
     }
 
     fun destroy() {
+        HologramHandler.spawnedHolograms -= this
         viewers.forEach { (_, spawnedHologramLines) ->
             spawnedHologramLines.forEach { it.destroy() }
         }
         viewers.clear()
         lines.clear()
 
-        HologramHandler.spawnedHolograms -= this
     }
 
     fun teleport(location: Location) {

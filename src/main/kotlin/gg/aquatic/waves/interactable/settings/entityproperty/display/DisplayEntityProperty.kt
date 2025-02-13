@@ -3,13 +3,16 @@ package gg.aquatic.waves.interactable.settings.entityproperty.display
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.DisplayEntityDataBuilder
+import io.lumine.mythic.lib.math3.complex.Quaternion
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Display
-import org.bukkit.entity.Player
 import org.bukkit.util.Transformation
 import org.joml.AxisAngle4f
+import org.joml.Math.toRadians
 import org.joml.Quaternionf
 import org.joml.Vector3f
+import kotlin.math.cos
+import kotlin.math.sin
 
 interface DisplayEntityProperty : EntityProperty {
 
@@ -19,7 +22,6 @@ interface DisplayEntityProperty : EntityProperty {
                 builder.setBillboard(billboard)
             }
         }
-
 
         companion object : EntityProperty.Serializer {
             override fun serialize(section: ConfigurationSection): EntityProperty {
@@ -102,11 +104,15 @@ interface DisplayEntityProperty : EntityProperty {
                     if (split.size > 3) {
                         Quaternionf(split[0].toFloat(), split[1].toFloat(), split[2].toFloat(), split[3].toFloat())
                     }
-                    else Quaternionf().rotationXYZ(split[0].toFloat(), split[1].toFloat(), split[2].toFloat())
+                    else Quaternionf().rotationXYZ(split[0].toFloat().toRadians(), split[1].toFloat().toRadians(), split[2].toFloat().toRadians())
                 } else Quaternionf()
 
                 return Transformation(Transformation(translation, rotation, scale, Quaternionf()))
             }
+
+            // Extension function for cleaner degrees-to-radians conversion
+            private fun Float.toRadians() = Math.toRadians(this.toDouble()).toFloat()
+
         }
 
         override fun apply(builder: EntityDataBuilder, updater: (String) -> String) {

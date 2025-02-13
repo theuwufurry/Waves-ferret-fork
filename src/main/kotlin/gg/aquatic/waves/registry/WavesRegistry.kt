@@ -16,6 +16,7 @@ import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.item.factory.*
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.ItemEntityDataBuilder
+import gg.aquatic.waves.packetevents.type.TextDisplayEntityDataBuilder
 import gg.aquatic.waves.util.action.*
 import gg.aquatic.waves.util.action.impl.discord.DiscordWebhookAction
 import gg.aquatic.waves.util.action.impl.*
@@ -137,6 +138,21 @@ object WavesRegistry {
         "interpolation-duration" to DisplayEntityProperty.InterpolationDuration.Companion,
         "teleport-interpolation-duration" to DisplayEntityProperty.TeleportInterpolationDuration.Companion,
         "transformation" to DisplayEntityProperty.Transformation.Companion,
+        createProperty("text") { s, str, builder, updater ->
+            if (builder is TextDisplayEntityDataBuilder) {
+                builder.setText(updater(s.getString(str) ?: "").toMMComponent())
+            }
+        },
+        createProperty("text") { s, str, builder, updater ->
+            if (builder is TextDisplayEntityDataBuilder) {
+                builder.setText(updater(s.getString(str) ?: "").toMMComponent())
+            }
+        },
+        createProperty("line-width") { s, str, builder, updater ->
+            if (builder is TextDisplayEntityDataBuilder) {
+                builder.setLineWidth(updater(s.getString(str) ?: "").toIntOrNull() ?: 150)
+            }
+        }
     )
     val ITEM = HashMap<String, AquaticItem>()
 
