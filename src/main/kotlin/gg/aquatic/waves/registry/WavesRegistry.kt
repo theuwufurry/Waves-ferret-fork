@@ -79,6 +79,7 @@ object WavesRegistry {
     val INTERACTABLE_FACTORIES = hashMapOf(
         "ORAXEN_FURNITURE" to OraxenEntityInteractableSettings.Companion,
         "ENTITY" to EntityInteractableSettings.Companion,
+        "NPC" to NPCInteractableSettings.Companion,
         "BLOCK" to BlockInteractableSettings.Companion,
         "MODELENGINE" to MEGInteractableSettings.Companion,
         "ITEM_MODEL" to ItemDisplayInteractableSettings.Companion

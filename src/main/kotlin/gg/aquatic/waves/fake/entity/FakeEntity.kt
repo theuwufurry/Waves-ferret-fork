@@ -15,6 +15,7 @@ import gg.aquatic.waves.chunk.cache.ChunkCacheHandler
 import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.chunk.chunkId
 import gg.aquatic.waves.chunk.trackedChunks
+import gg.aquatic.waves.fake.EntityBased
 import gg.aquatic.waves.fake.FakeObject
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.fake.FakeObjectChunkBundle
@@ -37,9 +38,9 @@ open class FakeEntity(
     override val viewRange: Int,
     audience: AquaticAudience,
     consumer: FakeEntity.() -> Unit = {},
-    var onInteract: (FakeEntityInteractEvent) -> Unit = {},
+    override var onInteract: (FakeEntityInteractEvent) -> Unit = {},
     var onUpdate: (Player) -> Unit = {},
-) : FakeObject() {
+) : FakeObject(), EntityBased {
 
     @Volatile
     override var audience: AquaticAudience = FilterAudience { false }
@@ -67,7 +68,7 @@ open class FakeEntity(
     }
 
     val atomicEntityId = AtomicInteger(SpigotReflectionUtil.generateEntityId())
-    val entityId: Int get() = atomicEntityId.get()
+    override val entityId: Int get() = atomicEntityId.get()
     val entityUUID = UUID.randomUUID()
     val entityData = ConcurrentHashMap<Int, EntityData>()
     val equipment = ConcurrentHashMap<EquipmentSlot, ItemStack>()

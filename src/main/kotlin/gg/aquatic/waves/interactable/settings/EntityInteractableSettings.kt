@@ -16,14 +16,18 @@ import org.bukkit.util.Vector
 
 class EntityInteractableSettings(
     val props: HashSet<EntityProperty>,
-    val offset: Vector
+    val offset: Vector,
+    val yawPitch: Pair<Float, Float>
 ) : InteractableSettings {
     override fun build(
         location: Location,
         audience: AquaticAudience,
         onInteract: (InteractableInteractEvent) -> Unit
     ): Interactable {
-        val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location.clone().add(offset), 50, audience, consumer = {
+        val fakeEntity = FakeEntity(EntityTypes.ITEM_DISPLAY, location.clone().add(offset).apply {
+            yaw = yawPitch.first
+            pitch = yawPitch.second
+        }, 50, audience, consumer = {
             val builder = EntityDataBuilder.ANY
             for (prop in props) {
                 prop.apply(builder) { str -> str }
@@ -46,7 +50,11 @@ class EntityInteractableSettings(
                 offsetStrs.getOrElse(1) { "0" }.toDouble(),
                 offsetStrs.getOrElse(2) { "0" }.toDouble()
             )
-            return EntityInteractableSettings(props, offset)
+            val yawPitch = (
+                    offsetStrs.getOrElse(3) {"0"}.toFloat()
+                    ) to (
+                    offsetStrs.getOrElse(4) {"0"}.toFloat())
+            return EntityInteractableSettings(props, offset, yawPitch)
         }
 
     }

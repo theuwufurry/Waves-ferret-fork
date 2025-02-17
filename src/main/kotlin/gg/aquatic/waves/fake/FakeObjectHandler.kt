@@ -15,6 +15,7 @@ import gg.aquatic.waves.fake.block.FakeBlock
 import gg.aquatic.waves.fake.block.FakeBlockInteractEvent
 import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.fake.entity.FakeEntityInteractEvent
+import gg.aquatic.waves.fake.npc.FakePlayer
 import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.util.event.event
@@ -35,7 +36,7 @@ object FakeObjectHandler : WavesModule {
     override val type: WaveModules = WaveModules.FAKE_OBJECTS
 
     internal val tickableObjects = ConcurrentHashMap.newKeySet<FakeObject>()
-    internal val idToEntity = ConcurrentHashMap<Int, FakeEntity>()
+    internal val idToEntity = ConcurrentHashMap<Int, EntityBased>()
     internal val locationToBlocks = ConcurrentHashMap<Location, MutableSet<FakeBlock>>()
     val objectRemovalQueue = ConcurrentHashMap.newKeySet<FakeObject>()
 
