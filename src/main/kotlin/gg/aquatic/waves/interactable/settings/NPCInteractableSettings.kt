@@ -5,12 +5,16 @@ import com.github.retrooper.packetevents.protocol.player.TextureProperty
 import com.github.retrooper.packetevents.protocol.player.UserProfile
 import gg.aquatic.waves.fake.npc.FakePlayer
 import gg.aquatic.waves.interactable.InteractableInteractEvent
+import gg.aquatic.waves.interactable.settings.entityproperty.EntityArmorProperty
 import gg.aquatic.waves.interactable.type.NPCInteractable
 import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.util.toMMComponent
+import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import java.util.*
 import kotlin.collections.ArrayList
@@ -23,7 +27,8 @@ class NPCInteractableSettings(
     val suffixName: String?,
     val gameMode: GameMode,
     val offset: Vector,
-    val yawPitch: Pair<Float, Float>
+    val yawPitch: Pair<Float, Float>,
+    val equipment: EntityArmorProperty
 ) : InteractableSettings {
     override fun build(
         location: Location,
@@ -44,6 +49,15 @@ class NPCInteractableSettings(
             50,
             audience
         )
+        fakePlayer.npc.helmet = SpigotConversionUtil.fromBukkitItemStack(equipment.helmet?.getItem() ?: ItemStack(Material.AIR))
+        fakePlayer.npc.chestplate = SpigotConversionUtil.fromBukkitItemStack(equipment.chestplate?.getItem() ?: ItemStack(Material.AIR))
+        fakePlayer.npc.leggings = SpigotConversionUtil.fromBukkitItemStack(equipment.leggings?.getItem() ?: ItemStack(Material.AIR))
+        fakePlayer.npc.boots = SpigotConversionUtil.fromBukkitItemStack(equipment.boots?.getItem() ?: ItemStack(Material.AIR))
+        fakePlayer.npc.mainHand = SpigotConversionUtil.fromBukkitItemStack(equipment.mainHand?.getItem() ?: ItemStack(Material.AIR))
+        fakePlayer.npc.offHand = SpigotConversionUtil.fromBukkitItemStack(equipment.offHand?.getItem() ?: ItemStack(Material.AIR))
+
+        fakePlayer.npc.updateEquipment()
+
         fakePlayer.register()
 
         return NPCInteractable(
@@ -79,6 +93,7 @@ class NPCInteractableSettings(
                 offsetStrs.getOrElse(1) { "0" }.toDouble(),
                 offsetStrs.getOrElse(2) { "0" }.toDouble()
             )
+            val equipment = EntityArmorProperty.Serializer.load(section)
             val yawPitch = (
                     offsetStrs.getOrElse(3) {"0"}.toFloat()
                     ) to (
@@ -91,7 +106,8 @@ class NPCInteractableSettings(
                 suffixName,
                 gamemode,
                 offset,
-                yawPitch
+                yawPitch,
+                equipment
             )
         }
 

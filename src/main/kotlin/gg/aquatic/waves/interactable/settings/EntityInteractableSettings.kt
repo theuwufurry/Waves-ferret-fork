@@ -1,10 +1,13 @@
 package gg.aquatic.waves.interactable.settings
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
+import com.github.retrooper.packetevents.protocol.player.Equipment
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot
 import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.interactable.Interactable
 import gg.aquatic.waves.interactable.InteractableInteractEvent
+import gg.aquatic.waves.interactable.settings.entityproperty.EntityArmorProperty
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.type.EntityInteractable
 import gg.aquatic.waves.packetevents.EntityDataBuilder
@@ -17,7 +20,8 @@ import org.bukkit.util.Vector
 class EntityInteractableSettings(
     val props: HashSet<EntityProperty>,
     val offset: Vector,
-    val yawPitch: Pair<Float, Float>
+    val yawPitch: Pair<Float, Float>,
+    val equipment: EntityArmorProperty
 ) : InteractableSettings {
     override fun build(
         location: Location,
@@ -32,8 +36,19 @@ class EntityInteractableSettings(
             for (prop in props) {
                 prop.apply(builder) { str -> str }
             }
+            this@EntityInteractableSettings.equipment.helmet?.getItem()?.let { equipment += EquipmentSlot.HELMET to it }
+            this@EntityInteractableSettings.equipment.chestplate?.getItem()
+                ?.let { equipment += EquipmentSlot.CHEST_PLATE to it }
+            this@EntityInteractableSettings.equipment.leggings?.getItem()
+                ?.let { equipment += EquipmentSlot.LEGGINGS to it }
+            this@EntityInteractableSettings.equipment.boots?.getItem()?.let { equipment += EquipmentSlot.BOOTS to it }
+            this@EntityInteractableSettings.equipment.mainHand?.getItem()
+                ?.let { equipment += EquipmentSlot.MAIN_HAND to it }
+            this@EntityInteractableSettings.equipment.offHand?.getItem()
+                ?.let { equipment += EquipmentSlot.OFF_HAND to it }
             entityData += builder.build().mapPair { it.index to it }
         })
+
         fakeEntity.register()
 
         val interactable = EntityInteractable(fakeEntity, onInteract)
@@ -50,11 +65,13 @@ class EntityInteractableSettings(
                 offsetStrs.getOrElse(1) { "0" }.toDouble(),
                 offsetStrs.getOrElse(2) { "0" }.toDouble()
             )
+
+            val equipment = EntityArmorProperty.Serializer.load(section)
             val yawPitch = (
-                    offsetStrs.getOrElse(3) {"0"}.toFloat()
+                    offsetStrs.getOrElse(3) { "0" }.toFloat()
                     ) to (
-                    offsetStrs.getOrElse(4) {"0"}.toFloat())
-            return EntityInteractableSettings(props, offset, yawPitch)
+                    offsetStrs.getOrElse(4) { "0" }.toFloat())
+            return EntityInteractableSettings(props, offset, yawPitch, equipment)
         }
 
     }
