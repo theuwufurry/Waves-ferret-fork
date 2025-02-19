@@ -12,13 +12,18 @@ class CommandAction: Action<Player> {
 
     override fun execute(binder: Player, args: ObjectArguments, textUpdater: (Player, String) -> String) {
         val commands = args.stringOrCollection("command") ?: return
+        val executor = if (args.boolean("player-executor") == true) binder else Bukkit.getConsoleSender()
         for (cmd in commands) {
+            val command = textUpdater(binder, cmd.updatePAPIPlaceholders(binder))
             Bukkit.dispatchCommand(
-                Bukkit.getConsoleSender(),
-                textUpdater(binder, cmd.updatePAPIPlaceholders(binder))
+                executor,
+                command
             )
         }
     }
 
-    override val arguments: List<AquaticObjectArgument<*>> = listOf(PrimitiveObjectArgument("command", "", true))
+    override val arguments: List<AquaticObjectArgument<*>> = listOf(
+        PrimitiveObjectArgument("command", "", true),
+        PrimitiveObjectArgument("player-executor", false, required = false)
+    )
 }
