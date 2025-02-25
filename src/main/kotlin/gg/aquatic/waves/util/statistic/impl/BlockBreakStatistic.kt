@@ -5,6 +5,7 @@ import gg.aquatic.waves.util.argument.impl.PrimitiveObjectArgument
 import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.statistic.StatisticAddEvent
 import gg.aquatic.waves.util.statistic.StatisticType
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
@@ -26,6 +27,9 @@ object BlockBreakStatistic: StatisticType<Player>() {
                 val types = args.stringCollection("types") ?: listOf()
 
                 if ("ALL" !in types && it.block.type.name.uppercase() !in types) {
+                    for (type in types) {
+                        Bukkit.broadcastMessage(type)
+                    }
                     continue
                 }
 

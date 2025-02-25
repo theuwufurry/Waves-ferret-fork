@@ -66,50 +66,50 @@ class ObjectArguments(
 
     // Collection of Strings
     fun stringCollection(id: String, updater: (String) -> String = { it }): Collection<String>? {
-        val value = arguments[id]?.toString() ?: return null
-        return updater(value).split(",").map { it.trim() }
+        val value = arguments[id] as? List<*> ?: return null
+        return value.mapNotNull { updater(it.toString()) }
     }
 
     // Collection of Ints
     fun intCollection(id: String, updater: (String) -> String = { it }): Collection<Int>? {
-        val value = arguments[id]?.toString() ?: return null
-        return updater(value).split(",").mapNotNull { it.trim().toIntOrNull() }
+        val value = arguments[id] as? List<*> ?: return null
+        return value.mapNotNull { updater(it.toString()).toIntOrNull() }
     }
 
     // Collection of Doubles
     fun doubleCollection(id: String, updater: (String) -> String = { it }): Collection<Double>? {
-        val value = arguments[id]?.toString() ?: return null
-        return updater(value).split(",").mapNotNull { it.trim().toDoubleOrNull() }
+        val value = arguments[id] as? List<*> ?: return null
+        return value.mapNotNull { updater(it.toString()).toDoubleOrNull() }
     }
 
     // Collection of Booleans
     fun booleanCollection(id: String, updater: (String) -> String = { it }): Collection<Boolean>? {
-        val value = arguments[id]?.toString() ?: return null
-        return updater(value).split(",").mapNotNull { it.trim().toBooleanStrictOrNull() }
+        val value = arguments[id] as? List<*> ?: return null
+        return value.mapNotNull { updater(it.toString()).toBoolean() }
     }
 
     // Collection of Floats
     fun floatCollection(id: String, updater: (String) -> String = { it }): Collection<Float>? {
-        val value = arguments[id]?.toString() ?: return null
-        return updater(value).split(",").mapNotNull { it.trim().toFloatOrNull() }
+        val value = arguments[id] as? List<*> ?: return null
+        return value.mapNotNull { updater(it.toString()).toFloatOrNull() }
     }
 
     // Collection of Longs
     fun longCollection(id: String, updater: (String) -> String = { it }): Collection<Long>? {
-        val value = arguments[id]?.toString() ?: return null
-        return updater(value).split(",").mapNotNull { it.trim().toLongOrNull() }
+        val value = arguments[id] as? List<*> ?: return null
+        return value.mapNotNull { updater(it.toString()).toLongOrNull() }
     }
 
     // Collection of Shorts
     fun shortCollection(id: String, updater: (String) -> String = { it }): Collection<Short>? {
-        val value = arguments[id]?.toString() ?: return null
-        return updater(value).split(",").mapNotNull { it.trim().toShortOrNull() }
+        val value = arguments[id] as? List<*> ?: return null
+        return value.mapNotNull { updater(it.toString()).toShortOrNull() }
     }
 
     // Collection of Bytes
     fun byteCollection(id: String, updater: (String) -> String = { it }): Collection<Byte>? {
-        val value = arguments[id]?.toString() ?: return null
-        return updater(value).split(",").mapNotNull { it.trim().toByteOrNull() }
+        val value = arguments[id] as? List<*> ?: return null
+        return value.mapNotNull { updater(it.toString()).toByteOrNull() }
     }
 
     inline fun <reified T> typedCollection(id: String, noinline updater: (String) -> String = { it }): Collection<T>? {

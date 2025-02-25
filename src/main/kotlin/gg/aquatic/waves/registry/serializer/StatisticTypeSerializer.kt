@@ -6,6 +6,7 @@ import gg.aquatic.waves.util.argument.ObjectArguments
 import gg.aquatic.waves.util.statistic.StatisticAddEvent
 import gg.aquatic.waves.util.statistic.StatisticHandle
 import gg.aquatic.waves.util.statistic.StatisticType
+import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 
 object StatisticTypeSerializer {
@@ -17,7 +18,9 @@ object StatisticTypeSerializer {
         val typeId = configurationSection.getString("type") ?: return null
         val registry = WavesRegistry.STATISTIC_TYPES[T::class.java] ?: return null
         val type = registry[typeId] as? StatisticType<T> ?: return null
-        val args = ObjectArguments(ArgumentSerializer.load(configurationSection, type.arguments))
+        val loadedArgs = ArgumentSerializer.load(configurationSection, type.arguments)
+        val args = ObjectArguments(loadedArgs)
+
         return StatisticHandle(type, args, consumer)
     }
 
