@@ -11,10 +11,13 @@ import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player
 import gg.aquatic.waves.util.runAsync
+import gg.aquatic.waves.util.runSync
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 object ChunkTracker : WavesModule {
@@ -34,7 +37,16 @@ object ChunkTracker : WavesModule {
             chunks.getOrPut(player.world.name) { ConcurrentHashMap() }.getOrPut(chunkId) { ConcurrentHashMap.newKeySet() }
                 .add(player.uniqueId)
 
+            /*
+            val future = CompletableFuture<Chunk>()
+            runSync {
+                val chunk =
+                future.complete(chunk)
+            }
+             */
+
             val chunk = chunkId.toChunk(player.world)
+
             var (previousWorldName, worldChunks) = playerToChunks.getOrPut(player.uniqueId) { player.world.name to ConcurrentHashMap.newKeySet() }
             if (previousWorldName != player.world.name) {
                 for (chunkId1 in worldChunks) {

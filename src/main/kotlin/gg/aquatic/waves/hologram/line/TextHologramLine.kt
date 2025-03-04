@@ -20,6 +20,8 @@ import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Display.Billboard
 import org.bukkit.entity.Player
+import org.bukkit.entity.TextDisplay
+import java.awt.Color
 import java.util.*
 
 class TextHologramLine(
@@ -30,6 +32,9 @@ class TextHologramLine(
     val lineWidth: Int,
     val scale: Float = 1.0f,
     val billboard: Billboard = Billboard.CENTER,
+    val hasShadow: Boolean = true,
+    val defaultBackground: Boolean = true,
+    val backgroundColor: Color? = null,
 ) : HologramLine() {
     override fun spawn(
         location: Location,
@@ -57,6 +62,11 @@ class TextHologramLine(
         val builder = EntityDataBuilder.TEXT_DISPLAY()
         builder.setText(text.toMMComponent())
         builder.setLineWidth(lineWidth)
+        builder.hasShadow(hasShadow)
+        builder.useDefaultBackgroundColor(defaultBackground)
+        backgroundColor?.let {
+            builder.setBackgroundColor(it.rgb)
+        }
         val entityData = builder
             .setScale(Vector3f(scale, scale, scale))
             .setBillboard(billboard)

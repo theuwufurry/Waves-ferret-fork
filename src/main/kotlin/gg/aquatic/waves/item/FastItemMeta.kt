@@ -9,7 +9,11 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLor
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound
+import com.github.retrooper.packetevents.protocol.nbt.NBTInt
+import com.github.retrooper.packetevents.protocol.nbt.NBTList
+import com.github.retrooper.packetevents.protocol.nbt.NBTNumber
 import com.github.retrooper.packetevents.protocol.nbt.NBTString
+import com.github.retrooper.packetevents.protocol.nbt.NBTType
 import gg.aquatic.waves.util.toJson
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.text.Component
@@ -50,9 +54,23 @@ class FastItemMeta(
 
     var lore: List<Component>
         get() {
+            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+                val jsons = nms.orCreateTag?.getCompoundTagOrNull("display")?.getStringListTagOrNull("Lore") ?: return emptyList()
+                return jsons.tags.map { JSONComponentSerializer.json().deserialize(it.value) }
+            }
             return nms.getComponent(ComponentTypes.LORE).getOrNull()?.lines ?: emptyList()
         }
         set(value) {
+            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+                var displayTag = nms.orCreateTag.getCompoundTagOrNull("display")
+                if (displayTag == null) {
+                    displayTag = NBTCompound()
+                    nms.orCreateTag.setTag("display", displayTag)
+                }
+                displayTag.removeTag("Lore")
+                displayTag.setTag("Lore", NBTList(NBTType.STRING, value.map { NBTString(it.toJson())}))
+                return
+            }
             nms.setComponent(
                 ComponentTypes.LORE, ItemLore(value)
             )
@@ -81,18 +99,22 @@ class FastItemMeta(
     @Deprecated("Use customModelData instead")
     var modelData: Int?
         get() {
-            return nms.getComponent(ComponentTypes.CUSTOM_MODEL_DATA).getOrNull()
+            return if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+                return nms.orCreateTag?.getNumberTagOrNull("CustomModelData")?.asInt
+            } else {
+                nms.getComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS).getOrNull()?.legacyId
+            }
         }
         set(value) {
             if (value == null) {
                 if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
-                    nms.unsetComponent(ComponentTypes.CUSTOM_MODEL_DATA)
+                    nms.orCreateTag.removeTag("CustomModelData")
                 } else {
                     nms.unsetComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS)
                 }
             } else {
                 if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
-                    nms.setComponent(ComponentTypes.CUSTOM_MODEL_DATA, value)
+                    nms.orCreateTag.setTag("CustomModelData",NBTInt(value))
                 } else {
                     nms.setComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS, ItemCustomModelData(value))
                 }
