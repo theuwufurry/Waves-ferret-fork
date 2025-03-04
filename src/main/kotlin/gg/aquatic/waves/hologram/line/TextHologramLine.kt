@@ -20,7 +20,6 @@ import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Display.Billboard
 import org.bukkit.entity.Player
-import org.bukkit.entity.TextDisplay
 import java.awt.Color
 import java.util.*
 
@@ -35,6 +34,7 @@ class TextHologramLine(
     val hasShadow: Boolean = true,
     val defaultBackground: Boolean = true,
     val backgroundColor: Color? = null,
+    val isSeeThrough: Boolean = true,
 ) : HologramLine() {
     override fun spawn(
         location: Location,
@@ -64,6 +64,7 @@ class TextHologramLine(
         builder.setLineWidth(lineWidth)
         builder.hasShadow(hasShadow)
         builder.useDefaultBackgroundColor(defaultBackground)
+        builder.isSeeThrough(isSeeThrough)
         backgroundColor?.let {
             builder.setBackgroundColor(it.rgb)
         }
@@ -118,6 +119,10 @@ class TextHologramLine(
         val scale: Float = 1.0f,
         val billboard: Billboard = Billboard.CENTER,
         val conditions: List<ConfiguredRequirement<Player>>,
+        val hasShadow: Boolean,
+        val defaultBackground: Boolean,
+        val backgroundColor: Color?,
+        val isSeeThrough: Boolean,
         val failLine: LineSettings?,
     ): LineSettings {
         override fun create(): HologramLine {
@@ -131,6 +136,10 @@ class TextHologramLine(
                 lineWidth,
                 scale,
                 billboard,
+                hasShadow,
+                defaultBackground,
+                backgroundColor,
+                isSeeThrough,
             )
         }
     }
@@ -146,6 +155,14 @@ class TextHologramLine(
             val failLine = section.getConfigurationSection("fail-line")?.let {
                 HologramSerializer.loadLine(it)
             }
+            val hasShadow = section.getBoolean("has-shadow", true)
+            val defaultBackground = section.getBoolean("default-background", true)
+            val backgroundColorStr = section.getString("background-color")
+            val isSeeThrough = section.getBoolean("is-see-through", true)
+            val backgroundColor = if (backgroundColorStr != null) {
+                val args = backgroundColorStr.split(";").map { it.toIntOrNull() ?: 0 }
+                Color(args[0], args[1], args[2])
+            } else null
             return Settings(
                 height,
                 text,
@@ -153,6 +170,10 @@ class TextHologramLine(
                 scale,
                 billboard,
                 conditions,
+                hasShadow,
+                defaultBackground,
+                backgroundColor,
+                isSeeThrough,
                 failLine,
             )
         }
