@@ -99,24 +99,24 @@ class FastItemMeta(
     @Deprecated("Use customModelData instead")
     var modelData: Int?
         get() {
-            return if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+            return if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_20_5)) {
                 return nms.orCreateTag?.getNumberTagOrNull("CustomModelData")?.asInt
             } else {
-                nms.getComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS).getOrNull()?.legacyId
+                customModelData?.legacyId
             }
         }
         set(value) {
             if (value == null) {
-                if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+                if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_20_5)) {
                     nms.orCreateTag.removeTag("CustomModelData")
                 } else {
-                    nms.unsetComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS)
+                    customModelData = null
                 }
             } else {
-                if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+                if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_20_5)) {
                     nms.orCreateTag.setTag("CustomModelData",NBTInt(value))
                 } else {
-                    nms.setComponent(ComponentTypes.CUSTOM_MODEL_DATA_LISTS, ItemCustomModelData(value))
+                    customModelData = ItemCustomModelData(value)
                 }
             }
         }
