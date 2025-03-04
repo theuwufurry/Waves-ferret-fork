@@ -29,14 +29,14 @@ class FastItemMeta(
 
     var displayName: Component?
         get() {
-            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_20_5)) {
                 val json = nms.orCreateTag?.getCompoundTagOrNull("display")?.getStringTagValueOrNull("Name") ?: return null
                 return JSONComponentSerializer.json().deserialize(json)
             }
             return nms.getComponent(ComponentTypes.CUSTOM_NAME).getOrNull()
         }
         set(value) {
-            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_20_5)) {
                 var displayTag = nms.orCreateTag.getCompoundTagOrNull("display")
                 if (displayTag == null) {
                     displayTag = NBTCompound()
@@ -54,14 +54,14 @@ class FastItemMeta(
 
     var lore: List<Component>
         get() {
-            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_20_5)) {
                 val jsons = nms.orCreateTag?.getCompoundTagOrNull("display")?.getStringListTagOrNull("Lore") ?: return emptyList()
                 return jsons.tags.map { JSONComponentSerializer.json().deserialize(it.value) }
             }
             return nms.getComponent(ComponentTypes.LORE).getOrNull()?.lines ?: emptyList()
         }
         set(value) {
-            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_21_1)) {
+            if (PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_20_5)) {
                 var displayTag = nms.orCreateTag.getCompoundTagOrNull("display")
                 if (displayTag == null) {
                     displayTag = NBTCompound()
