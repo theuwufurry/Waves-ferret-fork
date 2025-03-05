@@ -36,6 +36,7 @@ class TextHologramLine(
     val defaultBackground: Boolean = true,
     val backgroundColor: Color? = null,
     val isSeeThrough: Boolean = true,
+    val transformationDuration: Int = 0,
 ) : HologramLine() {
     override fun spawn(
         location: Location,
@@ -108,6 +109,9 @@ class TextHologramLine(
 
     override fun buildData(spawnedHologramLine: SpawnedHologramLine): List<EntityData> {
         val builder = EntityDataBuilder.TEXT_DISPLAY()
+        builder.setInterpolationDelay(0)
+        builder.setTransformationInterpolationDuration(transformationDuration)
+        builder.setPosRotInterpolationDuration(transformationDuration)
         builder.setText(text.toMMComponent())
         builder.setLineWidth(lineWidth)
         builder.hasShadow(hasShadow)
@@ -134,6 +138,7 @@ class TextHologramLine(
         val defaultBackground: Boolean,
         val backgroundColor: Color?,
         val isSeeThrough: Boolean,
+        val transformationDuration: Int,
         val failLine: LineSettings?,
     ): LineSettings {
         override fun create(): HologramLine {
@@ -151,6 +156,7 @@ class TextHologramLine(
                 defaultBackground,
                 backgroundColor,
                 isSeeThrough,
+                transformationDuration,
             )
         }
     }
@@ -170,6 +176,7 @@ class TextHologramLine(
             val defaultBackground = section.getBoolean("default-background", true)
             val backgroundColorStr = section.getString("background-color")
             val isSeeThrough = section.getBoolean("is-see-through", true)
+            val transformationDuration = section.getInt("transformation-duration", 0)
             val backgroundColor = if (backgroundColorStr != null) {
                 val args = backgroundColorStr.split(";").map { it.toIntOrNull() ?: 0 }
                 Color(args[0], args[1], args[2], args.getOrNull(3) ?: 255)
@@ -185,6 +192,7 @@ class TextHologramLine(
                 defaultBackground,
                 backgroundColor,
                 isSeeThrough,
+                transformationDuration,
                 failLine,
             )
         }
