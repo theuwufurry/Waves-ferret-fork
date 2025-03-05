@@ -16,4 +16,6 @@ abstract class HologramLine {
     internal abstract fun update(spawnedHologramLine: SpawnedHologramLine)
 
     internal abstract fun move(spawnedHologramLine: SpawnedHologramLine)
+
+    internal abstract fun createEntity(spawnedHologramLine: SpawnedHologramLine)
 }

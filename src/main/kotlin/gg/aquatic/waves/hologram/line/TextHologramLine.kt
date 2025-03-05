@@ -50,34 +50,7 @@ class TextHologramLine(
             textUpdater
         )
 
-        val spawnPacket = WrapperPlayServerSpawnEntity(
-            id,
-            UUID.randomUUID(),
-            EntityTypes.TEXT_DISPLAY,
-            SpigotConversionUtil.fromBukkitLocation(location),
-            location.yaw,
-            0,
-            null
-        )
-        val builder = EntityDataBuilder.TEXT_DISPLAY()
-        builder.setText(text.toMMComponent())
-        builder.setLineWidth(lineWidth)
-        builder.hasShadow(hasShadow)
-        builder.useDefaultBackgroundColor(defaultBackground)
-        builder.isSeeThrough(isSeeThrough)
-        backgroundColor?.let {
-            builder.setBackgroundColor(it.rgb)
-        }
-        val entityData = builder
-            .setScale(Vector3f(scale, scale, scale))
-            .setBillboard(billboard)
-            .build()
-
-        val metadataPacket = WrapperPlayServerEntityMetadata(id, entityData)
-
-        val user = player.toUser() ?: return spawned
-        user.sendPacket(spawnPacket)
-        user.sendPacket(metadataPacket)
+        createEntity(spawned)
 
         return spawned
     }
@@ -110,6 +83,39 @@ class TextHologramLine(
                 false
             )
         )
+    }
+
+    override fun createEntity(spawnedHologramLine: SpawnedHologramLine) {
+        val id = spawnedHologramLine.entityId
+        val location = spawnedHologramLine.currentLocation
+        val spawnPacket = WrapperPlayServerSpawnEntity(
+            id,
+            UUID.randomUUID(),
+            EntityTypes.TEXT_DISPLAY,
+            SpigotConversionUtil.fromBukkitLocation(location),
+            location.yaw,
+            0,
+            null
+        )
+        val builder = EntityDataBuilder.TEXT_DISPLAY()
+        builder.setText(text.toMMComponent())
+        builder.setLineWidth(lineWidth)
+        builder.hasShadow(hasShadow)
+        builder.useDefaultBackgroundColor(defaultBackground)
+        builder.isSeeThrough(isSeeThrough)
+        backgroundColor?.let {
+            builder.setBackgroundColor(it.rgb)
+        }
+        val entityData = builder
+            .setScale(Vector3f(scale, scale, scale))
+            .setBillboard(billboard)
+            .build()
+
+        val metadataPacket = WrapperPlayServerEntityMetadata(id, entityData)
+
+        val user = spawnedHologramLine.player.toUser() ?: return
+        user.sendPacket(spawnPacket)
+        user.sendPacket(metadataPacket)
     }
 
     class Settings(
@@ -155,13 +161,13 @@ class TextHologramLine(
             val failLine = section.getConfigurationSection("fail-line")?.let {
                 HologramSerializer.loadLine(it)
             }
-            val hasShadow = section.getBoolean("has-shadow", true)
+            val hasShadow = section.getBoolean("has-shadow", false)
             val defaultBackground = section.getBoolean("default-background", true)
             val backgroundColorStr = section.getString("background-color")
             val isSeeThrough = section.getBoolean("is-see-through", true)
             val backgroundColor = if (backgroundColorStr != null) {
                 val args = backgroundColorStr.split(";").map { it.toIntOrNull() ?: 0 }
-                Color(args[0], args[1], args[2])
+                Color(args[0], args[1], args[2], args.getOrNull(3) ?: 255)
             } else null
             return Settings(
                 height,

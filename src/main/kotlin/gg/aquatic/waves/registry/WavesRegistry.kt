@@ -3,6 +3,7 @@ package gg.aquatic.waves.registry
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose
 import gg.aquatic.waves.util.price.AbstractPrice
 import gg.aquatic.waves.economy.RegisteredCurrency
+import gg.aquatic.waves.hologram.line.AnimatedHologramLine
 import gg.aquatic.waves.hologram.line.ItemHologramLine
 import gg.aquatic.waves.hologram.line.TextHologramLine
 import gg.aquatic.waves.input.Input
@@ -88,6 +89,7 @@ object WavesRegistry {
     val HOLOGRAM_LINE_FACTORIES = hashMapOf(
         "item" to ItemHologramLine.Companion,
         "text" to TextHologramLine.Companion,
+        "animated" to AnimatedHologramLine.Companion,
     )
 
     val ENTITY_PROPERTY_FACTORIES = hashMapOf(

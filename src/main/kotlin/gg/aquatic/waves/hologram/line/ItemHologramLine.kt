@@ -48,27 +48,7 @@ class ItemHologramLine(
             textUpdater
         )
 
-        val spawnPacket = WrapperPlayServerSpawnEntity(
-            id,
-            UUID.randomUUID(),
-            EntityTypes.ITEM_DISPLAY,
-            SpigotConversionUtil.fromBukkitLocation(location),
-            location.yaw,
-            0,
-            null
-        )
-        val entityData = EntityDataBuilder.ITEM_DISPLAY()
-            .setItem(item)
-            .setItemTransformation(itemDisplayTransform)
-            .setScale(Vector3f(scale, scale, scale))
-            .setBillboard(billboard)
-            .build()
-
-        val metadataPacket = WrapperPlayServerEntityMetadata(id, entityData)
-
-        val user = player.toUser() ?: return spawned
-        user.sendPacket(spawnPacket)
-        user.sendPacket(metadataPacket)
+        createEntity(spawned)
 
         return spawned
     }
@@ -91,6 +71,32 @@ class ItemHologramLine(
                 false
             )
         )
+    }
+
+    override fun createEntity(spawnedHologramLine: SpawnedHologramLine) {
+        val id = spawnedHologramLine.entityId
+        val location = spawnedHologramLine.currentLocation
+        val spawnPacket = WrapperPlayServerSpawnEntity(
+            id,
+            UUID.randomUUID(),
+            EntityTypes.ITEM_DISPLAY,
+            SpigotConversionUtil.fromBukkitLocation(location),
+            location.yaw,
+            0,
+            null
+        )
+        val entityData = EntityDataBuilder.ITEM_DISPLAY()
+            .setItem(item)
+            .setItemTransformation(itemDisplayTransform)
+            .setScale(Vector3f(scale, scale, scale))
+            .setBillboard(billboard)
+            .build()
+
+        val metadataPacket = WrapperPlayServerEntityMetadata(id, entityData)
+
+        val user = spawnedHologramLine.player.toUser() ?: return
+        user.sendPacket(spawnPacket)
+        user.sendPacket(metadataPacket)
     }
 
     class Settings(
