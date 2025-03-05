@@ -1,5 +1,6 @@
 package gg.aquatic.waves.hologram.line
 
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
 import com.github.retrooper.packetevents.util.Vector3f
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
@@ -97,6 +98,15 @@ class TextHologramLine(
             0,
             null
         )
+        val entityData = buildData(spawnedHologramLine)
+        val metadataPacket = WrapperPlayServerEntityMetadata(id, entityData)
+
+        val user = spawnedHologramLine.player.toUser() ?: return
+        user.sendPacket(spawnPacket)
+        user.sendPacket(metadataPacket)
+    }
+
+    override fun buildData(spawnedHologramLine: SpawnedHologramLine): List<EntityData> {
         val builder = EntityDataBuilder.TEXT_DISPLAY()
         builder.setText(text.toMMComponent())
         builder.setLineWidth(lineWidth)
@@ -110,12 +120,7 @@ class TextHologramLine(
             .setScale(Vector3f(scale, scale, scale))
             .setBillboard(billboard)
             .build()
-
-        val metadataPacket = WrapperPlayServerEntityMetadata(id, entityData)
-
-        val user = spawnedHologramLine.player.toUser() ?: return
-        user.sendPacket(spawnPacket)
-        user.sendPacket(metadataPacket)
+        return entityData
     }
 
     class Settings(

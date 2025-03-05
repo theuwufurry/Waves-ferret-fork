@@ -1,6 +1,8 @@
 package gg.aquatic.waves.hologram.line
 
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport
 import gg.aquatic.waves.hologram.*
 import gg.aquatic.waves.registry.serializer.RequirementSerializer
@@ -74,6 +76,10 @@ class AnimatedHologramLine(
                 frame.createEntity(spawnedHologramLine)
                 return
             }
+            val data = buildData(spawnedHologramLine)
+            val metadataPacket = WrapperPlayServerEntityMetadata(spawnedHologramLine.entityId, data)
+            spawnedHologramLine.player.toUser()?.sendPacket(metadataPacket)
+            return
         }
         frame.update(spawnedHologramLine)
     }
@@ -93,6 +99,10 @@ class AnimatedHologramLine(
         val frame = frames[handle.index].second
 
         frame.createEntity(spawnedHologramLine)
+    }
+
+    override fun buildData(spawnedHologramLine: SpawnedHologramLine): List<EntityData> {
+        return frames[ticks.getOrPut(spawnedHologramLine.player.uniqueId) { AnimationHandle() }.index].second.buildData(spawnedHologramLine)
     }
 
     class AnimationHandle {

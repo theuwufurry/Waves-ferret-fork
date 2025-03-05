@@ -1,5 +1,6 @@
 package gg.aquatic.waves.hologram
 
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
@@ -18,4 +19,6 @@ abstract class HologramLine {
     internal abstract fun move(spawnedHologramLine: SpawnedHologramLine)
 
     internal abstract fun createEntity(spawnedHologramLine: SpawnedHologramLine)
+
+    internal abstract fun buildData(spawnedHologramLine: SpawnedHologramLine): List<EntityData>
 }
