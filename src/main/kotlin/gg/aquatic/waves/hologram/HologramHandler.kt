@@ -1,8 +1,8 @@
 package gg.aquatic.waves.hologram
 
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.util.runAsyncTimer
 import java.util.concurrent.ConcurrentHashMap
 

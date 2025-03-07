@@ -1,29 +1,5 @@
 package gg.aquatic.waves.inventory
 
-import com.github.retrooper.packetevents.PacketEvents
-import com.github.retrooper.packetevents.event.PacketReceiveEvent
-import com.github.retrooper.packetevents.protocol.item.type.ItemTypes
-import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow.WindowClickType
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
-import gg.aquatic.waves.Waves
-import gg.aquatic.waves.inventory.event.AsyncPacketInventoryCloseEvent
-import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
-import gg.aquatic.waves.module.WavesModule
-import gg.aquatic.waves.module.WaveModules
-import gg.aquatic.waves.util.*
-import gg.aquatic.waves.util.event.call
-import gg.aquatic.waves.util.event.event
-import io.github.retrooper.packetevents.util.SpigotConversionUtil
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.inventory.ItemStack
-import java.util.Optional
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.jvm.optionals.getOrNull
-
 //object InventoryManager : WavesModule {
 //
 //    val openedInventories = ConcurrentHashMap<Player, PacketInventory>()

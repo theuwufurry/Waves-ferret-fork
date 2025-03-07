@@ -1,7 +1,7 @@
 package gg.aquatic.waves.util.action.impl
 
-import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.item.AquaticItem
+import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.util.argument.ObjectArguments
 import gg.aquatic.waves.util.argument.impl.ItemObjectArgument
 import gg.aquatic.waves.util.generic.Action

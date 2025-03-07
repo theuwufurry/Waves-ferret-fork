@@ -10,8 +10,6 @@ import gg.aquatic.waves.packetevents.EntityDataBuilder.Companion.values
 import gg.aquatic.waves.packetevents.type.*
 import net.kyori.adventure.text.Component
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashMap
 
 open class EntityDataBuilder {
 

@@ -1,9 +1,9 @@
 package gg.aquatic.waves.interactable.type
 
-import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.fake.block.FakeBlock
 import gg.aquatic.waves.interactable.Interactable
 import gg.aquatic.waves.interactable.InteractableInteractEvent
+import gg.aquatic.waves.util.audience.AquaticAudience
 import org.bukkit.Location
 import org.bukkit.entity.Player
 

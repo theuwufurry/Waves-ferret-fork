@@ -1,11 +1,11 @@
 package gg.aquatic.waves.menu
 
-import gg.aquatic.waves.Waves
 //import gg.aquatic.waves.inventory.InventoryManager
+import gg.aquatic.waves.Waves
 import gg.aquatic.waves.inventory.PacketInventory
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
-import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.runAsyncTimer
 

@@ -1,8 +1,8 @@
 package gg.aquatic.waves.util.logger
 
+import gg.aquatic.waves.Waves
 import gg.aquatic.waves.util.logger.type.DebugLogger
 import gg.aquatic.waves.util.logger.type.InfoLogger
-import gg.aquatic.waves.Waves
 
 object AquaticLogger {
 

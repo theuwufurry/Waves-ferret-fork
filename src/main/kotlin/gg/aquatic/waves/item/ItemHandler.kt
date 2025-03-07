@@ -1,8 +1,8 @@
 package gg.aquatic.waves.item
 
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.registry.isAquaticItem
 import gg.aquatic.waves.registry.registryId
 import gg.aquatic.waves.util.event.call

@@ -1,7 +1,7 @@
 package gg.aquatic.waves.util.price.impl
 
-import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.item.AquaticItem
+import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.util.argument.impl.ItemObjectArgument
 import gg.aquatic.waves.util.item.toCustomItem
 import gg.aquatic.waves.util.price.AbstractPrice

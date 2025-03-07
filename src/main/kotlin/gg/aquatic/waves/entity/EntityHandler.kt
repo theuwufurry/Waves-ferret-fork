@@ -3,16 +3,12 @@ package gg.aquatic.waves.entity
 import com.github.retrooper.packetevents.event.PacketListenerPriority
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
+import com.github.retrooper.packetevents.wrapper.play.server.*
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
-import gg.aquatic.waves.util.event.event
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.util.collection.mapPair
+import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player
 import gg.aquatic.waves.util.toUser
@@ -20,7 +16,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import java.util.UUID
+import java.util.*
 
 object EntityHandler : WavesModule {
 

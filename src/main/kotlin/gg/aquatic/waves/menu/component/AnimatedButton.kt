@@ -4,7 +4,7 @@ import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import gg.aquatic.waves.menu.AquaticMenu
 import gg.aquatic.waves.menu.MenuComponent
 import org.bukkit.inventory.ItemStack
-import java.util.TreeMap
+import java.util.*
 
 class AnimatedButton(
     override val id: String,

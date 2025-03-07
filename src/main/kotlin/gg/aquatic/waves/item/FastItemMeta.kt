@@ -8,12 +8,7 @@ import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemEnc
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentType
 import com.github.retrooper.packetevents.protocol.item.enchantment.type.EnchantmentTypes
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound
-import com.github.retrooper.packetevents.protocol.nbt.NBTInt
-import com.github.retrooper.packetevents.protocol.nbt.NBTList
-import com.github.retrooper.packetevents.protocol.nbt.NBTNumber
-import com.github.retrooper.packetevents.protocol.nbt.NBTString
-import com.github.retrooper.packetevents.protocol.nbt.NBTType
+import com.github.retrooper.packetevents.protocol.nbt.*
 import gg.aquatic.waves.util.toJson
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.text.Component

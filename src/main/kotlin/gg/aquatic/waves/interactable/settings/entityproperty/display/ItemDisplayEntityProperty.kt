@@ -7,7 +7,6 @@ import gg.aquatic.waves.packetevents.type.ItemDisplayEntityDataBuilder
 import gg.aquatic.waves.util.item.loadFromYml
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.ItemDisplay.ItemDisplayTransform
-import org.bukkit.entity.Player
 
 interface ItemDisplayEntityProperty : EntityProperty {
 

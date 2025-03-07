@@ -1,10 +1,10 @@
 package gg.aquatic.waves.profile
 
+import gg.aquatic.waves.Waves
 import gg.aquatic.waves.data.DataDriver
 import gg.aquatic.waves.data.MySqlDriver
-import gg.aquatic.waves.Waves
-import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.profile.event.AsyncProfileLoadEvent
 import gg.aquatic.waves.profile.event.ProfileUnloadEvent
 import gg.aquatic.waves.profile.module.ProfileModule
@@ -20,8 +20,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.sql.Statement
-import java.util.Optional
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 object ProfilesModule : WavesModule {

@@ -4,20 +4,17 @@ import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType.Play
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.util.event.call
 import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player
 import gg.aquatic.waves.util.runAsync
-import gg.aquatic.waves.util.runSync
 import org.bukkit.Bukkit
-import org.bukkit.Chunk
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.world.ChunkUnloadEvent
-import java.util.UUID
-import java.util.concurrent.CompletableFuture
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 object ChunkTracker : WavesModule {

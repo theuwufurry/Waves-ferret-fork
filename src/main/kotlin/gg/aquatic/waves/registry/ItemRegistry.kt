@@ -1,8 +1,8 @@
 package gg.aquatic.waves.registry
 
 import gg.aquatic.waves.item.AquaticItem
-import gg.aquatic.waves.item.ItemHandler
 import gg.aquatic.waves.item.AquaticItemInteractEvent
+import gg.aquatic.waves.item.ItemHandler
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 

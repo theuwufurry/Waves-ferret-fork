@@ -16,9 +16,7 @@ import gg.aquatic.waves.util.requirement.ConfiguredRequirementWithFailActions
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
-import java.util.ArrayList
-import java.util.HashMap
-import java.util.TreeMap
+import java.util.*
 
 object MenuSerializer {
 

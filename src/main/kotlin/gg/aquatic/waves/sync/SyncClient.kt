@@ -18,7 +18,7 @@ import io.ktor.websocket.*
 import io.ktor.websocket.readText
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class SyncClient(

@@ -1,9 +1,7 @@
 package gg.aquatic.waves.interactable.settings
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
-import com.github.retrooper.packetevents.protocol.player.Equipment
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot
-import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.interactable.Interactable
 import gg.aquatic.waves.interactable.InteractableInteractEvent
@@ -12,6 +10,7 @@ import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.type.EntityInteractable
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.registry.serializer.EntityPropertySerializer
+import gg.aquatic.waves.util.audience.AquaticAudience
 import gg.aquatic.waves.util.collection.mapPair
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection

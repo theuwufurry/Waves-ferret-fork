@@ -17,7 +17,6 @@ import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import java.util.*
-import kotlin.collections.ArrayList
 
 class NPCInteractableSettings(
     val userProfile: UserProfile,

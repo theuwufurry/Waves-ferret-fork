@@ -4,7 +4,7 @@ import gg.aquatic.waves.Waves
 import gg.aquatic.waves.module.WaveModules
 import gg.aquatic.waves.profile.module.ProfileModuleEntry
 import org.bukkit.entity.Player
-import java.util.UUID
+import java.util.*
 
 class AquaticPlayer(
     val index: Int,

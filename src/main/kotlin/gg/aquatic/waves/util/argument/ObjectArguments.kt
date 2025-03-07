@@ -1,6 +1,5 @@
 package gg.aquatic.waves.util.argument
 
-import gg.aquatic.waves.item.AquaticItem
 import org.bukkit.util.Vector
 
 class ObjectArguments(

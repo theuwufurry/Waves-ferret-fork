@@ -1,6 +1,5 @@
 package gg.aquatic.waves.util.audience
 
-import gg.aquatic.waves.util.audience.MutableAquaticAudience
 import org.bukkit.entity.Player
 import java.util.*
 

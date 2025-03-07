@@ -4,8 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import gg.aquatic.waves.sync.packet.PacketResponse
 import gg.aquatic.wavessync.api.packet.SyncPacket
-import kotlinx.coroutines.*
-import java.util.concurrent.CompletableFuture
+import kotlinx.coroutines.runBlocking
 
 object SyncHandler {
 

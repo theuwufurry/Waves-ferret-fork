@@ -1,8 +1,8 @@
 package gg.aquatic.waves.registry.serializer
 
-import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.registry.WavesRegistry
 import gg.aquatic.waves.registry.getAction
+import gg.aquatic.waves.util.argument.AquaticObjectArgument
 import gg.aquatic.waves.util.generic.ConfiguredExecutableObject
 import org.bukkit.configuration.ConfigurationSection
 

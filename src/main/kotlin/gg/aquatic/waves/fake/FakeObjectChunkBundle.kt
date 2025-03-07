@@ -1,8 +1,8 @@
 package gg.aquatic.waves.fake
 
 import gg.aquatic.waves.chunk.cache.ChunkObject
-import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.fake.block.FakeBlock
+import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.fake.npc.FakePlayer
 import java.util.concurrent.ConcurrentHashMap
 

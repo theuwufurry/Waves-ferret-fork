@@ -6,7 +6,6 @@ import gg.aquatic.waves.util.argument.impl.PrimitiveObjectArgument
 import gg.aquatic.waves.util.generic.Action
 import gg.aquatic.waves.util.runAsync
 import me.micartey.webhookly.DiscordWebhook
-import me.micartey.webhookly.embeds.EmbedObject
 import org.bukkit.entity.Player
 
 class DiscordWebhookAction : Action<Player> {

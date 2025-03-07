@@ -13,11 +13,9 @@ import gg.aquatic.waves.chunk.cache.ChunkCacheHandler
 import gg.aquatic.waves.chunk.chunkId
 import gg.aquatic.waves.fake.block.FakeBlock
 import gg.aquatic.waves.fake.block.FakeBlockInteractEvent
-import gg.aquatic.waves.fake.entity.FakeEntity
 import gg.aquatic.waves.fake.entity.FakeEntityInteractEvent
-import gg.aquatic.waves.fake.npc.FakePlayer
-import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.util.event.event
 import gg.aquatic.waves.util.packetEvent
 import gg.aquatic.waves.util.player

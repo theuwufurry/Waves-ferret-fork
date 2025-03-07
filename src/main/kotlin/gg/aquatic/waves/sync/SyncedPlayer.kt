@@ -1,6 +1,6 @@
 package gg.aquatic.waves.sync
 
-import java.util.UUID
+import java.util.*
 
 class SyncedPlayer(
     val uuid: UUID,
