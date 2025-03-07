@@ -58,11 +58,11 @@ dependencies {
 //    compileOnly("io.lumine:Mythic-Dist:5.6.1")
 //    compileOnly("io.lumine:MythicLib-dist:1.6.2-SNAPSHOT")
 //    compileOnly("net.Indyuce:MMOItems-API:6.9.5-SNAPSHOT")
-    compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
+//    compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
     implementation("com.github.micartey:webhookly:master-SNAPSHOT")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
-    compileOnly("com.willfp:eco:6.74.5")
+//    compileOnly("com.willfp:eco:6.74.5")
 
     //implementation("net.wesjd:anvilgui:1.10.4-SNAPSHOT")
 }

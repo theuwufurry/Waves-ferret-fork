@@ -14,8 +14,8 @@ import gg.aquatic.waves.interactable.settings.entityproperty.display.DisplayEnti
 import gg.aquatic.waves.interactable.settings.entityproperty.display.ItemDisplayEntityProperty
 import gg.aquatic.waves.item.AquaticItem
 import gg.aquatic.waves.item.factory.Base64Factory
-import gg.aquatic.waves.item.factory.EcoFactory
-import gg.aquatic.waves.item.factory.HDBFactory
+//import gg.aquatic.waves.item.factory.EcoFactory
+//import gg.aquatic.waves.item.factory.HDBFactory
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.ItemEntityDataBuilder
 import gg.aquatic.waves.packetevents.type.TextDisplayEntityDataBuilder
@@ -59,9 +59,9 @@ object WavesRegistry {
     val ITEM_FACTORIES = hashMapOf(
 //        "MYTHICITEM" to MMFactory,
 //        "ORAXEN" to OraxenFactory,
-        "HDB" to HDBFactory,
+//        "HDB" to HDBFactory,
 //        "ITEMSADDER" to IAFactory,
-        "ECO" to EcoFactory,
+//        "ECO" to EcoFactory,
         "BASE64" to Base64Factory,
 //        "MMOITEM" to MMOFactory
     )
