@@ -1,7 +1,7 @@
 package gg.aquatic.waves.menu
 
 import gg.aquatic.waves.Waves
-import gg.aquatic.waves.inventory.InventoryManager
+//import gg.aquatic.waves.inventory.InventoryManager
 import gg.aquatic.waves.inventory.PacketInventory
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
 import gg.aquatic.waves.module.WavesModule
@@ -25,13 +25,13 @@ object MenuHandler : WavesModule {
 
     private fun tickInventories() {
         val ticked = hashSetOf<PacketInventory>()
-        for (openedInventory in InventoryManager.openedInventories.values) {
-            if (ticked.contains(openedInventory)) continue
-            ticked += openedInventory
-            if (openedInventory is AquaticMenu) {
-                openedInventory.tick()
-            }
-        }
+//        for (openedInventory in InventoryManager.openedInventories.values) {
+//            if (ticked.contains(openedInventory)) continue
+//            ticked += openedInventory
+//            if (openedInventory is AquaticMenu) {
+//                openedInventory.tick()
+//            }
+//        }
     }
 
     override fun disable(waves: Waves) {

@@ -35,7 +35,7 @@ class Waves : JavaPlugin() {
         WaveModules.FAKE_OBJECTS to FakeObjectHandler,
         WaveModules.CHUNK_TRACKER to ChunkTracker,
         WaveModules.INTERACTABLES to InteractableHandler,
-        WaveModules.INVENTORIES to gg.aquatic.waves.inventory.InventoryManager,
+//        WaveModules.INVENTORIES to gg.aquatic.waves.inventory.InventoryManager,
         WaveModules.MENUS to MenuHandler,
         WaveModules.HOLOGRAMS to HologramHandler,
         WaveModules.INPUT to InputModule

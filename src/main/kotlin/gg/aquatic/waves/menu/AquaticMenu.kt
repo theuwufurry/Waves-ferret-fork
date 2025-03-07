@@ -1,6 +1,6 @@
 package gg.aquatic.waves.menu
 
-import gg.aquatic.waves.inventory.InventoryManager
+//import gg.aquatic.waves.inventory.InventoryManager
 import gg.aquatic.waves.inventory.InventoryType
 import gg.aquatic.waves.inventory.PacketInventory
 import gg.aquatic.waves.inventory.event.AsyncPacketInventoryInteractEvent
@@ -19,9 +19,9 @@ open class AquaticMenu(
     val renderedComponents = ConcurrentHashMap<Int,String>()
     val componentStates = ConcurrentHashMap<String,ComponentState>()
 
-    open fun open(player: Player) {
-        InventoryManager.openMenu(player, this)
-    }
+//    open fun open(player: Player) {
+//        InventoryManager.openMenu(player, this)
+//    }
 
     fun addComponent(component: MenuComponent) {
         components[component.id] = component
@@ -43,7 +43,7 @@ open class AquaticMenu(
         }
         for (slot in renderedToRemove) {
             renderedComponents.remove(slot)
-            this.setItem(slot,null)
+//            this.setItem(slot,null)
         }
         for ((_, component) in components) {
             updateComponent(component)
@@ -73,7 +73,7 @@ open class AquaticMenu(
                         continue
                     }
                 }
-                this.setItem(slot,item)
+//                this.setItem(slot,item)
                 continue
             }
             if (previousComponent.priority <= component.priority) {
@@ -83,7 +83,7 @@ open class AquaticMenu(
                         continue
                     }
                 }
-                this.setItem(slot,item)
+//                this.setItem(slot,item)
             }
         }
         remainingSlots ?: return
@@ -98,11 +98,11 @@ open class AquaticMenu(
             }
             if (comp == null) {
                 renderedComponents.remove(slot)
-                this.setItem(slot,null)
+//                this.setItem(slot,null)
                 continue
             }
             val i = comp.second.itemStack
-            this.setItem(slot,i)
+//            this.setItem(slot,i)
             renderedComponents[slot] = comp.first.id
         }
     }

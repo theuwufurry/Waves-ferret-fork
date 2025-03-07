@@ -67,7 +67,7 @@ object VanillaMenuInput : Input {
             val awaitingInput = AwaitingInput(player, future, this)
             awaiting += player to awaitingInput
 
-            menu.open()
+//            menu.open()
             return future
         }
 

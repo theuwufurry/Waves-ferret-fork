@@ -30,7 +30,7 @@ open class PacketInventory(
 
         for ((_, viewer) in viewers) {
             viewer.player.toUser()?.sendPacket(packet)
-            InventoryManager.updateInventoryContent(this, viewer)
+//            InventoryManager.updateInventoryContent(this, viewer)
         }
 
         return packet
@@ -47,30 +47,30 @@ open class PacketInventory(
         content[slot] = item
     }
 
-    fun setItem(slot: Int, item: ItemStack?) {
-        InventoryManager.updateItem(this, item, slot)
-    }
-    fun changeItems(items: Map<Int,ItemStack?>) {
-        InventoryManager.updateItems(this, items)
-    }
-    fun setItems(items: Map<Int, ItemStack>) {
-        this.content.clear()
-        this.content.putAll(items)
-        for ((_, viewer) in viewers) {
-            InventoryManager.updateInventoryContent(this, viewer)
-        }
-    }
-
-    fun updateItems(player: Player) {
-        val viewer = viewers[player.uniqueId] ?: return
-        InventoryManager.updateInventoryContent(this, viewer)
-    }
-
-    fun updateItems() {
-        for ((_, viewer) in viewers) {
-            InventoryManager.updateInventoryContent(this, viewer)
-        }
-    }
+//    fun setItem(slot: Int, item: ItemStack?) {
+//        InventoryManager.updateItem(this, item, slot)
+//    }
+//    fun changeItems(items: Map<Int,ItemStack?>) {
+//        InventoryManager.updateItems(this, items)
+//    }
+//    fun setItems(items: Map<Int, ItemStack>) {
+//        this.content.clear()
+//        this.content.putAll(items)
+//        for ((_, viewer) in viewers) {
+//            InventoryManager.updateInventoryContent(this, viewer)
+//        }
+//    }
+//
+//    fun updateItems(player: Player) {
+//        val viewer = viewers[player.uniqueId] ?: return
+//        InventoryManager.updateInventoryContent(this, viewer)
+//    }
+//
+//    fun updateItems() {
+//        for ((_, viewer) in viewers) {
+//            InventoryManager.updateInventoryContent(this, viewer)
+//        }
+//    }
 
     override fun clone(): PacketInventory {
         val inv = PacketInventory(title, type)
