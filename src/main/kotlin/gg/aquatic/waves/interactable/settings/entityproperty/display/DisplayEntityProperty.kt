@@ -3,16 +3,12 @@ package gg.aquatic.waves.interactable.settings.entityproperty.display
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.DisplayEntityDataBuilder
-import io.lumine.mythic.lib.math3.complex.Quaternion
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Display
 import org.bukkit.util.Transformation
 import org.joml.AxisAngle4f
-import org.joml.Math.toRadians
 import org.joml.Quaternionf
 import org.joml.Vector3f
-import kotlin.math.cos
-import kotlin.math.sin
 
 interface DisplayEntityProperty : EntityProperty {
 

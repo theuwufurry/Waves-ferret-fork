@@ -1,43 +1,37 @@
 package gg.aquatic.waves.registry
 
 import com.github.retrooper.packetevents.protocol.entity.pose.EntityPose
-import gg.aquatic.waves.util.price.AbstractPrice
-import gg.aquatic.waves.economy.RegisteredCurrency
 import gg.aquatic.waves.hologram.line.AnimatedHologramLine
 import gg.aquatic.waves.hologram.line.ItemHologramLine
 import gg.aquatic.waves.hologram.line.TextHologramLine
-import gg.aquatic.waves.input.Input
 import gg.aquatic.waves.input.impl.ChatInput
 import gg.aquatic.waves.input.impl.VanillaMenuInput
-import gg.aquatic.waves.interactable.settings.*
+import gg.aquatic.waves.interactable.settings.EntityInteractableSettings
+import gg.aquatic.waves.interactable.settings.ItemDisplayInteractableSettings
+import gg.aquatic.waves.interactable.settings.NPCInteractableSettings
 import gg.aquatic.waves.interactable.settings.entityproperty.EntityProperty
 import gg.aquatic.waves.interactable.settings.entityproperty.display.DisplayEntityProperty
 import gg.aquatic.waves.interactable.settings.entityproperty.display.ItemDisplayEntityProperty
 import gg.aquatic.waves.item.AquaticItem
-import gg.aquatic.waves.item.factory.*
+import gg.aquatic.waves.item.factory.Base64Factory
+import gg.aquatic.waves.item.factory.EcoFactory
+import gg.aquatic.waves.item.factory.HDBFactory
 import gg.aquatic.waves.packetevents.EntityDataBuilder
 import gg.aquatic.waves.packetevents.type.ItemEntityDataBuilder
 import gg.aquatic.waves.packetevents.type.TextDisplayEntityDataBuilder
-import gg.aquatic.waves.util.action.*
-import gg.aquatic.waves.util.action.impl.discord.DiscordWebhookAction
 import gg.aquatic.waves.util.action.impl.*
-import gg.aquatic.waves.util.currency.Currency
+import gg.aquatic.waves.util.action.impl.discord.DiscordWebhookAction
 import gg.aquatic.waves.util.generic.Action
 import gg.aquatic.waves.util.generic.Condition
 import gg.aquatic.waves.util.item.loadFromYml
-import gg.aquatic.waves.util.price.impl.ItemPrice
-import gg.aquatic.waves.util.price.impl.VaultPrice
 import gg.aquatic.waves.util.statistic.StatisticType
 import gg.aquatic.waves.util.statistic.impl.BlockBreakStatistic
 import gg.aquatic.waves.util.toMMComponent
-import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 
 object WavesRegistry {
 
-    val INDEX_TO_CURRENCY = HashMap<Int, RegisteredCurrency>()
-    val ECONOMY = HashMap<String, Currency>()
     val ACTION = HashMap<Class<*>, MutableMap<String, Action<*>>>().apply {
         val p = getOrPut(Player::class.java) { HashMap() }
         p["actionbar"] = ActionbarAction()
@@ -54,35 +48,35 @@ object WavesRegistry {
         //val p = getOrPut(Player::class.java) { HashMap() }
         //p += "expression" to ExpressionPlayerRequirement()
     }
-    val PRICE by lazy {
-        HashMap<Class<*>, MutableMap<String, AbstractPrice<*>>>().apply {
-            val p = getOrPut(Player::class.java) { HashMap() }
-            p["item"] = ItemPrice()
-            if (Bukkit.getPluginManager().getPlugin("Vault") != null)
-                p["vault"] = VaultPrice()
-        }
-    }
+//    val PRICE by lazy {
+//        HashMap<Class<*>, MutableMap<String, AbstractPrice<*>>>().apply {
+//            val p = getOrPut(Player::class.java) { HashMap() }
+//            p["item"] = ItemPrice()
+//            if (Bukkit.getPluginManager().getPlugin("Vault") != null)
+//                p["vault"] = VaultPrice()
+//        }
+//    }
     val ITEM_FACTORIES = hashMapOf(
-        "MYTHICITEM" to MMFactory,
-        "ORAXEN" to OraxenFactory,
+//        "MYTHICITEM" to MMFactory,
+//        "ORAXEN" to OraxenFactory,
         "HDB" to HDBFactory,
-        "ITEMSADDER" to IAFactory,
+//        "ITEMSADDER" to IAFactory,
         "ECO" to EcoFactory,
         "BASE64" to Base64Factory,
-        "MMOITEM" to MMOFactory
+//        "MMOITEM" to MMOFactory
     )
 
-    val BLOCK_FACTORIES = hashMapOf(
-        "ITEMSADDER" to gg.aquatic.waves.util.block.factory.IAFactory,
-        "ORAXEN" to gg.aquatic.waves.util.block.factory.OraxenFactory,
-    )
+//    val BLOCK_FACTORIES = hashMapOf(
+//        "ITEMSADDER" to gg.aquatic.waves.util.block.factory.IAFactory,
+//        "ORAXEN" to gg.aquatic.waves.util.block.factory.OraxenFactory,
+//    )
 
     val INTERACTABLE_FACTORIES = hashMapOf(
-        "ORAXEN_FURNITURE" to OraxenEntityInteractableSettings.Companion,
+//        "ORAXEN_FURNITURE" to OraxenEntityInteractableSettings.Companion,
         "ENTITY" to EntityInteractableSettings.Companion,
         "NPC" to NPCInteractableSettings.Companion,
-        "BLOCK" to BlockInteractableSettings.Companion,
-        "MODELENGINE" to MEGInteractableSettings.Companion,
+//        "BLOCK" to BlockInteractableSettings.Companion,
+//        "MODELENGINE" to MEGInteractableSettings.Companion,
         "ITEM_MODEL" to ItemDisplayInteractableSettings.Companion
     )
 

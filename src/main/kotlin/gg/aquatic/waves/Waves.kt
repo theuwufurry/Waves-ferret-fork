@@ -1,22 +1,20 @@
 package gg.aquatic.waves
 
+//import gg.aquatic.waves.interactable.InteractableHandler
 import com.github.retrooper.packetevents.PacketEvents
 import com.tcoded.folialib.FoliaLib
-import gg.aquatic.waves.data.MySqlDriver
-import gg.aquatic.waves.data.SQLiteDriver
 import gg.aquatic.waves.chunk.ChunkTracker
 import gg.aquatic.waves.command.AquaticBaseCommand
 import gg.aquatic.waves.command.impl.ItemConvertCommand
 import gg.aquatic.waves.command.register
+import gg.aquatic.waves.data.MySqlDriver
+import gg.aquatic.waves.data.SQLiteDriver
 import gg.aquatic.waves.entity.EntityHandler
 import gg.aquatic.waves.fake.FakeObjectHandler
 import gg.aquatic.waves.hologram.HologramHandler
-import gg.aquatic.waves.input.InputModule
-import gg.aquatic.waves.interactable.InteractableHandler
 import gg.aquatic.waves.item.ItemHandler
-import gg.aquatic.waves.menu.MenuHandler
-import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.module.WaveModules
+import gg.aquatic.waves.module.WavesModule
 import gg.aquatic.waves.profile.ProfilesModule
 import gg.aquatic.waves.sync.SyncHandler
 import gg.aquatic.waves.sync.SyncSettings
@@ -34,11 +32,11 @@ class Waves : JavaPlugin() {
         WaveModules.ENTITIES to EntityHandler,
         WaveModules.FAKE_OBJECTS to FakeObjectHandler,
         WaveModules.CHUNK_TRACKER to ChunkTracker,
-        WaveModules.INTERACTABLES to InteractableHandler,
+//        WaveModules.INTERACTABLES to InteractableHandler,
 //        WaveModules.INVENTORIES to gg.aquatic.waves.inventory.InventoryManager,
-        WaveModules.MENUS to MenuHandler,
+//        WaveModules.MENUS to MenuHandler,
         WaveModules.HOLOGRAMS to HologramHandler,
-        WaveModules.INPUT to InputModule
+//        WaveModules.INPUT to InputModule
     )
     lateinit var configValues: WavesConfig
     /**
